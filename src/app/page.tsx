@@ -23,7 +23,7 @@ import {
   Play, 
   Headphones, 
   ExternalLink,
-  Award, 
+  Award,
   Trophy, 
   Star, 
   Medal, 
@@ -41,11 +41,11 @@ import {
   Eye
 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import type { SocialMediaPost, NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/types';
+import type { NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/types';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
 import { useFirebase } from '@/firebase/provider';
-import { getNewsArticles, getSocialMediaPosts, getGalleryImages, getResources, getInterviewsAndPodcasts } from '@/lib/services';
+import { getNewsArticles, getGalleryImages, getResources, getInterviewsAndPodcasts } from '@/lib/services';
 
 const socialIcons: { [key: string]: React.ReactNode } = {
   Twitter: <Twitter className="h-6 w-6 text-sky-500" />,
@@ -111,18 +111,52 @@ const slides = [
   PlaceHolderImages.find(p => p.id === 'gallery-3'),
 ].filter(Boolean) as (typeof PlaceHolderImages[0])[];
 
+const socialPosts = [
+  {
+    id: '1',
+    platform: 'Facebook',
+    content: 'Great discussion with local leaders about the new community development projects. Together, we can build a better future for everyone. #CommunityFirst #Development',
+    imageUrl: '/images/followus/post1.jpg',
+    likes: 1200,
+    comments: 85,
+    shares: 45,
+    timestamp: '2h ago',
+    url: '#',
+  },
+  {
+    id: '2',
+    platform: 'Instagram',
+    content: 'Inspiring visit to the youth skill development center today! So much talent and potential. We must continue to support and empower our young generation. ✨',
+    imageUrl: '/images/followus/post2.jpg',
+    likes: 2500,
+    comments: 150,
+    shares: 20,
+    timestamp: '1d ago',
+    url: '#',
+  },
+  {
+    id: '3',
+    platform: 'Twitter',
+    content: 'Announcing a new scholarship program for meritorious students from underprivileged backgrounds. Education is the key to unlocking potential. More details will be shared soon. #EducationForAll',
+    imageUrl: '/images/followus/post3.jpg',
+    likes: 800,
+    comments: 60,
+    shares: 112,
+    timestamp: '3d ago',
+    url: '#',
+  },
+];
+
 
 export default function Home() {
     const { firestore } = useFirebase();
     const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
-    const [socialPosts, setSocialPosts] = useState<SocialMediaPost[]>([]);
     const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
     const [interviewsAndPodcasts, setInterviewsAndPodcasts] = useState<InterviewAndPodcast[]>([]);
 
     useEffect(() => {
         if (firestore) {
             getNewsArticles(firestore).then(setNewsArticles);
-            getSocialMediaPosts(firestore).then(setSocialPosts);
             getGalleryImages(firestore).then(setGalleryImages);
             getInterviewsAndPodcasts(firestore).then(setInterviewsAndPodcasts);
         }
@@ -299,7 +333,7 @@ export default function Home() {
                 <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Twitter</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {filteredSocialPosts.map((post: SocialMediaPost) => (
+                {filteredSocialPosts.map((post) => (
                     <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
                         {post.imageUrl &&
                             <div className="relative">
