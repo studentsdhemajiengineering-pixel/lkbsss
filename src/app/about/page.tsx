@@ -20,7 +20,7 @@ export default function AboutPage() {
             <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
               About Luit Kumar Barman
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
               Engineer • Film Producer • Social Activist • Author
             </p>
           </header>

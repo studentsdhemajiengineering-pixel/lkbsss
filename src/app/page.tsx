@@ -186,7 +186,7 @@ export default function Home() {
                 </div>
                 <h2 className="text-4xl font-bold text-gray-900 mb-6 font-headline">
                   Luit Kumar Barman
-                  <span className="block text-primary">Engineer • Film Producer • Social Activist</span>
+                  <span className="text-xl text-primary font-normal block">Engineer • Film Producer • Social Activist</span>
                 </h2>
                 <p className="text-lg text-gray-600 leading-relaxed">
                   Luit Kumar Barman is an engineer by education. Presently, he is the Managing Director of Medishine 
@@ -240,7 +240,7 @@ export default function Home() {
           <div className="relative">
             <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full hidden md:block"></div>
             
-            <div className="space-y-8 md:space-y-4">
+            <div className="space-y-4 md:space-y-2">
               {awards.map((award, index) => {
                 const IconComponent = award.icon;
                 const isLeft = award.side === 'left';
@@ -474,8 +474,8 @@ export default function Home() {
                  <Image
                       src="/images/book-cover.jpg"
                       alt="Book Cover"
-                      width={300}
-                      height={400}
+                      width={280}
+                      height={380}
                       className="rounded-xl shadow-2xl mx-auto"
                     />
               </div>
@@ -596,3 +596,4 @@ export default function Home() {
     
 
     
+
