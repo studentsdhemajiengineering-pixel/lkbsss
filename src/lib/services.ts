@@ -43,7 +43,7 @@ const addServiceRequest = <T extends Omit<ServiceRequest, 'id' | 'submittedAt' |
     }
 
     const userSubcollectionRef = collection(db, 'users', userId, collectionName);
-    const newDocRef = doc(userSubcollectionRef); // Creates a reference with a new auto-generated ID
+    const newDocRef = doc(userSubcollectionRef);
 
     const payload = {
         ...data,
@@ -61,7 +61,6 @@ const addServiceRequest = <T extends Omit<ServiceRequest, 'id' | 'submittedAt' |
                 requestResourceData: payload,
             });
             errorEmitter.emit('permission-error', permissionError);
-            // Reject the promise so the calling function's catch block is triggered
             return Promise.reject(permissionError);
         });
 };
@@ -92,46 +91,53 @@ export const getSocialMediaPosts = (db: any): Promise<SocialMediaPost[]> => getC
 
 
 const getServiceRequests = async (db: any, collectionName: string, userId?: string) => {
-    if (!userId) return []; // Cannot fetch requests without a user ID
-
-    // Path: /users/{userId}/{collectionName}
-    const collectionRef = collection(db, 'users', userId, collectionName);
-    const q = query(collectionRef, orderBy("submittedAt", "desc"));
-    
-    const snapshot = await getDocs(q);
-     if (snapshot.empty) {
-        return [];
+    if (!userId) {
+        // For admin: get all requests from all users for a specific collection
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const allRequests: any[] = [];
+        for (const userDoc of usersSnapshot.docs) {
+            const userSubcollectionRef = collection(db, 'users', userDoc.id, collectionName);
+            const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
+            const requestsSnapshot = await getDocs(q);
+            requestsSnapshot.forEach(doc => {
+                allRequests.push({ 
+                    id: doc.id, 
+                    ...doc.data(), 
+                    submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString(),
+                    userId: userDoc.id // Ensure userId is included for admin
+                });
+            });
+        }
+        allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+        return allRequests;
+    } else {
+        // For a specific user: get their requests from a specific collection
+        const userSubcollectionRef = collection(db, 'users', userId, collectionName);
+        const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+            return [];
+        }
+        return snapshot.docs.map(doc => ({ 
+            id: doc.id, 
+            ...doc.data(), 
+            submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() 
+        }));
     }
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() }));
 };
 
-const getAllServiceRequestsForAdmin = async (db: any, collectionName: string) => {
-    const usersSnapshot = await getDocs(collection(db, 'users'));
-    const allRequests: any[] = [];
-    for (const userDoc of usersSnapshot.docs) {
-        const userId = userDoc.id;
-        const requestsRef = collection(db, 'users', userId, collectionName);
-        const requestsSnapshot = await getDocs(query(requestsRef, orderBy("submittedAt", "desc")));
-        requestsSnapshot.forEach(doc => {
-            allRequests.push({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString(), userId: userId });
-        });
-    }
-    allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-    return allRequests;
-};
-
-export const getAppointments = (db: any, userId?: string): Promise<Appointment[]> => userId ? getServiceRequests(db, 'appointments', userId) as Promise<Appointment[]> : getAllServiceRequestsForAdmin(db, 'appointments');
-export const getGrievances = (db: any, userId?: string): Promise<Grievance[]> => userId ? getServiceRequests(db, 'grievances', userId) as Promise<Grievance[]> : getAllServiceRequestsForAdmin(db, 'grievances');
-export const getHealthRequests = (db: any, userId?: string): Promise<HealthRequest[]> => userId ? getServiceRequests(db, 'health-requests', userId) as Promise<HealthRequest[]> : getAllServiceRequestsForAdmin(db, 'health-requests');
-export const getEducationRequests = (db: any, userId?: string): Promise<EducationRequest[]> => userId ? getServiceRequests(db, 'education-requests', userId) as Promise<EducationRequest[]> : getAllServiceRequestsForAdmin(db, 'education-requests');
-export const getRealEstateRequests = (db: any, userId?: string): Promise<RealEstateRequest[]> => userId ? getServiceRequests(db, 'real-estate-requests', userId) as Promise<RealEstateRequest[]> : getAllServiceRequestsForAdmin(db, 'real-estate-requests');
-export const getInvitationRequests = (db: any, userId?: string): Promise<InvitationRequest[]> => userId ? getServiceRequests(db, 'invitation-requests', userId) as Promise<InvitationRequest[]> : getAllServiceRequestsForAdmin(db, 'invitation-requests');
+export const getAppointments = (db: any, userId?: string): Promise<Appointment[]> => getServiceRequests(db, 'appointments', userId);
+export const getGrievances = (db: any, userId?: string): Promise<Grievance[]> => getServiceRequests(db, 'grievances', userId);
+export const getHealthRequests = (db: any, userId?: string): Promise<HealthRequest[]> => getServiceRequests(db, 'health-requests', userId);
+export const getEducationRequests = (db: any, userId?: string): Promise<EducationRequest[]> => getServiceRequests(db, 'education-requests', userId);
+export const getRealEstateRequests = (db: any, userId?: string): Promise<RealEstateRequest[]> => getServiceRequests(db, 'real-estate-requests', userId);
+export const getInvitationRequests = (db: any, userId?: string): Promise<InvitationRequest[]> => getServiceRequests(db, 'invitation-requests', userId);
 
 
 export const updateServiceRequestStatus = async (db: any, collectionName: string, id: string, status: string, userId: string) => {
     const docRef = doc(db, 'users', userId, collectionName, id);
     const payload = { status };
-    updateDoc(docRef, payload)
+    await updateDoc(docRef, payload)
         .catch(error => {
             errorEmitter.emit(
                 'permission-error',
@@ -141,12 +147,13 @@ export const updateServiceRequestStatus = async (db: any, collectionName: string
                     requestResourceData: payload,
                 })
             );
+            return Promise.reject(error);
         });
 };
 
 export const deleteServiceRequest = async (db: any, collectionName: string, id: string, userId: string) => {
     const docRef = doc(db, 'users', userId, collectionName, id);
-    deleteDoc(docRef)
+    await deleteDoc(docRef)
         .catch(error => {
             errorEmitter.emit(
                 'permission-error',
@@ -155,6 +162,7 @@ export const deleteServiceRequest = async (db: any, collectionName: string, id: 
                     operation: 'delete',
                 })
             );
+            return Promise.reject(error);
         });
 };
 
@@ -165,7 +173,7 @@ export const addContent = async (db: any, collectionName: string, data: Partial<
         ...data,
         published_at: serverTimestamp()
     };
-    addDoc(collRef, payload)
+    await addDoc(collRef, payload)
         .catch(error => {
             errorEmitter.emit(
                 'permission-error',
@@ -175,12 +183,13 @@ export const addContent = async (db: any, collectionName: string, data: Partial<
                     requestResourceData: payload,
                 })
             );
+             return Promise.reject(error);
         });
 };
 
 export const updateContent = async (db: any, collectionName: string, id: string, data: Partial<Content>) => {
     const docRef = doc(db, collectionName, id);
-    updateDoc(docRef, data)
+    await updateDoc(docRef, data)
         .catch(error => {
             errorEmitter.emit(
                 'permission-error',
@@ -190,12 +199,13 @@ export const updateContent = async (db: any, collectionName: string, id: string,
                     requestResourceData: data,
                 })
             );
+             return Promise.reject(error);
         });
 };
 
 export const deleteContent = async (db: any, collectionName: string, id: string) => {
     const docRef = doc(db, collectionName, id);
-    deleteDoc(docRef)
+    await deleteDoc(docRef)
         .catch(error => {
             errorEmitter.emit(
                 'permission-error',
@@ -204,6 +214,7 @@ export const deleteContent = async (db: any, collectionName: string, id: string)
                     operation: 'delete',
                 })
             );
+             return Promise.reject(error);
         });
 };
 

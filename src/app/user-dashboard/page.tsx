@@ -18,6 +18,7 @@ import { getStatusColor } from '@/lib/status-helpers';
 import { Home, User, BarChart2, Loader2, LogOut, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
+import type { Appointment, Grievance, HealthRequest, EducationRequest, RealEstateRequest, InvitationRequest } from '@/lib/types';
 
 type ServiceRequest = {
   id: string;
@@ -47,6 +48,7 @@ export default function UserDashboardPage() {
         setLoading(true);
         
         try {
+          // Fetch all request types for the current user
           const [appointments, grievances, health, education, realEstate, invitations] = await Promise.all([
             getAppointments(firestore, user.uid),
             getGrievances(firestore, user.uid),
@@ -58,15 +60,18 @@ export default function UserDashboardPage() {
 
           const allRequests: ServiceRequest[] = [];
 
-          appointments.forEach(req => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
-          grievances.forEach(req => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
-          health.forEach(req => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
-          education.forEach(req => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
-          realEstate.forEach(req => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
-          invitations.forEach(req => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
+          // Process and combine all requests into a single list
+          appointments.forEach((req: Appointment) => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
+          grievances.forEach((req: Grievance) => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
+          health.forEach((req: HealthRequest) => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
+          education.forEach((req: EducationRequest) => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
+          realEstate.forEach((req: RealEstateRequest) => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
+          invitations.forEach((req: InvitationRequest) => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
 
+          // Sort all requests by submission date, most recent first
           allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
           setRequests(allRequests);
+
         } catch (error) {
             console.error("Failed to fetch user requests:", error);
         } finally {
@@ -76,7 +81,6 @@ export default function UserDashboardPage() {
 
       fetchRequests();
     } else if (!isUserLoading && !user) {
-      // If user is not logged in and we are not in a loading state, stop loading.
       setLoading(false);
     }
   }, [user, firestore, isUserLoading]);
@@ -88,10 +92,18 @@ export default function UserDashboardPage() {
     }
   };
 
-  if (isUserLoading || (!user && !isUserLoading)) {
+  if (isUserLoading || loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (!user) {
+     return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Please log in to see your dashboard.</p>
       </div>
     );
   }
@@ -150,44 +162,38 @@ export default function UserDashboardPage() {
                 <CardTitle>My Service Requests</CardTitle>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex justify-center items-center h-48">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                      <TableHeader>
-                          <TableRow>
-                              <TableHead>Reference</TableHead>
-                              <TableHead>Service Type</TableHead>
-                              <TableHead>Details</TableHead>
-                              <TableHead>Submitted On</TableHead>
-                              <TableHead>Status</TableHead>
-                          </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                          {requests.length > 0 ? requests.map(req => (
-                              <TableRow key={req.id}>
-                                  <TableCell className="font-mono text-xs">{req.reference.toUpperCase()}</TableCell>
-                                  <TableCell>{req.type}</TableCell>
-                                  <TableCell className="text-muted-foreground">{req.details}</TableCell>
-                                  <TableCell>{new Date(req.submittedAt).toLocaleDateString()}</TableCell>
-                                  <TableCell>
-                                      <Badge variant="outline" className={`${getStatusColor(req.status)} capitalize`}>
-                                          {req.status.replace(/_/g, ' ')}
-                                      </Badge>
-                                  </TableCell>
-                              </TableRow>
-                          )) : (
-                              <TableRow>
-                                  <TableCell colSpan={5} className="text-center h-24">You have not submitted any service requests yet.</TableCell>
-                              </TableRow>
-                          )}
-                      </TableBody>
-                  </Table>
-                </div>
-              )}
+              <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Reference</TableHead>
+                            <TableHead>Service Type</TableHead>
+                            <TableHead>Details</TableHead>
+                            <TableHead>Submitted On</TableHead>
+                            <TableHead>Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {requests.length > 0 ? requests.map(req => (
+                            <TableRow key={req.id}>
+                                <TableCell className="font-mono text-xs">{req.reference.toUpperCase()}</TableCell>
+                                <TableCell>{req.type}</TableCell>
+                                <TableCell className="text-muted-foreground">{req.details}</TableCell>
+                                <TableCell>{new Date(req.submittedAt).toLocaleDateString()}</TableCell>
+                                <TableCell>
+                                    <Badge variant="outline" className={`${getStatusColor(req.status)} capitalize`}>
+                                        {req.status.replace(/_/g, ' ')}
+                                    </Badge>
+                                </TableCell>
+                            </TableRow>
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center h-24">You have not submitted any service requests yet.</TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+              </div>
             </CardContent>
         </Card>
       </div>
