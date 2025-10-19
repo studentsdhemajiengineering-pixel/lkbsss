@@ -19,6 +19,7 @@ import {
 import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Image from "next/image"
 
 const adminNavLinks = [
   { href: "/admin", label: "Dashboard", icon: Home },
@@ -29,6 +30,20 @@ const adminNavLinks = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
+function AdminLogo() {
+    return (
+        <Link href="/" className="flex items-center space-x-3" prefetch={false}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+                <Image src="/images/logo-profile.jpg" alt="Luit Kumar Barman" width={40} height={40} className="object-cover"/>
+            </div>
+            <div>
+                <h1 className="text-lg font-bold">Luit Kumar Barman</h1>
+                <p className="text-xs text-muted-foreground">Admin Panel</p>
+            </div>
+        </Link>
+    )
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
@@ -36,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <Logo />
+          <AdminLogo />
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
