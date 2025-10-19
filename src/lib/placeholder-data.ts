@@ -20,7 +20,7 @@ export type NewsArticle = {
   author: string;
   date: string;
   imageId: string;
-  category: 'Latest' | 'Video' | 'Podcast';
+  category: 'Latest' | 'Video' | 'Podcast' | 'Book';
 };
 
 export type GalleryImage = {
@@ -122,7 +122,7 @@ export const socialPosts: SocialPost[] = [
       id: 4,
       platform: 'Facebook',
       username: 'Luit Kumar Barman',
-      content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/২০২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ત আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
+      content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/২০২৫। এনেکৈ চলি আছে GMC File ৰ date of application 13/3/2024 ત আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
       timestamp: '8 hours ago',
       imageUrl: '/images/followus/post4.jpg',
       likes: 312,
@@ -134,7 +134,7 @@ export const socialPosts: SocialPost[] = [
       id: 5,
       platform: 'Facebook',
       username: 'Luit Kumar Barman',
-      content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ২০১৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
+      content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ۲۰۰৩ ৰ পৰা ২০১৯ চনলৈ ৭.৬২ কোটিৰ অনিয়م হৈছিল।',
       timestamp: '1 day ago',
       imageUrl: '/images/followus/post5.jpg',
       likes: 198,
@@ -146,7 +146,7 @@ export const socialPosts: SocialPost[] = [
       id: 6,
       platform: 'Facebook',
       username: 'Luit Kumar Barman',
-      content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰিলোঁ',
+      content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰילোঁ',
       timestamp: '1 day ago',
       imageUrl: '/images/followus/post6.jpg',
       likes: 2267,
@@ -197,6 +197,16 @@ export const newsArticles: NewsArticle[] = [
     imageId: 'news-4',
     category: 'Latest',
   },
+  {
+    id: '5',
+    title: 'Damn It - A Novel by Luit Kumar Barman',
+    excerpt: 'Luit Kumar Barman\'s latest novel "Damn It" is now available. A thrilling page-turner that has received widespread appreciation.',
+    content: 'Rahul, the male protagonist is surrounded by three ladies. While Jharna and Disha fall in love with him, he’s saved by his personal assistant, Arushi, who has devoted her life to her boss. He was born to serve the public without joining politics. Rahul and his team exposes the nexus between a powerful politician and a drugs mafia. The story also showcases the unity among the various religious factions of India. Rahul, a businessman, has tremendous public support and thus the government, and bureaucrats fear him. He is a hero in society. Love, hate, and politics make this thrilling page turner colourful and exciting.',
+    author: 'Luit Kumar Barman',
+    date: '2024-06-25',
+    imageId: 'book-cover.jpg',
+    category: 'Book',
+  }
 ];
 
 export const galleryImages: GalleryImage[] = [

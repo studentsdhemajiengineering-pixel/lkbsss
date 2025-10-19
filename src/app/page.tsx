@@ -364,7 +364,7 @@ export default function Home() {
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {newsArticles.map((article: NewsArticle) => {
-                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
+                const articleImage = article.category === 'Book' ? { imageUrl: `/images/${article.imageId}`, alt: article.title } : PlaceHolderImages.find(p => p.id === article.imageId);
                 return (
                     <Link
                         key={article.id}
@@ -381,7 +381,7 @@ export default function Home() {
                                     className="w-full h-48 object-cover"
                                 />
                             )}
-                             <span className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">News Articles</span>
+                             <span className={`absolute top-3 left-3 text-white px-2 py-1 rounded-full text-xs font-medium ${article.category === 'Book' ? 'bg-purple-500' : 'bg-green-500'}`}>{article.category}</span>
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                         </div>
                         <div className="p-4">
@@ -481,7 +481,7 @@ export default function Home() {
             <div className="lg:col-span-3 space-y-8">
               <div>
                 <h3 className="text-3xl font-bold text-gray-900 mb-4 font-headline">
-                  Journey Through Cinema and Community
+                  Damn It
                 </h3>
                 <p className="text-lg text-gray-600 leading-relaxed mb-6">
                  Rahul, the male protagonist is surrounded by three ladies. While Jharna and Disha fall in love with him, he’s saved by his personal assistant, Arushi, who has devoted her life to her boss. He was born to serve the public without joining politics. Rahul and his team exposes the nexus between a powerful politician and a drugs mafia. The story also showcases the unity among the various religious factions of India. Rahul, a businessman, has tremendous public support and thus the government, and bureaucrats fear him. He is a hero in society. Love, hate, and politics make this thrilling page turner colourful and exciting.

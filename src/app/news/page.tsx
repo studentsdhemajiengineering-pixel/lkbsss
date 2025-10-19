@@ -16,7 +16,7 @@ export default function NewsPage() {
     const filteredArticles = newsArticles.filter(article => {
         if (activeTab === 'All') return true;
         if (activeTab === 'News Articles') return article.category === 'Latest';
-        if (activeTab === 'Books') return article.category === 'Book'; // Assuming 'Book' category exists
+        if (activeTab === 'Books') return article.category === 'Book';
         return false;
     });
 
@@ -49,7 +49,7 @@ export default function NewsPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {filteredArticles.map((article: NewsArticle) => {
-                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
+                const articleImage = article.category === 'Book' ? { imageUrl: `/images/${article.imageId}`, alt: article.title } : PlaceHolderImages.find(p => p.id === article.imageId);
                 return (
                     <Link
                         key={article.id}
@@ -66,7 +66,7 @@ export default function NewsPage() {
                                     className="w-full h-48 object-cover"
                                 />
                             )}
-                             <span className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">News Articles</span>
+                             <span className={`absolute top-3 left-3 text-white px-2 py-1 rounded-full text-xs font-medium ${article.category === 'Book' ? 'bg-purple-500' : 'bg-green-500'}`}>{article.category}</span>
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                         </div>
                         <div className="p-4">
