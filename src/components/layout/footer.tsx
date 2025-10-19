@@ -12,11 +12,11 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
-                <p className="text-gray-300 text-sm font-semibold">
-                  FLAT NO 303, RAJNANDINI HEIGHT, BANPHOOL PATH, <br />
-                  HATIGAON ROAD, GUWAHATI
+                <p className="text-gray-300 text-sm">
+                  Flat No 303, Rajnandini Height, Banphool Path, <br />
+                  Hatigaon Road, Guwahati
                   <br />
-                  ASSAM
+                  Assam
                 </p>
               </div>
               <div className="flex items-center space-x-3">
