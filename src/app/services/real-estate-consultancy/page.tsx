@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,15 +16,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Home, User, Phone, Mail, MapPin, Upload, Building } from "lucide-react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
+  contactNumber: z.string().regex(/^\d{10}$/, { message: "Please enter a valid 10-digit phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
-  inquiryType: z.string().min(1, { message: "Please select an inquiry type." }),
-  propertyDetails: z.string().min(10, { message: "Please provide some details." }),
+  address: z.string().min(10, { message: "Address must be at least 10 characters." }),
+  propertyType: z.string().min(1, { message: "Please select a property type." }),
+  consultationType: z.string().min(1, { message: "Please select a consultation type." }),
+  propertyLocation: z.string().min(3, { message: "Property location is required." }),
+  budgetRange: z.string().optional(),
+  description: z.string().min(20, { message: "Description must be at least 20 characters." }),
+  document: z.any().optional(),
 });
 
 export default function RealEstateConsultancyPage() {
@@ -31,113 +38,335 @@ export default function RealEstateConsultancyPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
+      contactNumber: "",
       email: "",
-      phone: "",
-      inquiryType: "",
-      propertyDetails: "",
+      address: "",
+      propertyType: "",
+      consultationType: "",
+      propertyLocation: "",
+      budgetRange: "",
+      description: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    // Handle form submission
+    // Handle submission logic
   }
 
   return (
-    <div className="container py-12 md:py-16">
-      <Card className="max-w-3xl mx-auto">
-        <CardHeader>
-          <CardTitle className="font-headline text-3xl">Real Estate Consultancy</CardTitle>
-          <CardDescription>Get expert guidance on property matters, land records, and real estate procedures.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="john.doe@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input type="tel" placeholder="123-456-7890" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="inquiryType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type of Inquiry</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an inquiry type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="land-records">Land Records</SelectItem>
-                        <SelectItem value="property-valuation">Property Valuation</SelectItem>
-                        <SelectItem value="legal-guidance">Legal Guidance</SelectItem>
-                        <SelectItem value="zoning-regulations">Zoning & Regulations</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="propertyDetails"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Property Details / Question</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Please describe your inquiry or provide details about the property..."
-                        className="resize-y min-h-[120px]"
-                        {...field}
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 py-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-gradient-to-r from-teal-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Home className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-4 font-headline">Real Estate Consultancy</h1>
+            <p className="text-gray-600 text-lg">Get expert guidance on property matters and real estate transactions</p>
+          </div>
+
+          <Card className="mb-8 shadow-lg">
+            <CardHeader>
+                <CardTitle className="flex items-center text-xl font-semibold text-gray-800">
+                    <Building className="w-6 h-6 mr-3 text-teal-600" />
+                    Instructions
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-teal-600 font-semibold text-sm">1</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">Property Consultation</h3>
+                      <p className="text-muted-foreground text-sm">Get expert advice on buying, selling, or renting properties</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-teal-600 font-semibold text-sm">2</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">Expert Response</h3>
+                      <p className="text-muted-foreground text-sm">Our real estate expert will contact you within 24-48 hours</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-teal-600 font-semibold text-sm">3</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">Documentation Help</h3>
+                      <p className="text-muted-foreground text-sm">Assistance with property documents and legal procedures</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-teal-600 font-semibold text-sm">4</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">Track Progress</h3>
+                      <p className="text-muted-foreground text-sm">Monitor your consultation status in the dashboard</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg">
+            <CardContent className="p-8">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <FormField
+                      control={form.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name *</FormLabel>
+                          <FormControl>
+                             <div className="relative">
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                <Input placeholder="Enter your full name" {...field} className="pl-10" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="contactNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Number *</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                <Input type="tel" placeholder="Enter your contact number" {...field} className="pl-10" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="md:col-span-2">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email ID *</FormLabel>
+                            <FormControl>
+                               <div className="relative">
+                                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                  <Input type="email" placeholder="Enter your email address" {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">Submit Inquiry</Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                    </div>
+                    <div className="md:col-span-2">
+                       <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Current Address *</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <MapPin className="absolute left-3 top-3 text-muted-foreground w-5 h-5" />
+                                <Textarea
+                                    placeholder="Enter your complete address"
+                                    className="resize-y min-h-[100px] pl-10"
+                                    {...field}
+                                />
+                               </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="propertyType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Property Type *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select property type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Residential">Residential</SelectItem>
+                              <SelectItem value="Commercial">Commercial</SelectItem>
+                              <SelectItem value="Industrial">Industrial</SelectItem>
+                              <SelectItem value="Agricultural">Agricultural Land</SelectItem>
+                              <SelectItem value="Plot">Plot/Land</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="consultationType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Consultation Type *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select consultation type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Buying">Property Buying</SelectItem>
+                              <SelectItem value="Selling">Property Selling</SelectItem>
+                              <SelectItem value="Renting">Property Renting</SelectItem>
+                              <SelectItem value="Legal">Legal Documentation</SelectItem>
+                              <SelectItem value="Valuation">Property Valuation</SelectItem>
+                              <SelectItem value="Investment">Investment Advice</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="propertyLocation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Property Location *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter property location/area" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="budgetRange"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Budget Range</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select budget range" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Under 10 Lakh">Under ₹10 Lakh</SelectItem>
+                              <SelectItem value="10-25 Lakh">₹10-25 Lakh</SelectItem>
+                              <SelectItem value="25-50 Lakh">₹25-50 Lakh</SelectItem>
+                              <SelectItem value="50 Lakh - 1 Crore">₹50 Lakh - 1 Crore</SelectItem>
+                              <SelectItem value="1-2 Crore">₹1-2 Crore</SelectItem>
+                              <SelectItem value="Above 2 Crore">Above ₹2 Crore</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="md:col-span-2">
+                       <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description of Requirement *</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Please provide detailed description of your real estate requirement, including specific needs, preferences, timeline, and any other relevant information"
+                                className="resize-y min-h-[120px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                       <FormField
+                        control={form.control}
+                        name="document"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Optional Document Upload</FormLabel>
+                            <FormControl>
+                               <div className="relative">
+                                <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                                <Input type="file" {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormDescription>
+                              Upload property documents, ID proof, or related files (PDF, JPG, PNG, DOC - Max 5MB)
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-teal-50 rounded-lg p-4">
+                    <h3 className="font-medium text-teal-800 mb-2">Our Real Estate Services:</h3>
+                    <ul className="text-sm text-teal-700 space-y-1 list-disc list-inside">
+                        <li>Property buying and selling guidance</li>
+                        <li>Legal documentation and verification assistance</li>
+                        <li>Property valuation and market analysis</li>
+                        <li>Investment advisory and portfolio planning</li>
+                        <li>Rental property management consultation</li>
+                        <li>Land acquisition and development guidance</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h3 className="font-medium text-blue-800 mb-2">Important Information:</h3>
+                    <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                        <li>Our certified real estate expert will contact you within 24-48 hours</li>
+                        <li>Initial consultation is free of charge</li>
+                        <li>All property transactions are handled with complete transparency</li>
+                        <li>We provide end-to-end support for all real estate needs</li>
+                        <li>Confidentiality of all client information is guaranteed</li>
+                    </ul>
+                  </div>
+
+                  <Button type="submit" className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white py-3">
+                    Submit Real Estate Consultancy Request
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
+
+    
