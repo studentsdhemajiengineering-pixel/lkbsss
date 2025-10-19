@@ -1,64 +1,99 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BarChart, Users, Newspaper, GalleryHorizontal, PlusCircle } from "lucide-react";
-import Link from "next/link";
+"use client";
 
-const stats = [
-  { title: "Total Users", value: "1,254", icon: Users, change: "+12.5%" },
-  { title: "News Articles", value: "89", icon: Newspaper, change: "+5" },
-  { title: "Gallery Images", value: "340", icon: GalleryHorizontal, change: "+22" },
-  { title: "Site Visits", value: "24,890", icon: BarChart, change: "+8.2%" },
-];
+import React, { useState } from 'react';
+import {
+  BarChart3,
+  Settings,
+} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import OverviewTab from '@/components/admin/dashboard/overview-tab';
+import ServiceRequestsTab from '@/components/admin/dashboard/service-requests-tab';
+import ContentManagementTab from '@/components/admin/dashboard/content-management-tab';
+import { appointments, grievances, healthRequests, educationRequests, realEstateRequests, invitationRequests, newsArticles, videoNews, podcasts, galleryImages, resources, socialPosts } from '@/lib/data-provider';
+
 
 export default function AdminDashboardPage() {
+  const allRequests = [
+    ...appointments.map(a => ({ ...a, type: 'Appointment' })),
+    ...grievances.map(g => ({ ...g, type: 'Grievance' })),
+    ...healthRequests.map(h => ({ ...h, type: 'Health Support' })),
+    ...educationRequests.map(e => ({ ...e, type: 'Education Support' })),
+    ...realEstateRequests.map(r => ({ ...r, type: 'Real Estate' })),
+    ...invitationRequests.map(i => ({ ...i, type: 'Invitation' })),
+  ];
+
+  const allContent = {
+    news: newsArticles,
+    videos: videoNews,
+    podcasts: podcasts,
+    gallery: galleryImages,
+    resources: resources,
+    social: socialPosts,
+  };
+
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold font-headline tracking-tight">Welcome back, Admin!</h2>
-        <p className="text-muted-foreground">Here's a snapshot of your website's activity.</p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change} from last month</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div>
-        <h3 className="text-2xl font-semibold font-headline mb-4">Quick Actions</h3>
-        <div className="flex flex-wrap gap-4">
-          <Button asChild>
-            <Link href="/admin/news/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Article
-            </Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link href="/admin/gallery/upload">
-              <PlusCircle className="mr-2 h-4 w-4" /> Upload to Gallery
-            </Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link href="/admin/resources/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Post Announcement
-            </Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link href="/admin/users/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Create New User
-            </Link>
-          </Button>
+    <div className="min-h-screen bg-secondary/50 py-8">
+      <div className="container mx-auto px-4">
+        <div className="bg-card rounded-2xl shadow-lg p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary-light rounded-full flex items-center justify-center">
+                <Settings className="w-8 h-8 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground font-headline">Admin Dashboard</h1>
+                <p className="text-muted-foreground">Manage all services and content</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Welcome back,</p>
+              <p className="font-semibold text-foreground">Admin</p>
+            </div>
+          </div>
         </div>
+
+        <Tabs defaultValue="overview">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8 h-auto">
+            <TabsTrigger value="overview" className="py-3">
+              <BarChart3 className="w-5 h-5 mr-2" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="services" className="py-3">
+              <Settings className="w-5 h-5 mr-2" />
+              Service Requests
+            </TabsTrigger>
+            <TabsTrigger value="content" className="py-3">
+              <Settings className="w-5 h-5 mr-2" />
+              Content Management
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview">
+            <OverviewTab
+              appointments={appointments}
+              grievances={grievances}
+              healthRequests={healthRequests}
+              educationRequests={educationRequests}
+              allRequests={allRequests}
+            />
+          </TabsContent>
+          <TabsContent value="services">
+            <ServiceRequestsTab
+              appointments={appointments}
+              grievances={grievances}
+              healthRequests={healthRequests}
+              educationRequests={educationRequests}
+              realEstateRequests={realEstateRequests}
+              invitationRequests={invitationRequests}
+            />
+          </TabsContent>
+          <TabsContent value="content">
+            <ContentManagementTab content={allContent} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
-}
+};
