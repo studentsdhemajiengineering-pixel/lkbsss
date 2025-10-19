@@ -4,8 +4,7 @@
 import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calendar, Eye, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Calendar, Eye, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { newsArticles } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -104,4 +103,3 @@ export default function NewsPage() {
     </section>
   );
 }
-

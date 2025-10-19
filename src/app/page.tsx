@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -383,47 +382,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interview and Podcast Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Interview and podcast </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Watch the latest video updates, press conferences, and important announcements.</p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-              <button onClick={() => setActiveInterviewTab('All')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'All' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>All</button>
-              <button onClick={() => setActiveInterviewTab('Podcast')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'Podcast' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Podcasts</button>
-              <button onClick={() => setActiveInterviewTab('Interview')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'Interview' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Interview</button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {filteredInterviews.map((item) => (
-                  <Link key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
-                      <div className="relative">
-                          <Image src={item.thumbnail} alt={item.title} width={600} height={400} className="w-full h-48 object-cover"/>
-                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Play className="w-12 h-12 text-white" />
-                          </div>
-                          {item.category && <span className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">{item.category}</span>}
-                          {item.duration && <span className="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">{item.duration}</span>}
-                      </div>
-                      <div className="p-4">
-                          <h3 className="font-bold text-gray-900 mb-2 h-12 line-clamp-2">{item.title}</h3>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                              <div className="flex items-center">
-                                  <Eye className="w-4 h-4 mr-1" />{item.views}
-                              </div>
-                              <span>{item.age}</span>
-                          </div>
-                      </div>
-                  </Link>
-              ))}
-          </div>
-          <div className="text-center">
-              <Button className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full font-medium transition-colors">Load More Videos</Button>
-          </div>
-        </div>
-      </section>
-
       {/* Latest News Section */}
       <section id="news" className="w-full py-12 md:py-20 lg:py-24 bg-secondary">
         <div className="container px-4 md:px-6">
@@ -505,6 +463,47 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Interview and Podcast Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Interview and podcast </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Watch the latest video updates, press conferences, and important announcements.</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+              <button onClick={() => setActiveInterviewTab('All')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'All' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>All</button>
+              <button onClick={() => setActiveInterviewTab('Podcast')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'Podcast' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Podcasts</button>
+              <button onClick={() => setActiveInterviewTab('Interview')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'Interview' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Interview</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {filteredInterviews.map((item) => (
+                  <Link key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
+                      <div className="relative">
+                          <Image src={item.thumbnail} alt={item.title} width={600} height={400} className="w-full h-48 object-cover"/>
+                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Play className="w-12 h-12 text-white" />
+                          </div>
+                          {item.category && <span className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">{item.category}</span>}
+                          {item.duration && <span className="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">{item.duration}</span>}
+                      </div>
+                      <div className="p-4">
+                          <h3 className="font-bold text-gray-900 mb-2 h-12 line-clamp-2">{item.title}</h3>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                              <div className="flex items-center">
+                                  <Eye className="w-4 h-4 mr-1" />{item.views}
+                              </div>
+                              <span>{item.age}</span>
+                          </div>
+                      </div>
+                  </Link>
+              ))}
+          </div>
+          <div className="text-center">
+              <Button className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full font-medium transition-colors">Load More Videos</Button>
+          </div>
+        </div>
+      </section>
+
       {/* Published Book Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -533,7 +532,7 @@ export default function Home() {
                   <div className="relative text-center p-8">
                     <BookOpen className="w-16 h-16 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold mb-2 font-headline">Damn It</h3>
-                    <h4 className="text-xl font-semibold mb-4">Cinema & Community</h4>
+                    <h4 className="text-xl font-semibold mb-4">Cinema &amp; Community</h4>
                     <p className="text-sm opacity-90">By Luit Kumar Barman</p>
                   </div>
                 </div>
@@ -557,7 +556,7 @@ export default function Home() {
                 <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6">
                   <BookOpen className="w-8 h-8 text-indigo-600 mb-3" />
                   <h4 className="text-lg font-semibold text-gray-800 mb-2">Genre</h4>
-                  <p className="text-gray-600 text-sm">Literature & Fiction</p>
+                  <p className="text-gray-600 text-sm">Literature &amp; Fiction</p>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
                   <FileText className="w-8 h-8 text-purple-600 mb-3" />
