@@ -17,11 +17,10 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { login } from "@/lib/auth";
-import { User } from "lucide-react";
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -32,13 +31,13 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // This would be replaced with actual user login logic
-      console.log("User login attempt:", { email });
+      await login({ username, password });
       toast({
         title: "Login Successful",
-        description: "Redirecting to your dashboard...",
+        description: "Redirecting to the dashboard...",
       });
-      router.push('/user-dashboard');
+      router.push('/admin');
+      router.refresh();
     } catch (error: any) {
       setError(error.message);
       toast({
@@ -54,27 +53,27 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-md w-full shadow-2xl rounded-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary-light rounded-full flex items-center justify-center mx-auto">
-            <User className="w-8 h-8 text-primary-foreground" />
+            <Lock className="w-8 h-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">User Login</CardTitle>
+          <CardTitle className="text-3xl font-bold font-headline">Admin Login</CardTitle>
           <CardDescription>
-            Sign in to access your account
+            Sign in to access the admin panel
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && <p className="text-center text-red-500 text-sm mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <div className="relative">
                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
                   className="pl-10"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -105,11 +104,13 @@ export default function LoginPage() {
               Sign In
             </Button>
           </form>
-           <div className="mt-4 text-center text-sm">
-            Don't have an account?{' '}
-            <Link href="/register" className="underline">
-              Register
-            </Link>
+
+          <div className="mt-8 p-4 bg-secondary/70 rounded-lg">
+            <h3 className="text-sm font-medium text-foreground mb-2">Demo Credentials:</h3>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p><strong>Username:</strong> admin</p>
+              <p><strong>Password:</strong> Admin@123</p>
+            </div>
           </div>
         </CardContent>
       </Card>

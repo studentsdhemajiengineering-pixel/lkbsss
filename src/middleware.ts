@@ -6,21 +6,28 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   const { pathname } = request.nextUrl;
 
-  // If the user is trying to access the admin area and is not logged in,
-  // redirect them to the login page.
-  if (pathname.startsWith('/admin') && !session) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  const isAdminRoute = pathname.startsWith('/admin');
+  const isLoginPage = pathname === '/login';
+  const isAdminLoginPage = pathname === '/admin/login';
+
+  // If trying to access admin routes without a session, redirect to admin login
+  if (isAdminRoute && !isAdminLoginPage && !session) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  // If the user is logged in and tries to access the login page,
-  // redirect them to the admin dashboard.
-  if (pathname === '/login' && session) {
-    return NextResponse.redirect(new URL('/admin', request.url));
+  // If logged in, redirect away from login pages
+  if (session) {
+    if (isLoginPage) {
+        return NextResponse.redirect(new URL('/user-dashboard', request.url)); // Or wherever user dashboard is
+    }
+    if (isAdminLoginPage) {
+        return NextResponse.redirect(new URL('/admin', request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  matcher: ['/admin/:path*', '/login', '/admin/login'],
 };
