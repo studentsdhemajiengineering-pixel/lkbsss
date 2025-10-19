@@ -37,10 +37,7 @@ import type {
 
 const addDocument = async (db: any, collectionName: string, data: any, userId?: string) => {
     if (!userId) {
-        // This should be handled by UI logic before calling the service.
-        // This is a safeguard.
-        console.error("User must be authenticated to add a document."); 
-        throw new Error("User must be authenticated.");
+        throw new Error("User must be authenticated to add a document.");
     }
     
     const collRef = collection(db, 'users', userId, collectionName);
@@ -51,7 +48,6 @@ const addDocument = async (db: any, collectionName: string, data: any, userId?: 
         userId: userId,
     };
     
-    // Return the promise from addDoc
     return addDoc(collRef, payload)
         .catch(error => {
             const permissionError = new FirestorePermissionError({
@@ -60,8 +56,7 @@ const addDocument = async (db: any, collectionName: string, data: any, userId?: 
                 requestResourceData: payload,
             });
             errorEmitter.emit('permission-error', permissionError);
-            // Re-throw the original error to be caught by the calling function's catch block
-            throw error; 
+            // DO NOT re-throw the error here, let the emitter handle it.
         });
 };
 
