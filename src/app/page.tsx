@@ -469,7 +469,7 @@ export default function Home() {
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl opacity-20 blur-lg"></div>
               <div className="relative bg-white p-4 rounded-2xl shadow-2xl">
                  <Image
-                      src="https://picsum.photos/seed/bookcover/280/380"
+                      src="/images/book-cover.jpg"
                       alt="Book Cover"
                       width={280}
                       height={380}
