@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Home, Newspaper, GalleryHorizontal, Users, Files, Settings, LogOut } from "lucide-react"
 
 import {
@@ -16,10 +16,10 @@ import {
   SidebarTrigger,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { Logo } from "@/components/logo"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
+import { logout } from "@/lib/auth"
 
 const adminNavLinks = [
   { href: "/admin", label: "Dashboard", icon: Home },
@@ -46,6 +46,13 @@ function AdminLogo() {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <SidebarProvider>
@@ -85,12 +92,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <SidebarSeparator />
           <SidebarMenu>
             <SidebarMenuItem>
-                <Link href="/" className="w-full">
-                    <SidebarMenuButton tooltip={{children: 'Logout'}}>
-                        <LogOut className="h-4 w-4" />
-                        <span>Logout</span>
-                    </SidebarMenuButton>
-                </Link>
+                <SidebarMenuButton tooltip={{children: 'Logout'}} onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>

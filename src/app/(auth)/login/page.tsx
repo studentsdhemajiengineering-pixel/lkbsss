@@ -2,7 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,10 +15,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { login } from "@/lib/auth";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setError('');
+
+    try {
+      await login({ username, password });
+      toast({
+        title: "Login Successful",
+        description: "Redirecting to the dashboard...",
+      });
+      router.push('/admin');
+      router.refresh();
+    } catch (error: any) {
+      setError(error.message);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.message,
+      });
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-secondary/50">
@@ -26,28 +55,28 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary-light rounded-full flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">Welcome Back</CardTitle>
+          <CardTitle className="text-3xl font-bold font-headline">Admin Login</CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            Sign in to access the admin panel
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-6">
+          {error && <p className="text-center text-red-500 text-sm mb-4">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email or Username</Label>
+              <Label htmlFor="username">Username</Label>
               <div className="relative">
                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email or username"
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
                   className="pl-10"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
-               <p className="text-xs text-muted-foreground mt-1">
-                Admin login: username "admin", password "Admin@123"
-              </p>
             </div>
             <div className="grid gap-2">
                <Label htmlFor="password">Password</Label>
@@ -58,6 +87,8 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"} 
                     placeholder="Enter your password"
                     className="pl-10 pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required 
                   />
                   <button
@@ -74,18 +105,11 @@ export default function LoginPage() {
             </Button>
           </form>
 
-           <div className="mt-6 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="underline text-primary hover:text-primary/90 font-medium">
-              Create Account
-            </Link>
-          </div>
-
           <div className="mt-8 p-4 bg-secondary/70 rounded-lg">
             <h3 className="text-sm font-medium text-foreground mb-2">Demo Credentials:</h3>
             <div className="text-sm text-muted-foreground space-y-1">
-              <p><strong>Admin:</strong> admin / Admin@123</p>
-              <p><strong>User:</strong> Register a new account</p>
+              <p><strong>Username:</strong> admin</p>
+              <p><strong>Password:</strong> Admin@123</p>
             </div>
           </div>
         </CardContent>
