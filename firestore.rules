@@ -1,113 +1,81 @@
+/**
+ * @file Firestore Security Rules for Digital Connect application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model.  Users can only access their own profile data and service requests.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information, with the document ID being the user's unique ID.
+ * - /users/{userId}/serviceRequests/{serviceRequestId}: Stores service requests associated with a specific user.
+ *
+ * Key Security Decisions:
+ * - Users can only read and write their own data.
+ * - Listing all users is disallowed.
+ * - Service requests are private and only accessible by the owning user.
+ *
+ * Denormalization for Authorization:
+ * Ownership is enforced through path-based rules, eliminating the need for denormalized data or `get()` calls.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Grants access to user-specific data based on ownership.
+     * @description Controls access to user profile data.
      * @path /users/{userId}
-     * @allow (create) - Authenticated user with ID matching the userId in the path can create their profile.
-     * @allow (get, update, delete) - Authenticated user with ID matching the userId in the path can read, update, and delete their profile.
-     * @deny (create) - Authenticated user attempts to create a profile with a userId that doesn't match their own ID.
-     * @deny (list) - Listing users is not allowed.
-     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.
+     * @allow (create) - A user can create their own profile if the userId matches their auth UID.
+     * @allow (get, update, delete) - A user can only access their own profile data.
+     * @deny (create) - A user cannot create a profile with an ID that doesn't match their auth UID.
+     * @deny (get, update, delete) - A user cannot access another user's profile data.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isSignedIn() && resource.data != null && isOwner(userId);
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
       allow list: if false;
       allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isOwner(userId);
-      allow delete: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Manages admin privileges based on document existence.
-     * @path /roles_admin/{userId}
-     * @allow (create) - Only an admin can create a role_admin document.  This would require a get() operation to verify their admin status, which is disallowed to maintain authorization independence.
-     * @allow (get) - Any authenticated user can check if a user is an admin.
-     * @allow (delete) - Only an admin can delete a role_admin document.
-     * @deny (create) - A non-admin user attempts to create a role_admin document.
-     * @deny (list) - Listing admin roles is not allowed.
-     * @principle Grants admin privileges based on document existence.
+     * @description Controls access to service requests for a specific user.
+     * @path /users/{userId}/serviceRequests/{serviceRequestId}
+     * @allow (create) - A user can create a service request under their own user ID.
+     * @allow (get, list, update, delete) - A user can only access their own service requests.
+     * @deny (create) - A user cannot create a service request under another user's ID.
+     * @deny (get, list, update, delete) - A user cannot access another user's service requests.
+     * @principle Restricts access to a user's own service requests.
      */
-    match /roles_admin/{userId} {
-      allow get: if isSignedIn();
+    match /users/{userId}/serviceRequests/{serviceRequestId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+       function isExistingOwner(userId) {
+        return isSignedIn() && resource.data != null && isOwner(userId);
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
       allow list: if false;
-      allow create: if isAdmin();
-      allow update: if false;
-      allow delete: if isAdmin();
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
     }
-
-    /**
-     * @description Allows public read access to social media posts.
-     * @path /social_media_posts/{postId}
-     * @allow (get, list) - Any user can read social media posts.
-     * @deny (create, update, delete) - Only admins can modify social media posts.
-     * @principle Allows public read access with owner-only writes.
-     */
-    match /social_media_posts/{postId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Allows public read access to news articles.
-     * @path /news_articles/{articleId}
-     * @allow (get, list) - Any user can read news articles.
-     * @deny (create, update, delete) - Only admins can modify news articles.
-     * @principle Allows public read access with owner-only writes.
-     */
-    match /news_articles/{articleId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Allows public read access to gallery images.
-     * @path /gallery_images/{imageId}
-     * @allow (get, list) - Any user can read gallery images.
-     * @deny (create, update, delete) - Only admins can modify gallery images.
-     * @principle Allows public read access with owner-only writes.
-     */
-    match /gallery_images/{imageId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Allows public read access to resources.
-     * @path /resources/{resourceId}
-     * @allow (get, list) - Any user can read resources.
-     * @deny (create, update, delete) - Only admins can modify resources.
-     * @principle Allows public read access with owner-only writes.
-     */
-    match /resources/{resourceId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Allows public read access to language pages.
-     * @path /language_pages/{pageId}
-     * @allow (get, list) - Any user can read language pages.
-     * @deny (create, update, delete) - Only admins can modify language pages.
-     * @principle Allows public read access with owner-only writes.
-     */
-    match /language_pages/{pageId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
-  }
-
-  // Helper functions
-  function isSignedIn() {
-    return request.auth != null;
-  }
-
-  function isOwner(userId) {
-    return isSignedIn() && request.auth.uid == userId;
-  }
-
-  function isAdmin() {
-    return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
   }
 }

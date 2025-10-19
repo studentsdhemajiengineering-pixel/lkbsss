@@ -1,234 +1,128 @@
 {
   "entities": {
-    "Appointment": {
+    "User": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Appointment",
+      "title": "User",
       "type": "object",
-      "description": "Represents an appointment booking made by a user.",
+      "description": "Represents a user within the Digital Connect application.",
       "properties": {
-        "id": { "type": "string", "description": "Unique identifier for the appointment." },
-        "fullName": { "type": "string", "description": "The full name of the person booking the appointment." },
-        "dateOfBirth": { "type": "string", "format": "date", "description": "The date of birth of the person." },
-        "mobile": { "type": "string", "description": "The mobile number of the person." },
-        "email": { "type": "string", "format": "email", "description": "The email address of the person." },
-        "appointmentDate": { "type": "string", "format": "date", "description": "The requested date for the appointment." },
-        "purpose": { "type": "string", "description": "The purpose of the appointment." },
-        "documentUrl": { "type": "string", "format": "uri", "description": "URL to an optional uploaded document." },
-        "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"], "description": "The status of the appointment." },
-        "submittedAt": { "type": "string", "format": "date-time", "description": "The date and time the appointment was submitted." }
-      },
-      "required": ["id", "fullName", "dateOfBirth", "mobile", "email", "appointmentDate", "purpose", "status", "submittedAt"]
-    },
-    "Grievance": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Grievance",
-      "type": "object",
-      "description": "Represents a public grievance or complaint submitted by a user.",
-      "properties": {
-        "id": { "type": "string", "description": "Unique identifier for the grievance." },
-        "ticketNumber": { "type": "string", "description": "A unique ticket number for tracking." },
-        "fullName": { "type": "string", "description": "The full name of the complainant." },
-        "contactNumber": { "type": "string", "description": "The contact number of the complainant." },
-        "email": { "type": "string", "format": "email", "description": "The email address of the complainant." },
-        "address": { "type": "string", "description": "The address of the complainant." },
-        "grievanceType": { "type": "string", "description": "The category of the grievance." },
-        "description": { "type": "string", "description": "A detailed description of the grievance." },
-        "documentUrl": { "type": "string", "format": "uri", "description": "URL to an optional uploaded document." },
-        "status": { "type": "string", "enum": ["submitted", "under_review", "resolved", "closed"], "description": "The status of the grievance." },
-        "submittedAt": { "type": "string", "format": "date-time", "description": "The date and time the grievance was submitted." }
-      },
-      "required": ["id", "ticketNumber", "fullName", "contactNumber", "email", "address", "grievanceType", "description", "status", "submittedAt"]
-    },
-    "HealthRequest": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "HealthRequest",
-        "type": "object",
-        "description": "Represents a request for health support.",
-        "properties": {
-            "id": { "type": "string" },
-            "fullName": { "type": "string" },
-            "age": { "type": "number" },
-            "gender": { "type": "string" },
-            "mobile": { "type": "string" },
-            "email": { "type": "string", "format": "email" },
-            "assistanceType": { "type": "string" },
-            "description": { "type": "string" },
-            "documentUrl": { "type": "string", "format": "uri" },
-            "status": { "type": "string", "enum": ["submitted", "processing", "approved", "completed"] },
-            "submittedAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
         },
-        "required": ["id", "fullName", "age", "gender", "mobile", "email", "assistanceType", "description", "status", "submittedAt"]
-    },
-    "EducationRequest": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "EducationRequest",
-        "type": "object",
-        "description": "Represents a request for education support.",
-        "properties": {
-            "id": { "type": "string" },
-            "studentName": { "type": "string" },
-            "dateOfBirth": { "type": "string", "format": "date" },
-            "parentName": { "type": "string" },
-            "contactNumber": { "type": "string" },
-            "email": { "type": "string", "format": "email" },
-            "institutionName": { "type": "string" },
-            "requestType": { "type": "string" },
-            "details": { "type": "string" },
-            "documentUrl": { "type": "string", "format": "uri" },
-            "status": { "type": "string", "enum": ["submitted", "under_review", "approved", "rejected"] },
-            "submittedAt": { "type": "string", "format": "date-time" }
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the user."
         },
-        "required": ["id", "studentName", "dateOfBirth", "parentName", "contactNumber", "email", "institutionName", "requestType", "details", "status", "submittedAt"]
-    },
-    "RealEstateRequest": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "RealEstateRequest",
-        "type": "object",
-        "description": "Represents a request for real estate consultancy.",
-        "properties": {
-            "id": { "type": "string" },
-            "fullName": { "type": "string" },
-            "contactNumber": { "type": "string" },
-            "email": { "type": "string", "format": "email" },
-            "address": { "type": "string" },
-            "propertyType": { "type": "string" },
-            "consultationType": { "type": "string" },
-            "propertyLocation": { "type": "string" },
-            "budgetRange": { "type": "string" },
-            "description": { "type": "string" },
-            "documentUrl": { "type": "string", "format": "uri" },
-            "status": { "type": "string", "enum": ["submitted", "under_review", "in_progress", "completed"] },
-            "submittedAt": { "type": "string", "format": "date-time" }
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user."
         },
-        "required": ["id", "fullName", "contactNumber", "email", "address", "propertyType", "consultationType", "propertyLocation", "description", "status", "submittedAt"]
-    },
-    "InvitationRequest": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "InvitationRequest",
-        "type": "object",
-        "description": "Represents a request for an invitation to an event.",
-        "properties": {
-            "id": { "type": "string" },
-            "fullName": { "type": "string" },
-            "organization": { "type": "string" },
-            "designation": { "type": "string" },
-            "contactNumber": { "type": "string" },
-            "email": { "type": "string", "format": "email" },
-            "eventType": { "type": "string" },
-            "eventName": { "type": "string" },
-            "eventDate": { "type": "string", "format": "date" },
-            "eventVenue": { "type": "string" },
-            "numberOfInvitees": { "type": "string" },
-            "purpose": { "type": "string" },
-            "specialRequirements": { "type": "string" },
-            "documentUrl": { "type": "string", "format": "uri" },
-            "status": { "type": "string", "enum": ["submitted", "under_review", "approved", "rejected"] },
-            "submittedAt": { "type": "string", "format": "date-time" }
+        "email": {
+          "type": "string",
+          "description": "The email address of the user.",
+          "format": "email"
         },
-        "required": ["id", "fullName", "organization", "designation", "contactNumber", "email", "eventType", "eventName", "eventDate", "eventVenue", "numberOfInvitees", "purpose", "status", "submittedAt"]
-    },
-    "NewsArticle": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "NewsArticle",
-      "type": "object",
-      "description": "Represents a news article.",
-      "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "excerpt": { "type": "string" },
-        "content": { "type": "string" },
-        "author": { "type": "string" },
-        "date": { "type": "string", "format": "date-time" },
-        "imageId": { "type": "string" },
-        "category": { "type": "string" },
-        "published_at": { "type": "string", "format": "date-time" }
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number of the user."
+        }
       },
-      "required": ["id", "title", "excerpt", "content", "author", "date", "category", "published_at"]
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "phoneNumber"
+      ]
     },
-    "GalleryImage": {
+    "ServiceRequest": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "GalleryImage",
+      "title": "ServiceRequest",
       "type": "object",
-      "description": "Represents an image in the gallery.",
+      "description": "Represents a service request made by a user.",
       "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "imageId": { "type": "string" },
-        "imageUrl": { "type": "string", "format": "uri" },
-        "published_at": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the service request."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who created the request. (Relationship: User 1:N ServiceRequest)"
+        },
+        "requestDate": {
+          "type": "string",
+          "description": "The date and time the service request was created.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the service request (e.g., 'Pending', 'In Progress', 'Completed')."
+        },
+        "referenceNumber": {
+          "type": "string",
+          "description": "A unique reference number for tracking the service request."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the service requested"
+        }
       },
-      "required": ["id", "title", "imageId", "imageUrl", "published_at"]
-    },
-    "Resource": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Resource",
-      "type": "object",
-      "description": "Represents an official resource document.",
-      "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "category": { "type": "string" },
-        "date": { "type": "string", "format": "date-time" },
-        "link": { "type": "string", "format": "uri" },
-        "published_at": { "type": "string", "format": "date-time" }
-      },
-      "required": ["id", "title", "category", "date", "link", "published_at"]
-    },
-     "InterviewAndPodcast": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "InterviewAndPodcast",
-      "type": "object",
-      "description": "Represents an interview or podcast.",
-      "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "thumbnail": { "type": "string", "format": "uri" },
-        "url": { "type": "string", "format": "uri" },
-        "duration": { "type": "string" },
-        "views": { "type": "string" },
-        "age": { "type": "string" },
-        "category": { "type": "string", "enum": ["Interview", "Podcast"] },
-        "published_at": { "type": "string", "format": "date-time" }
-      },
-      "required": ["id", "title", "thumbnail", "url", "category", "published_at"]
-    },
-    "SocialMediaPost": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "SocialMediaPost",
-      "type": "object",
-      "description": "Represents a social media post.",
-      "properties": {
-        "id": { "type": "string" },
-        "platform": { "type": "string" },
-        "username": { "type": "string" },
-        "content": { "type": "string" },
-        "timestamp": { "type": "string" },
-        "imageUrl": { "type": "string", "format": "uri" },
-        "likes": { "type": "number" },
-        "comments": { "type": "number" },
-        "shares": { "type": "number" },
-        "url": { "type": "string", "format": "uri" },
-        "published_at": { "type": "string", "format": "date-time" }
-      },
-      "required": ["id", "platform", "content", "timestamp", "published_at"]
+      "required": [
+        "id",
+        "userId",
+        "requestDate",
+        "status",
+        "referenceNumber",
+        "description"
+      ]
     }
   },
   "auth": {
-    "providers": ["password", "anonymous"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "collections": [
-      { "path": "/appointments", "schema": { "$ref": "#/entities/Appointment" }, "description": "Stores appointment requests." },
-      { "path": "/grievances", "schema": { "$ref": "#/entities/Grievance" }, "description": "Stores grievance submissions." },
-      { "path": "/health-requests", "schema": { "$ref": "#/entities/HealthRequest" }, "description": "Stores health support requests." },
-      { "path": "/education-requests", "schema": { "$ref": "#/entities/EducationRequest" }, "description": "Stores education support requests." },
-      { "path": "/real-estate-requests", "schema": { "$ref": "#/entities/RealEstateRequest" }, "description": "Stores real estate consultancy requests." },
-      { "path": "/invitation-requests", "schema": { "$ref": "#/entities/InvitationRequest" }, "description": "Stores invitation requests." },
-      { "path": "/news-articles", "schema": { "$ref": "#/entities/NewsArticle" }, "description": "Stores news articles." },
-      { "path": "/gallery-images", "schema": { "$ref": "#/entities/GalleryImage" }, "description": "Stores gallery images." },
-      { "path": "/resources", "schema": { "$ref": "#/entities/Resource" }, "description": "Stores official resources." },
-      { "path": "/interviews-podcasts", "schema": { "$ref": "#/entities/InterviewAndPodcast" }, "description": "Stores interviews and podcasts." },
-      { "path": "/social-media-posts", "schema": { "$ref": "#/entities/SocialMediaPost" }, "description": "Stores social media posts." }
-    ]
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile data. User ID is used as the document ID.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/serviceRequests/{serviceRequestId}",
+        "definition": {
+          "entityName": "ServiceRequest",
+          "schema": {
+            "$ref": "#/backend/entities/ServiceRequest"
+          },
+          "description": "Stores service requests made by users. The path enforces ownership; only the user can access their own requests.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "serviceRequestId",
+              "description": "The unique identifier for the service request."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure authorization independence and efficient data retrieval for the Digital Connect application. User data is stored under `/users/{userId}`. Service requests made by users are stored within a subcollection `/users/{userId}/serviceRequests/{serviceRequestId}` to establish a clear ownership hierarchy. This approach enables simple and secure security rules based on path ownership, eliminating the need for complex `get()` calls and ensuring atomic operations. Denormalization isn't explicitly needed in this design as ownership is implicit in the path."
   }
 }
