@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getStatusColor } from '@/lib/status-helpers';
 import { Home, User, BarChart2, Loader2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getAuth, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 
 type ServiceRequest = {
   id: string;
@@ -23,15 +23,12 @@ type ServiceRequest = {
 
 export default function UserDashboardPage() {
   const { user, isUserLoading } = useUser();
-  const { firestore } = useFirebase();
+  const { firestore, auth } = useFirebase();
   const router = useRouter();
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [auth, setAuth] = useState<any>(null);
 
   useEffect(() => {
-    const authInstance = getAuth();
-    setAuth(authInstance);
     if (!isUserLoading && !user) {
       router.push('/login');
     }
@@ -42,27 +39,32 @@ export default function UserDashboardPage() {
       const fetchRequests = async () => {
         setLoading(true);
         
-        const allRequests: ServiceRequest[] = [];
+        try {
+          const allRequests: ServiceRequest[] = [];
 
-        const [appointments, grievances, health, education, realEstate, invitations] = await Promise.all([
-          getAppointments(firestore, user.uid),
-          getGrievances(firestore, user.uid),
-          getHealthRequests(firestore, user.uid),
-          getEducationRequests(firestore, user.uid),
-          getRealEstateRequests(firestore, user.uid),
-          getInvitationRequests(firestore, user.uid),
-        ]);
+          const [appointments, grievances, health, education, realEstate, invitations] = await Promise.all([
+            getAppointments(firestore, user.uid),
+            getGrievances(firestore, user.uid),
+            getHealthRequests(firestore, user.uid),
+            getEducationRequests(firestore, user.uid),
+            getRealEstateRequests(firestore, user.uid),
+            getInvitationRequests(firestore, user.uid),
+          ]);
 
-        appointments.forEach(req => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
-        grievances.forEach(req => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
-        health.forEach(req => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
-        education.forEach(req => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
-        realEstate.forEach(req => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
-        invitations.forEach(req => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
+          appointments.forEach(req => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
+          grievances.forEach(req => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
+          health.forEach(req => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
+          education.forEach(req => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
+          realEstate.forEach(req => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
+          invitations.forEach(req => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
 
-        allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-        setRequests(allRequests);
-        setLoading(false);
+          allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+          setRequests(allRequests);
+        } catch (error) {
+            console.error("Failed to fetch user requests:", error);
+        } finally {
+            setLoading(false);
+        }
       };
 
       fetchRequests();
