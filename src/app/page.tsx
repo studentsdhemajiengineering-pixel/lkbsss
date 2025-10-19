@@ -38,7 +38,8 @@ import {
   HeartPulse,
   MessageCircle,
   Share2,
-  Eye
+  Eye,
+  Camera
 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/types';
@@ -219,18 +220,19 @@ const interviewsAndPodcasts: InterviewAndPodcast[] = [
   },
 ];
 
+const galleryImages: Omit<GalleryImage, 'imageId' | 'published_at'>[] = [
+    { id: '1', title: 'Community Gathering', imageUrl: '/images/gallery/1.jpg' },
+    { id: '2', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
+    { id: '3', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
+    { id: '4', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
+    { id: '5', title: 'Health Camp', imageUrl: '/images/gallery/5.jpg' },
+    { id: '6', title: 'Award Function', imageUrl: '/images/gallery/6.jpg' },
+    { id: '7', title: 'Press Conference', imageUrl: '/images/gallery/7.jpg' },
+    { id: '8', title: 'Felicitation Program', imageUrl: '/images/gallery/8.jpg' },
+];
+
 
 export default function Home() {
-    const { firestore } = useFirebase();
-    const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-
-    useEffect(() => {
-        if (firestore) {
-            getGalleryImages(firestore).then(setGalleryImages);
-        }
-    }, [firestore]);
-
-
     const [activeTab, setActiveTab] = React.useState('All');
     const [activeInterviewTab, setActiveInterviewTab] = React.useState('All');
 
@@ -647,7 +649,7 @@ export default function Home() {
         <div className="container px-4 md:px-6">
            <div className="text-center space-y-4 mb-12">
             <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-4">
-              <Image className="w-4 h-4 mr-2" />
+              <Camera className="w-4 h-4 mr-2" />
               Photo Gallery
             </div>
             <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">
@@ -658,7 +660,7 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {galleryImages.slice(0, 8).map((image: GalleryImage, index: number) => {
+            {galleryImages.slice(0, 8).map((image, index) => {
               return (
                 <div key={image.id} className={`relative aspect-square rounded-lg overflow-hidden group ${index >= 4 ? 'hidden md:block' : ''}`}>
                     <Image
@@ -675,7 +677,7 @@ export default function Home() {
             })}
           </div>
           <div className="text-center mt-12">
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
+            <Button asChild size="lg" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium transition-colors">
               <Link href="/gallery">View Full Gallery <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>

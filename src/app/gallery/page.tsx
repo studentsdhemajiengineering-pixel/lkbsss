@@ -2,21 +2,24 @@
 'use client';
 import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
-import { useFirebase } from "@/firebase/provider";
-import { getGalleryImages } from "@/lib/services";
-import { useState, useEffect } from "react";
+
+const galleryImages: Omit<GalleryImage, 'imageId' | 'published_at'>[] = [
+    { id: '1', title: 'Community Gathering', imageUrl: '/images/gallery/1.jpg' },
+    { id: '2', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
+    { id: '3', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
+    { id: '4', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
+    { id: '5', title: 'Health Camp', imageUrl: '/images/gallery/5.jpg' },
+    { id: '6', title: 'Award Function', imageUrl: '/images/gallery/6.jpg' },
+    { id: '7', title: 'Press Conference', imageUrl: '/images/gallery/7.jpg' },
+    { id: '8', title: 'Felicitation Program', imageUrl: '/images/gallery/8.jpg' },
+    { id: '9', title: 'Community Gathering', imageUrl: '/images/gallery/1.jpg' },
+    { id: '10', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
+    { id: '11', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
+    { id: '12', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
+];
+
 
 export default function GalleryPage() {
-    const { firestore } = useFirebase();
-    const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-
-    useEffect(() => {
-        if (firestore) {
-            getGalleryImages(firestore).then(setGalleryImages);
-        }
-    }, [firestore]);
-
-
   return (
     <div className="container py-12 md:py-16">
       <div className="text-center space-y-4 mb-12">
@@ -28,7 +31,7 @@ export default function GalleryPage() {
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {galleryImages.map((image: GalleryImage) => {
+        {galleryImages.map((image) => {
           return (
             <div key={image.id} className="relative aspect-square rounded-xl overflow-hidden group shadow-lg">
                 <Image
