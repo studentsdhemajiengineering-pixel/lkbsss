@@ -1,3 +1,82 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "Abstract digital connection background",
+      "imageUrl": "https://images.unsplash.com/photo-1750969185331-e03829f72c7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMG5ldHdvcmt8ZW58MHx8fHwxNzYwNzMxMjE3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract network"
+    },
+    {
+      "id": "news-1",
+      "description": "Person reading news on a tablet",
+      "imageUrl": "https://images.unsplash.com/photo-1608555463402-98d9890a92fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxyZWFkaW5nJTIwbmV3c3xlbnwwfHx8fDE3NjA4NDQ1NzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "reading news"
+    },
+    {
+      "id": "news-2",
+      "description": "A bustling city street with modern buildings",
+      "imageUrl": "https://images.unsplash.com/photo-1518729406574-12149251ac0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjaXR5JTIwc3RyZWV0fGVufDB8fHx8MTc2MDc0MDA4OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city street"
+    },
+    {
+      "id": "news-3",
+      "description": "Close up of a person typing on a laptop",
+      "imageUrl": "https://images.unsplash.com/photo-1636996668917-16f9d88f3df6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0eXBpbmclMjBsYXB0b3B8ZW58MHx8fHwxNzYwNzMyOTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "typing laptop"
+    },
+    {
+      "id": "news-4",
+      "description": "Team of people collaborating in an office",
+      "imageUrl": "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZWFtJTIwY29sbGFib3JhdGlvbnxlbnwwfHx8fDE3NjA3MzEwOTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "team collaboration"
+    },
+    {
+      "id": "gallery-1",
+      "description": "Community event outdoors",
+      "imageUrl": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjb21tdW5pdHklMjBldmVudHxlbnwwfHx8fDE3NjA4NDQ1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community event"
+    },
+    {
+      "id": "gallery-2",
+      "description": "Speaker at a conference",
+      "imageUrl": "https://images.unsplash.com/photo-1544531586-fde5298cdd40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb25mZXJlbmNlJTIwc3BlYWtlcnxlbnwwfHx8fDE3NjA3NjE0MDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "conference speaker"
+    },
+    {
+      "id": "gallery-3",
+      "description": "Group of volunteers working together",
+      "imageUrl": "https://images.unsplash.com/photo-1566930000176-fdb48dee82d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx2b2x1bnRlZXJzJTIwd29ya2luZ3xlbnwwfHx8fDE3NjA3NzAxODV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "volunteers working"
+    },
+    {
+      "id": "gallery-4",
+      "description": "Modern architecture of a public building",
+      "imageUrl": "https://images.unsplash.com/photo-1543071293-d91175a68672?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb2Rlcm4lMjBhcmNoaXRlY3R1cmV8ZW58MHx8fHwxNzYwODMwMTA4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern architecture"
+    },
+    {
+      "id": "gallery-5",
+      "description": "Children participating in a workshop",
+      "imageUrl": "https://images.unsplash.com/photo-1628338243893-056573e389ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaGlsZHJlbiUyMHdvcmtzaG9wfGVufDB8fHx8MTc2MDg0NDU3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "children workshop"
+    },
+    {
+      "id": "gallery-6",
+      "description": "Digital art installation",
+      "imageUrl": "https://images.unsplash.com/photo-1623904121689-ec6e11628474?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhcnQlMjBpbnN0YWxsYXRpb258ZW58MHx8fHwxNzYwODQ0NTcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "art installation"
+    },
+    {
+      "id": "gallery-7",
+      "description": "Ribbon cutting ceremony",
+      "imageUrl": "https://images.unsplash.com/photo-1758384075947-19c6bd7a1afb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2VyZW1vbnklMjBldmVudHxlbnwwfHx8fDE3NjA4NDQ1NzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ceremony event"
+    },
+    {
+      "id": "gallery-8",
+      "description": "Smiling person receiving an award",
+      "imageUrl": "https://images.unsplash.com/photo-1560801122-b59974a71aca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhd2FyZCUyMGNlcmVtb255fGVufDB8fHx8MTc2MDg0NDU3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "award ceremony"
+    }
+  ]
 }
