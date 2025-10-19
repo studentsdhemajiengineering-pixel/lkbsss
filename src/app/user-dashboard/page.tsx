@@ -3,14 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser, useFirebase } from '@/firebase/provider';
 import { useRouter } from 'next/navigation';
-import { 
-  getAppointments, 
-  getGrievances, 
-  getHealthRequests, 
-  getEducationRequests, 
-  getRealEstateRequests, 
-  getInvitationRequests 
-} from '@/lib/services';
+import { getUserServiceRequests } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -48,25 +41,26 @@ export default function UserDashboardPage() {
         setLoading(true);
         
         try {
-          // Fetch all request types for the current user
-          const [appointments, grievances, health, education, realEstate, invitations] = await Promise.all([
-            getAppointments(firestore, user.uid),
-            getGrievances(firestore, user.uid),
-            getHealthRequests(firestore, user.uid),
-            getEducationRequests(firestore, user.uid),
-            getRealEstateRequests(firestore, user.uid),
-            getInvitationRequests(firestore, user.uid),
-          ]);
+          const collectionsToFetch = [
+              'appointments', 'grievances', 'health-requests', 
+              'education-requests', 'real-estate-requests', 'invitation-requests'
+          ];
+
+          const allPromises = collectionsToFetch.map(collectionName => 
+            getUserServiceRequests(firestore, collectionName, user.uid)
+          );
+          
+          const results = await Promise.all(allPromises);
 
           const allRequests: ServiceRequest[] = [];
 
           // Process and combine all requests into a single list
-          appointments.forEach((req: Appointment) => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
-          grievances.forEach((req: Grievance) => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
-          health.forEach((req: HealthRequest) => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
-          education.forEach((req: EducationRequest) => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
-          realEstate.forEach((req: RealEstateRequest) => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
-          invitations.forEach((req: InvitationRequest) => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
+          (results[0] as Appointment[]).forEach((req) => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
+          (results[1] as Grievance[]).forEach((req) => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
+          (results[2] as HealthRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
+          (results[3] as EducationRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
+          (results[4] as RealEstateRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
+          (results[5] as InvitationRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
 
           // Sort all requests by submission date, most recent first
           allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());

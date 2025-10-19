@@ -90,48 +90,48 @@ export const getInterviewsAndPodcasts = (db: any): Promise<InterviewAndPodcast[]
 export const getSocialMediaPosts = (db: any): Promise<SocialMediaPost[]> => getCollectionData(db, 'social-media-posts') as Promise<SocialMediaPost[]>;
 
 
-const getServiceRequests = async (db: any, collectionName: string, userId?: string) => {
-    if (!userId) {
-        // For admin: get all requests from all users for a specific collection
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        const allRequests: any[] = [];
-        for (const userDoc of usersSnapshot.docs) {
-            const userSubcollectionRef = collection(db, 'users', userDoc.id, collectionName);
-            const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
-            const requestsSnapshot = await getDocs(q);
-            requestsSnapshot.forEach(doc => {
-                allRequests.push({ 
-                    id: doc.id, 
-                    ...doc.data(), 
-                    submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString(),
-                    userId: userDoc.id // Ensure userId is included for admin
-                });
-            });
-        }
-        allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-        return allRequests;
-    } else {
-        // For a specific user: get their requests from a specific collection
-        const userSubcollectionRef = collection(db, 'users', userId, collectionName);
+const getServiceRequests = async (db: any, collectionName: string) => {
+    // For admin: get all requests from all users for a specific collection
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    const allRequests: any[] = [];
+    for (const userDoc of usersSnapshot.docs) {
+        const userSubcollectionRef = collection(db, 'users', userDoc.id, collectionName);
         const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
-        const snapshot = await getDocs(q);
-        if (snapshot.empty) {
-            return [];
-        }
-        return snapshot.docs.map(doc => ({ 
-            id: doc.id, 
-            ...doc.data(), 
-            submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() 
-        }));
+        const requestsSnapshot = await getDocs(q);
+        requestsSnapshot.forEach(doc => {
+            allRequests.push({ 
+                id: doc.id, 
+                ...doc.data(), 
+                submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString(),
+                userId: userDoc.id // Ensure userId is included for admin
+            });
+        });
     }
+    allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+    return allRequests;
 };
 
-export const getAppointments = (db: any, userId?: string): Promise<Appointment[]> => getServiceRequests(db, 'appointments', userId);
-export const getGrievances = (db: any, userId?: string): Promise<Grievance[]> => getServiceRequests(db, 'grievances', userId);
-export const getHealthRequests = (db: any, userId?: string): Promise<HealthRequest[]> => getServiceRequests(db, 'health-requests', userId);
-export const getEducationRequests = (db: any, userId?: string): Promise<EducationRequest[]> => getServiceRequests(db, 'education-requests', userId);
-export const getRealEstateRequests = (db: any, userId?: string): Promise<RealEstateRequest[]> => getServiceRequests(db, 'real-estate-requests', userId);
-export const getInvitationRequests = (db: any, userId?: string): Promise<InvitationRequest[]> => getServiceRequests(db, 'invitation-requests', userId);
+export const getUserServiceRequests = async (db: Firestore, collectionName: string, userId: string) => {
+    // For a specific user: get their requests from a specific collection
+    const userSubcollectionRef = collection(db, 'users', userId, collectionName);
+    const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+        return [];
+    }
+    return snapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data(), 
+        submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() 
+    }));
+};
+
+export const getAppointments = (db: any): Promise<Appointment[]> => getServiceRequests(db, 'appointments');
+export const getGrievances = (db: any): Promise<Grievance[]> => getServiceRequests(db, 'grievances');
+export const getHealthRequests = (db: any): Promise<HealthRequest[]> => getServiceRequests(db, 'health-requests');
+export const getEducationRequests = (db: any): Promise<EducationRequest[]> => getServiceRequests(db, 'education-requests');
+export const getRealEstateRequests = (db: any): Promise<RealEstateRequest[]> => getServiceRequests(db, 'real-estate-requests');
+export const getInvitationRequests = (db: any): Promise<InvitationRequest[]> => getServiceRequests(db, 'invitation-requests');
 
 
 export const updateServiceRequestStatus = async (db: any, collectionName: string, id: string, status: string, userId: string) => {
