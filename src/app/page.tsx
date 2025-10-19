@@ -22,7 +22,7 @@ import {
   Home as HomeIcon, 
   Play, 
   Headphones, 
-  ExternalLink, 
+  ExternalLink,
   Award, 
   Trophy, 
   Star, 
@@ -605,5 +605,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

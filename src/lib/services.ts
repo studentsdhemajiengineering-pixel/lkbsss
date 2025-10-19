@@ -69,6 +69,9 @@ export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id'
 const getCollectionData = async (db: any, collectionName: string) => {
     const q = query(collection(db, collectionName), orderBy("published_at", "desc"));
     const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+        return [];
+    }
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), published_at: (doc.data().published_at as Timestamp)?.toDate().toISOString() }));
 };
 
@@ -82,6 +85,9 @@ export const getSocialMediaPosts = (db: any): Promise<SocialMediaPost[]> => getC
 const getServiceRequests = async (db: any, collectionName: string) => {
     const q = query(collection(db, collectionName), orderBy("submittedAt", "desc"));
     const snapshot = await getDocs(q);
+     if (snapshot.empty) {
+        return [];
+    }
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() }));
 };
 
