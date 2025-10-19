@@ -1,8 +1,11 @@
+
 import Image from "next/image";
 import Link from "next/link";
-import { PlayCircle, Camera } from "lucide-react";
+import { PlayCircle, Camera, Target, Eye, BookOpen, Film } from "lucide-react";
 import { interviewsAndPodcasts, galleryImages } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function AboutPage() {
   const featuredVideos = interviewsAndPodcasts.slice(0, 2);
@@ -22,14 +25,15 @@ export default function AboutPage() {
             </p>
           </header>
 
-          {/* Hero Image */}
+          {/* Hero Video */}
           <div className="relative w-full h-96 md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-            <Image
-              src="https://picsum.photos/seed/about/1200/600"
-              alt="Luit Kumar Barman"
-              layout="fill"
-              objectFit="cover"
-              className="transform hover:scale-105 transition-transform duration-500"
+            <video
+              src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
           </div>
@@ -49,6 +53,35 @@ export default function AboutPage() {
               </p>
             </div>
           </section>
+
+          {/* Mission and Vision Section */}
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                       <Target className="w-8 h-8 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold font-headline">Our Mission</h2>
+                  </div>
+                  <p className="text-muted-foreground">To leverage technology and community engagement to create transparent, accessible, and efficient services that empower every citizen and foster inclusive growth.</p>
+                </CardContent>
+              </Card>
+              <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 bg-accent/10 rounded-full">
+                        <Eye className="w-8 h-8 text-accent" />
+                    </div>
+                    <h2 className="text-2xl font-bold font-headline">Our Vision</h2>
+                  </div>
+                  <p className="text-muted-foreground">A future where digital innovation and social responsibility converge to build a connected, informed, and thriving society for all.</p>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
 
           {/* Video Gallery Section */}
           <section>
@@ -88,7 +121,7 @@ export default function AboutPage() {
                       src={imgData.imageUrl}
                       alt={imgData.description}
                       data-ai-hint={imgData.imageHint}
-                      layout="fill"
+                      fill
                       objectFit="cover"
                       className="transition-transform duration-500 group-hover:scale-110"
                     />
@@ -100,10 +133,12 @@ export default function AboutPage() {
               })}
             </div>
             <div className="text-center mt-10">
-                <Link href="/gallery" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
-                    View Full Gallery
-                    <Camera className="ml-2 -mr-1 h-5 w-5" />
-                </Link>
+                <Button asChild>
+                    <Link href="/gallery" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md">
+                        View Full Gallery
+                        <Camera className="ml-2 -mr-1 h-5 w-5" />
+                    </Link>
+                </Button>
             </div>
           </section>
         </article>
@@ -111,3 +146,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
+    
