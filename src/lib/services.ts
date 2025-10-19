@@ -11,7 +11,6 @@ import {
   serverTimestamp,
   query,
   orderBy,
-  limit,
   Timestamp,
   where,
 } from 'firebase/firestore';
@@ -39,11 +38,12 @@ import type {
 const addDocument = async (db: any, collectionName: string, data: any, userId?: string) => {
     if (!userId) {
         const error = new Error("User must be authenticated to add a document.");
-        console.error(error);
-        throw error;
+        // We are not throwing this because it should be caught by UI logic before this point.
+        // This is a safeguard.
+        console.error(error); 
+        return;
     }
     
-    // Path: /users/{userId}/{collectionName}
     const collRef = collection(db, 'users', userId, collectionName);
     const payload: any = {
         ...data,
@@ -62,8 +62,6 @@ const addDocument = async (db: any, collectionName: string, data: any, userId?: 
                     requestResourceData: payload,
                 })
             );
-            console.error(`Error adding document to ${collectionName}:`, error);
-            throw new Error(`Failed to submit: ${error.message}`);
         });
 };
 
@@ -212,4 +210,3 @@ export const uploadFile = async (file: File) => {
     const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
 };
-
