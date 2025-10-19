@@ -20,7 +20,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
-import { logout } from "@/lib/auth"
 
 const adminNavLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: Home },
@@ -48,11 +47,6 @@ function AdminLogo() {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-
-  const handleLogout = async () => {
-    await logout();
-    window.location.href = '/admin/login';
-  };
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
@@ -93,15 +87,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <p className="text-xs text-muted-foreground">admin@example.com</p>
             </div>
            </div>
-          <SidebarSeparator />
-          <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton tooltip={{children: 'Logout'}} onClick={handleLogout}>
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
