@@ -15,6 +15,7 @@ import {
 import { Menu, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { Logo } from "@/components/logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -33,21 +34,9 @@ const services = [
 
 const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'as', name: 'অসমীয়া', flag: '🇮🇳' },
+    { code: 'as', name: 'অসমীয়া', flag: '🇮🇳' },
     { code: 'hi', name: 'हिंदी', flag: '🇮🇳' }
 ];
-
-const Logo = () => (
-    <Link href="/" className="flex items-center space-x-3" prefetch={false}>
-        <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
-            <Image src="/images/logo-profile.jpg" alt="Luit Kumar Barman" width={40} height={40} className="object-cover"/>
-        </div>
-        <div>
-            <h1 className="text-lg font-bold text-white">Luit Kumar Barman</h1>
-            <p className="text-xs text-blue-100">Official Website</p>
-        </div>
-    </Link>
-);
 
 
 export default function Header() {
