@@ -1,6 +1,7 @@
 
 "use client";
 
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,10 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Home, User, Phone, Mail, MapPin, Upload, Building } from "lucide-react";
+import { Home, User, Phone, Mail, MapPin, Upload, Building, CheckCircle } from "lucide-react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -34,6 +35,8 @@ const formSchema = z.object({
 });
 
 export default function RealEstateConsultancyPage() {
+  const [success, setSuccess] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,7 +54,24 @@ export default function RealEstateConsultancyPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    setSuccess(true);
     // Handle submission logic
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Request Submitted Successfully!</h1>
+          <p className="text-gray-600 mb-6">
+            Your real estate consultancy request has been submitted. Our expert will contact you within 24-48 hours.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -66,7 +86,7 @@ export default function RealEstateConsultancyPage() {
             <p className="text-gray-600 text-lg">Get expert guidance on property matters and real estate transactions</p>
           </div>
 
-          <Card className="mb-8 shadow-lg">
+          <Card className="mb-8 shadow-lg bg-white rounded-2xl">
             <CardHeader>
                 <CardTitle className="flex items-center text-xl font-semibold text-gray-800">
                     <Building className="w-6 h-6 mr-3 text-teal-600" />
@@ -119,7 +139,7 @@ export default function RealEstateConsultancyPage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white rounded-2xl">
             <CardContent className="p-8">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -132,8 +152,8 @@ export default function RealEstateConsultancyPage() {
                           <FormLabel>Full Name *</FormLabel>
                           <FormControl>
                              <div className="relative">
-                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                <Input placeholder="Enter your full name" {...field} className="pl-10" />
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <Input placeholder="Enter your full name" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -148,8 +168,8 @@ export default function RealEstateConsultancyPage() {
                           <FormLabel>Contact Number *</FormLabel>
                           <FormControl>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                <Input type="tel" placeholder="Enter your contact number" {...field} className="pl-10" />
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <Input type="tel" placeholder="Enter your contact number" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -165,8 +185,8 @@ export default function RealEstateConsultancyPage() {
                             <FormLabel>Email ID *</FormLabel>
                             <FormControl>
                                <div className="relative">
-                                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                  <Input type="email" placeholder="Enter your email address" {...field} className="pl-10" />
+                                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                  <Input type="email" placeholder="Enter your email address" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -183,10 +203,10 @@ export default function RealEstateConsultancyPage() {
                             <FormLabel>Current Address *</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <MapPin className="absolute left-3 top-3 text-muted-foreground w-5 h-5" />
+                                <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                                 <Textarea
                                     placeholder="Enter your complete address"
-                                    className="resize-y min-h-[100px] pl-10"
+                                    className="resize-y min-h-[100px] pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                                     {...field}
                                 />
                                </div>
@@ -205,7 +225,7 @@ export default function RealEstateConsultancyPage() {
                           <FormLabel>Property Type *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
                                 <SelectValue placeholder="Select property type" />
                               </SelectTrigger>
                             </FormControl>
@@ -231,7 +251,7 @@ export default function RealEstateConsultancyPage() {
                           <FormLabel>Consultation Type *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
                                 <SelectValue placeholder="Select consultation type" />
                               </SelectTrigger>
                             </FormControl>
@@ -257,7 +277,7 @@ export default function RealEstateConsultancyPage() {
                         <FormItem>
                           <FormLabel>Property Location *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter property location/area" {...field} />
+                            <Input placeholder="Enter property location/area" {...field} className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -272,7 +292,7 @@ export default function RealEstateConsultancyPage() {
                           <FormLabel>Budget Range</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
                                 <SelectValue placeholder="Select budget range" />
                               </SelectTrigger>
                             </FormControl>
@@ -300,7 +320,7 @@ export default function RealEstateConsultancyPage() {
                             <FormControl>
                               <Textarea
                                 placeholder="Please provide detailed description of your real estate requirement, including specific needs, preferences, timeline, and any other relevant information"
-                                className="resize-y min-h-[120px]"
+                                className="resize-y min-h-[120px] px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                                 {...field}
                               />
                             </FormControl>
@@ -319,11 +339,11 @@ export default function RealEstateConsultancyPage() {
                             <FormLabel>Optional Document Upload</FormLabel>
                             <FormControl>
                                <div className="relative">
-                                <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                <Input type="file" {...field} className="pl-10" />
+                                <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <Input type="file" onChange={(e) => field.onChange(e.target.files)} className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
                               </div>
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-sm text-gray-500 mt-1">
                               Upload property documents, ID proof, or related files (PDF, JPG, PNG, DOC - Max 5MB)
                             </FormDescription>
                             <FormMessage />
@@ -336,27 +356,27 @@ export default function RealEstateConsultancyPage() {
                   <div className="bg-teal-50 rounded-lg p-4">
                     <h3 className="font-medium text-teal-800 mb-2">Our Real Estate Services:</h3>
                     <ul className="text-sm text-teal-700 space-y-1 list-disc list-inside">
-                        <li>Property buying and selling guidance</li>
-                        <li>Legal documentation and verification assistance</li>
-                        <li>Property valuation and market analysis</li>
-                        <li>Investment advisory and portfolio planning</li>
-                        <li>Rental property management consultation</li>
-                        <li>Land acquisition and development guidance</li>
+                        <li>• Property buying and selling guidance</li>
+                        <li>• Legal documentation and verification assistance</li>
+                        <li>• Property valuation and market analysis</li>
+                        <li>• Investment advisory and portfolio planning</li>
+                        <li>• Rental property management consultation</li>
+                        <li>• Land acquisition and development guidance</li>
                     </ul>
                   </div>
 
                   <div className="bg-blue-50 rounded-lg p-4">
                     <h3 className="font-medium text-blue-800 mb-2">Important Information:</h3>
                     <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                        <li>Our certified real estate expert will contact you within 24-48 hours</li>
-                        <li>Initial consultation is free of charge</li>
-                        <li>All property transactions are handled with complete transparency</li>
-                        <li>We provide end-to-end support for all real estate needs</li>
-                        <li>Confidentiality of all client information is guaranteed</li>
+                        <li>• Our certified real estate expert will contact you within 24-48 hours</li>
+                        <li>• Initial consultation is free of charge</li>
+                        <li>• All property transactions are handled with complete transparency</li>
+                        <li>• We provide end-to-end support for all real estate needs</li>
+                        <li>• Confidentiality of all client information is guaranteed</li>
                     </ul>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white py-3">
+                  <Button type="submit" className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
                     Submit Real Estate Consultancy Request
                   </Button>
                 </form>
@@ -368,5 +388,3 @@ export default function RealEstateConsultancyPage() {
     </div>
   );
 }
-
-    
