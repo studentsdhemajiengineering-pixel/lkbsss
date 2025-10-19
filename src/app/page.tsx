@@ -183,16 +183,50 @@ const newsArticles: NewsArticle[] = [
     }
 ];
 
+const interviewsAndPodcasts: InterviewAndPodcast[] = [
+  {
+    id: '1',
+    title: 'In Conversation with Luit Kumar Barman: The Future of Assamese Cinema',
+    thumbnail: '/images/interviews/interview1.jpg',
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    duration: '28:45',
+    views: '152k',
+    age: '3 weeks ago',
+    category: 'Interview',
+    published_at: '2024-07-01T10:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'The Social Impact Podcast: Community Building with Luit Kumar Barman',
+    thumbnail: '/images/interviews/podcast1.jpg',
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    duration: '45:12',
+    views: '50k',
+    age: '1 month ago',
+    category: 'Podcast',
+    published_at: '2024-06-20T10:00:00Z',
+  },
+  {
+    id: '3',
+    title: 'Behind the Scenes of "Boomba Ride" - A Director\'s Take',
+    thumbnail: '/images/interviews/interview2.jpg',
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    duration: '15:30',
+    views: '2.1M',
+    age: '2 months ago',
+    category: 'Interview',
+    published_at: '2024-05-15T10:00:00Z',
+  },
+];
+
 
 export default function Home() {
     const { firestore } = useFirebase();
     const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-    const [interviewsAndPodcasts, setInterviewsAndPodcasts] = useState<InterviewAndPodcast[]>([]);
 
     useEffect(() => {
         if (firestore) {
             getGalleryImages(firestore).then(setGalleryImages);
-            getInterviewsAndPodcasts(firestore).then(setInterviewsAndPodcasts);
         }
     }, [firestore]);
 
