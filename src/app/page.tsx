@@ -299,31 +299,28 @@ export default function Home() {
                 <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Twitter</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {filteredSocialPosts.map((post: SocialMediaPost) => {
-                    const postImage = PlaceHolderImages.find(p => p.id === post.imageUrl);
-                    return (
-                        <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
-                            {post.imageUrl &&
-                                <div className="relative">
-                                    <Image src={post.imageUrl} alt={post.content} width={600} height={400} className="w-full h-48 object-cover" />
-                                    <span className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">{post.platform}</span>
-                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-                                </div>
-                            }
-                            <div className="p-4">
-                                <p className="text-gray-800 font-medium mb-3 h-20 line-clamp-3">{post.content}</p>
-                                <div className="flex items-center justify-between text-sm text-gray-500">
-                                    <div className="flex items-center space-x-4">
-                                        <span className="flex items-center"><Heart className="w-4 h-4 mr-1" />{post.likes}</span>
-                                        <span className="flex items-center"><MessageCircle className="w-4 h-4 mr-1" />{post.comments}</span>
-                                        <span className="flex items-center"><Share2 className="w-4 h-4 mr-1" />{post.shares}</span>
-                                    </div>
-                                    <span>{post.timestamp}</span>
-                                </div>
+                {filteredSocialPosts.map((post: SocialMediaPost) => (
+                    <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
+                        {post.imageUrl &&
+                            <div className="relative">
+                                <Image src={post.imageUrl} alt={post.content} width={600} height={400} className="w-full h-48 object-cover" />
+                                <span className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">{post.platform}</span>
+                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                             </div>
-                        </Link>
-                    )
-                })}
+                        }
+                        <div className="p-4">
+                            <p className="text-gray-800 font-medium mb-3 h-20 line-clamp-3">{post.content}</p>
+                            <div className="flex items-center justify-between text-sm text-gray-500">
+                                <div className="flex items-center space-x-4">
+                                    <span className="flex items-center"><Heart className="w-4 h-4 mr-1" />{post.likes}</span>
+                                    <span className="flex items-center"><MessageCircle className="w-4 h-4 mr-1" />{post.comments}</span>
+                                    <span className="flex items-center"><Share2 className="w-4 h-4 mr-1" />{post.shares}</span>
+                                </div>
+                                <span>{post.timestamp}</span>
+                            </div>
+                        </div>
+                    </Link>
+                ))}
             </div>
             <div className="text-center">
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium transition-colors">Load More Posts</Button>
@@ -382,7 +379,7 @@ export default function Home() {
             </p>
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {newsArticles.map((article: NewsArticle) => {
+              {newsArticles.slice(0, 3).map((article: NewsArticle) => {
                 const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
                 return (
                     <Link
@@ -391,7 +388,7 @@ export default function Home() {
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                     >
                         <div className="relative">
-                            {articleImage && (
+                            {article.imageId && articleImage ? (
                                 <Image
                                     src={articleImage.imageUrl}
                                     alt={article.title}
@@ -399,6 +396,10 @@ export default function Home() {
                                     height={400}
                                     className="w-full h-48 object-cover"
                                 />
+                            ) : (
+                                <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                                    <FileText className="w-12 h-12 text-gray-400" />
+                                </div>
                             )}
                              <span className={`absolute top-3 left-3 text-white px-2 py-1 rounded-full text-xs font-medium ${article.category === 'Book' ? 'bg-purple-500' : 'bg-green-500'}`}>{article.category}</span>
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
@@ -441,7 +442,7 @@ export default function Home() {
               <button onClick={() => setActiveInterviewTab('Interview')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeInterviewTab === 'Interview' ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Interview</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {filteredInterviews.map((item) => (
+              {filteredInterviews.slice(0,3).map((item) => (
                   <Link key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
                       <div className="relative">
                           <Image src={item.thumbnail} alt={item.title} width={600} height={400} className="w-full h-48 object-cover"/>

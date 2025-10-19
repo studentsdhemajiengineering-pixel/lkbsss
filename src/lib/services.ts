@@ -11,7 +11,8 @@ import {
   serverTimestamp,
   query,
   orderBy,
-  limit
+  limit,
+  Timestamp,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFirestore } from '@/firebase/provider';
@@ -39,7 +40,7 @@ const addDocument = async (db: any, collectionName: string, data: any) => {
     const payload = {
         ...data,
         submittedAt: serverTimestamp(),
-        status: 'submitted', // or 'pending'
+        status: data.status || 'submitted', 
     };
     
     addDoc(collRef, payload)
@@ -57,7 +58,7 @@ const addDocument = async (db: any, collectionName: string, data: any) => {
         });
 };
 
-export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status'>) => addDocument(db, 'appointments', data);
+export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status'>) => addDocument(db, 'appointments', {...data, status: 'pending'});
 export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'status' | 'ticketNumber'>) => addDocument(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}` });
 export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'status'>) => addDocument(db, 'health-requests', data);
 export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'status'>) => addDocument(db, 'education-requests', data);
@@ -68,7 +69,7 @@ export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id'
 const getCollectionData = async (db: any, collectionName: string) => {
     const q = query(collection(db, collectionName), orderBy("published_at", "desc"));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), published_at: (doc.data().published_at as Timestamp)?.toDate().toISOString() }));
 };
 
 export const getNewsArticles = (db: any): Promise<NewsArticle[]> => getCollectionData(db, 'news-articles') as Promise<NewsArticle[]>;
@@ -81,7 +82,7 @@ export const getSocialMediaPosts = (db: any): Promise<SocialMediaPost[]> => getC
 const getServiceRequests = async (db: any, collectionName: string) => {
     const q = query(collection(db, collectionName), orderBy("submittedAt", "desc"));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() }));
 };
 
 export const getAppointments = (db: any): Promise<Appointment[]> => getServiceRequests(db, 'appointments') as Promise<Appointment[]>;

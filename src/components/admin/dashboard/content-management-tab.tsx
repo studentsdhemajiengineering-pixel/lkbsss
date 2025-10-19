@@ -27,6 +27,7 @@ import { Label } from '@/components/ui/label';
 import { useFirebase } from '@/firebase/provider';
 import { addContent, updateContent, deleteContent } from '@/lib/services';
 import type { Content } from '@/lib/types';
+import { Timestamp } from 'firebase/firestore';
 
 type ContentType = 'news' | 'videos' | 'podcasts' | 'gallery' | 'resources' | 'social';
 
@@ -97,7 +98,7 @@ const ContentManagementTab = ({ content, onDataChange }: { content: Record<strin
         if (type === 'podcasts') return `${item.listens || 0} listens`;
         return 'N/A';
     }
-
+    
     const renderDialogFields = (item: any, setItem: (item: any) => void) => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
@@ -117,8 +118,8 @@ const ContentManagementTab = ({ content, onDataChange }: { content: Record<strin
                 <Input id="link-url" value={item.link || item.url || ''} onChange={(e) => setItem({ ...item, link: e.target.value, url: e.target.value })} />
             </div>
             <div className="md:col-span-2">
-                <Label htmlFor="description">Description *</Label>
-                <Textarea id="description" value={item.description || item.content || item.excerpt || ''} onChange={(e) => setItem({ ...item, description: e.target.value, content: e.target.value, excerpt: e.target.value })} />
+                <Label htmlFor="description">Description / Excerpt / Content *</Label>
+                <Textarea id="description" value={item.excerpt || item.content || item.description || ''} onChange={(e) => setItem({ ...item, excerpt: e.target.value, content: e.target.value, description: e.target.value })} />
             </div>
         </div>
     );
@@ -185,7 +186,7 @@ const ContentManagementTab = ({ content, onDataChange }: { content: Record<strin
                                         </TableCell>
                                         <TableCell className="px-6 py-4 text-sm text-foreground">{item.category || item.platform || 'General'}</TableCell>
                                         <TableCell className="px-6 py-4 text-sm text-muted-foreground">{getStats(item, selectedContentType)}</TableCell>
-                                        <TableCell className="px-6 py-4 text-sm text-muted-foreground">{item.published_at ? new Date(item.published_at.seconds * 1000).toLocaleDateString() : 'N/A'}</TableCell>
+                                        <TableCell className="px-6 py-4 text-sm text-muted-foreground">{item.published_at ? new Date(item.published_at).toLocaleDateString() : 'N/A'}</TableCell>
                                         <TableCell className="px-6 py-4">
                                             <div className="flex space-x-2">
                                                 <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)} className="text-primary hover:text-primary/80">
@@ -220,7 +221,7 @@ const ContentManagementTab = ({ content, onDataChange }: { content: Record<strin
             }}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>{editingItem ? 'Edit' : 'Add'} {selectedContentType}</DialogTitle>
+                        <DialogTitle>{editingItem ? 'Edit' : 'Add'} {contentTypes.find(c => c.id === selectedContentType)?.label}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4 space-y-4">
                         {editingItem ? renderDialogFields(editingItem, setEditingItem) : renderDialogFields(newItem, setNewItem)}

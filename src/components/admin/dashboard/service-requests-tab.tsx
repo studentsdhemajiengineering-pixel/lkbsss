@@ -108,7 +108,7 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
             description: '',
             contact: item.mobile || item.contactNumber,
             email: item.email,
-            date: item.submittedAt ? new Date(item.submittedAt.seconds * 1000).toLocaleDateString() : 'N/A'
+            date: item.submittedAt ? new Date(item.submittedAt).toLocaleDateString() : 'N/A'
         };
 
         switch(type) {
