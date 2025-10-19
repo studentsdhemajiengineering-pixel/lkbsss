@@ -68,7 +68,7 @@ export default function EducationSupportPage() {
      if (user) {
       form.setValue('parentName', user.displayName || '');
       form.setValue('email', user.email || '');
-      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.replace('+91', '') : '');
     }
   }, [user, isUserLoading, router, form]);
 
@@ -79,16 +79,18 @@ export default function EducationSupportPage() {
     }
     setLoading(true);
     try {
-        let documentUrl;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
-
-        await addEducationRequest(firestore, { 
+        const payload: any = {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
-            documentUrl 
-        }, user.uid);
+        };
+
+        if (values.document) {
+            const documentUrl = await uploadFile(values.document);
+            payload.documentUrl = documentUrl;
+        }
+        delete payload.document;
+
+        await addEducationRequest(firestore, payload, user.uid);
         
         form.reset();
         toast({ title: 'Success!', description: 'Education support request submitted. Track its status in your dashboard.' });

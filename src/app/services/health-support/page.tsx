@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/componentsui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, User, Phone, Mail, Upload, CheckCircle, Activity, Loader2 } from 'lucide-react';
@@ -62,7 +62,7 @@ export default function HealthSupportPage() {
     if (user) {
       form.setValue('fullName', user.displayName || '');
       form.setValue('email', user.email || '');
-      form.setValue('mobile', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+      form.setValue('mobile', user.phoneNumber ? user.phoneNumber.replace('+91', '') : '');
     }
   }, [user, isUserLoading, router, form]);
 
@@ -73,12 +73,15 @@ export default function HealthSupportPage() {
     }
     setLoading(true);
     try {
-        let documentUrl;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
+        const payload: any = { ...values };
 
-        await addHealthRequest(firestore, { ...values, documentUrl }, user.uid);
+        if (values.document) {
+            const documentUrl = await uploadFile(values.document);
+            payload.documentUrl = documentUrl;
+        }
+        delete payload.document;
+
+        await addHealthRequest(firestore, payload, user.uid);
         
         form.reset();
         toast({ title: 'Success!', description: 'Health support request submitted. Track its status in your dashboard.' });

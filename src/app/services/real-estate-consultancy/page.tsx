@@ -67,7 +67,7 @@ export default function RealEstateConsultancyPage() {
     if (user) {
       form.setValue('fullName', user.displayName || '');
       form.setValue('email', user.email || '');
-      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.replace('+91', '') : '');
     }
   }, [user, isUserLoading, router, form]);
 
@@ -78,12 +78,15 @@ export default function RealEstateConsultancyPage() {
     }
     setLoading(true);
     try {
-        let documentUrl;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
+        const payload: any = { ...values };
 
-        await addRealEstateRequest(firestore, { ...values, documentUrl }, user.uid);
+        if (values.document) {
+            const documentUrl = await uploadFile(values.document);
+            payload.documentUrl = documentUrl;
+        }
+        delete payload.document;
+
+        await addRealEstateRequest(firestore, payload, user.uid);
         
         form.reset();
         toast({ title: 'Success!', description: 'Real estate request submitted. Track its status in your dashboard.' });

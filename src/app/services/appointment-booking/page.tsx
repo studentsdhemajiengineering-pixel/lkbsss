@@ -75,7 +75,7 @@ export default function AppointmentBookingPage() {
     if (user) {
       form.setValue('fullName', user.displayName || '');
       form.setValue('email', user.email || '');
-      form.setValue('mobile', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+      form.setValue('mobile', user.phoneNumber ? user.phoneNumber.replace('+91', '') : '');
     }
   }, [user, isUserLoading, router, form]);
 
@@ -86,17 +86,20 @@ export default function AppointmentBookingPage() {
     }
     setLoading(true);
     try {
-        let documentUrl;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
-
-        await addAppointment(firestore, {
+        const payload: any = {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
             appointmentDate: values.appointmentDate.toISOString(),
-            documentUrl,
-        }, user.uid);
+        };
+
+        if (values.document) {
+            const documentUrl = await uploadFile(values.document);
+            payload.documentUrl = documentUrl;
+        }
+        delete payload.document;
+
+
+        await addAppointment(firestore, payload, user.uid);
         
         form.reset();
         toast({ title: 'Success!', description: 'Appointment booked successfully! Track its status in your dashboard.' });
