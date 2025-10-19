@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -11,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, User, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse } from "lucide-react";
+import { Menu, User, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,8 @@ const services = [
   { href: "/services/grievance-system", label: "Grievance Redressal", icon: FileWarning},
   { href: "/services/health-support", label: "Health Support", icon: HeartPulse},
   { href: "/services/education-support", label: "Education Support", icon: BookOpenCheck},
+  { href: "/services/invitation-request", label: "Invitation Request", icon: Mail },
+  { href: "/services/real-estate-consultancy", label: "Real Estate Consultancy", icon: Home },
 ];
 
 export default function Header() {

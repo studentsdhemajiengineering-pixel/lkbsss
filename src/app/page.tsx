@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -55,6 +56,8 @@ const services = [
   { name: 'Grievance Redressal', icon: FileWarning, color: 'bg-red-500', description: 'Submit complaints and track resolution status with unique ticket numbers.', href: '/services/grievance-system' },
   { name: 'Health Support', icon: HeartPulse, color: 'bg-green-500', description: 'Access medical assistance, health camps, and healthcare resources.', href: '/services/health-support' },
   { name: 'Education Support', icon: BookOpenCheck, color: 'bg-purple-500', description: 'Apply for scholarships, educational aid, and skill development programs.', href: '/services/education-support' },
+  { name: 'Invitation Request', icon: Mail, color: 'bg-orange-500', description: 'Request official invitations for events and ceremonial functions.', href: '/services/invitation-request' },
+  { name: 'Real Estate Consultancy', icon: HomeIcon, color: 'bg-teal-500', description: 'Get guidance on property matters, land records, and real estate procedures.', href: '/services/real-estate-consultancy' },
 ];
 
 const awards = [
@@ -299,7 +302,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <div key={index} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
                 <div className={`${service.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
@@ -542,5 +545,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

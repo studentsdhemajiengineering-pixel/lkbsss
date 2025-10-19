@@ -1,4 +1,5 @@
-import { ArrowRight, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse } from "lucide-react";
+
+import { ArrowRight, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home } from "lucide-react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,18 @@ const services = [
     icon: <BookOpenCheck className="h-8 w-8 text-primary" />,
     href: "/services/education-support",
   },
+  {
+    title: "Invitation Request",
+    description: "Request official invitations for events and ceremonial functions.",
+    icon: <Mail className="h-8 w-8 text-primary" />,
+    href: "/services/invitation-request",
+  },
+  {
+    title: "Real Estate Consultancy",
+    description: "Get guidance on property matters, land records, and real estate procedures.",
+    icon: <Home className="h-8 w-8 text-primary" />,
+    href: "/services/real-estate-consultancy",
+  },
 ];
 
 export default function ServicesPage() {
@@ -41,7 +54,7 @@ export default function ServicesPage() {
           Access a wide range of government services online.
         </p>
       </div>
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (
           <Card key={service.title} className="flex flex-col">
             <CardHeader className="flex flex-row items-start gap-4">
