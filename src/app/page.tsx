@@ -284,7 +284,7 @@ export default function Home() {
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-primary to-purple-600 rounded-2xl opacity-20 blur-lg"></div>
               <Image
-                src="https://picsum.photos/seed/about/800/1000"
+                src="/images/about-me.jpg"
                 alt="About Luit Kumar Barman"
                 width={800}
                 height={1000}
@@ -710,3 +710,4 @@ export default function Home() {
     </div>
   );
 }
+
