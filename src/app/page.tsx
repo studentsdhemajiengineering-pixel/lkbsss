@@ -289,7 +289,7 @@ export default function Home() {
       </section>
 
        {/* Services Section */}
-       <section className="py-20 bg-white">
+       <section className="py-20" style={{backgroundColor: '#e0e7ff'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
