@@ -1,9 +1,10 @@
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { newsArticles } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import type { NewsArticle } from "@/lib/placeholder-data";
@@ -23,36 +24,38 @@ export default function NewsPage() {
         {newsArticles.map((article: NewsArticle) => {
           const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
           return (
-            <Card key={article.id} className="flex flex-col overflow-hidden">
-                {articleImage && 
-                <Link href={`/news/${article.id}`} className="block overflow-hidden">
-                    <Image
-                    src={articleImage.imageUrl}
-                    alt={articleImage.description}
-                    data-ai-hint={articleImage.imageHint}
-                    width={600}
-                    height={400}
-                    className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                </Link>
-                }
-              <CardHeader>
-                <div className="flex justify-between items-center text-xs text-muted-foreground mb-2">
-                    <span>{article.date}</span>
+            <Card key={article.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+              {articleImage && 
+                <div className="relative">
+                  <Link href={`/news/${article.id}`} className="block overflow-hidden">
+                      <Image
+                        src={articleImage.imageUrl}
+                        alt={articleImage.description}
+                        data-ai-hint={articleImage.imageHint}
+                        width={600}
+                        height={400}
+                        className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                  </Link>
+                  <div className="absolute top-4 left-4">
                     <Badge variant="secondary">{article.category}</Badge>
+                  </div>
                 </div>
+              }
+              <CardHeader>
                 <CardTitle className="text-xl font-headline leading-tight">
                   <Link href={`/news/${article.id}`}>{article.title}</Link>
                 </CardTitle>
+                 <span className="text-sm text-gray-500 pt-2">{new Date(article.date).toLocaleDateString()}</span>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-sm text-muted-foreground line-clamp-4">{article.excerpt}</p>
+                <p className="text-sm text-muted-foreground line-clamp-3">{article.excerpt}</p>
               </CardContent>
-              <CardFooter>
-                 <Button asChild variant="link" className="p-0 h-auto">
-                    <Link href={`/news/${article.id}`}>Read More <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                  </Button>
-              </CardFooter>
+              <CardContent>
+                <Button asChild variant="link" className="p-0 h-auto font-medium">
+                  <Link href={`/news/${article.id}`}>Read More <ExternalLink className="ml-1 h-4 w-4" /></Link>
+                </Button>
+              </CardContent>
             </Card>
           )
         })}

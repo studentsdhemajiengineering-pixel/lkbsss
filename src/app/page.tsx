@@ -37,12 +37,15 @@ import {
   BookOpenCheck,
   CalendarCheck,
   FileWarning,
-  HeartPulse
+  HeartPulse,
+  MessageCircle,
+  Share2
 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { newsArticles, socialPosts, galleryImages, resources } from '@/lib/placeholder-data';
 import type { SocialPost, NewsArticle, GalleryImage, Resource } from '@/lib/placeholder-data';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Badge } from '@/components/ui/badge';
 
 const socialIcons: { [key: string]: React.ReactNode } = {
   Twitter: <Twitter className="h-6 w-6 text-sky-500" />,
@@ -256,7 +259,7 @@ export default function Home() {
       </section>
 
       {/* Social Feed Section */}
-      <section id="social" className="py-16 bg-gray-50">
+       <section id="social" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Follow Us</h2>
@@ -282,7 +285,9 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {socialPosts
               .filter(post => activeTab === 'All' || post.platform === activeTab)
-              .map((post: any) => (
+              .map((post: any) => {
+                const postImage = PlaceHolderImages.find(p => p.id === 'news-1');
+                return (
                 <Link
                   key={post.id}
                   href="#"
@@ -292,7 +297,7 @@ export default function Home() {
                 >
                   <div className="relative">
                     <Image
-                      src={post.image || "https://picsum.photos/seed/social/600/400"}
+                      src={postImage?.imageUrl || "https://picsum.photos/seed/social/600/400"}
                       alt={post.content}
                       width={600}
                       height={400}
@@ -310,15 +315,15 @@ export default function Home() {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <div className="flex items-center space-x-4">
                         <span className="flex items-center">
-                          <Heart className="w-4 h-4 mr-1" />
+                          <Heart className="w-4 h-4 mr-1"/>
                           {post.likes || 0}
                         </span>
                         <span className="flex items-center">
-                          <Mail className="w-4 h-4 mr-1" />
+                          <MessageCircle className="w-4 h-4 mr-1"/>
                           {post.comments || 0}
                         </span>
                         <span className="flex items-center">
-                          <ArrowRight className="w-4 h-4 mr-1" />
+                          <Share2 className="w-4 h-4 mr-1" />
                           {post.shares || 0}
                         </span>
                       </div>
@@ -326,7 +331,7 @@ export default function Home() {
                     </div>
                   </div>
                 </Link>
-              ))}
+              )})}
           </div>
           <div className="text-center">
             <Button className="bg-blue-500 hover:bg-blue-600">
@@ -400,30 +405,38 @@ export default function Home() {
                 {newsArticles.slice(0, 3).map((article: NewsArticle) => {
                   const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
                   return (
-                    <Card key={article.id} className="overflow-hidden">
-                      {articleImage && 
-                        <Link href={`/news/${article.id}`} className="block">
-                          <Image
-                            src={articleImage.imageUrl}
-                            alt={articleImage.description}
-                            data-ai-hint={articleImage.imageHint}
-                            width={600}
-                            height={400}
-                            className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </Link>
+                    <Card key={article.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                       {articleImage && 
+                        <div className="relative">
+                          <Link href={`/news/${article.id}`} className="block overflow-hidden">
+                              <Image
+                                src={articleImage.imageUrl}
+                                alt={articleImage.description}
+                                data-ai-hint={articleImage.imageHint}
+                                width={600}
+                                height={400}
+                                className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
+                              />
+                          </Link>
+                          <div className="absolute top-4 left-4">
+                            <Badge variant="secondary">{article.category}</Badge>
+                          </div>
+                        </div>
                       }
                       <CardHeader>
-                        <CardTitle className="text-lg font-headline">{article.title}</CardTitle>
+                        <CardTitle className="text-xl font-headline leading-tight">
+                          <Link href={`/news/${article.id}`}>{article.title}</Link>
+                        </CardTitle>
+                         <span className="text-sm text-gray-500 pt-2">{new Date(article.date).toLocaleDateString()}</span>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="flex-grow">
                         <p className="text-sm text-muted-foreground line-clamp-3">{article.excerpt}</p>
                       </CardContent>
-                      <CardFooter>
-                         <Button asChild variant="link" className="p-0 h-auto">
-                            <Link href={`/news/${article.id}`}>Read More <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                          </Button>
-                      </CardFooter>
+                      <CardContent>
+                        <Button asChild variant="link" className="p-0 h-auto font-medium">
+                          <Link href={`/news/${article.id}`}>Read More <ExternalLink className="ml-1 h-4 w-4" /></Link>
+                        </Button>
+                      </CardContent>
                     </Card>
                   )
                 })}
