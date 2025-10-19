@@ -4,14 +4,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useUser, useFirebase } from '@/firebase/provider';
+import { useUser, useFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, User as UserIcon, Mail, Lock, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { errorEmitter, FirestorePermissionError } from '@/firebase';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -35,21 +34,25 @@ export default function RegisterPage() {
   const handleCreateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     if (!fullName || !email || !password || !phoneNumber) {
       setError('Please fill in all fields.');
-      setLoading(false);
       return;
     }
-
     if (!/^\d{10}$/.test(phoneNumber)) {
         setError('Please enter a valid 10-digit phone number.');
-        setLoading(false);
         return;
     }
 
+    setLoading(true);
+
     try {
+      if (!auth || !firestore) {
+        setError('Firebase is not initialized. Please try again later.');
+        setLoading(false);
+        return;
+      }
+      
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const createdUser = userCredential.user;
       
@@ -64,24 +67,29 @@ export default function RegisterPage() {
         createdAt: new Date().toISOString(),
       };
 
+      // Set the document and chain the catch for permission errors
       setDoc(userDocRef, userProfileData)
         .catch(serverError => {
+            // This is the specialized error handling for Firestore security rules
             const permissionError = new FirestorePermissionError({
                 path: userDocRef.path,
                 operation: 'create',
                 requestResourceData: userProfileData,
             });
             errorEmitter.emit('permission-error', permissionError);
+            // We don't set a local error here, as the global handler will show the overlay
         });
 
       toast({ title: 'Registration Successful!', description: 'Redirecting to your dashboard.' });
       router.push('/user-dashboard');
-    } catch (err: any) {
-      console.error('Error creating profile:', err);
-      if (err.code === 'auth/email-already-in-use') {
+
+    } catch (authError: any) {
+      // This block now only catches errors from createUserWithEmailAndPassword
+      if (authError.code === 'auth/email-already-in-use') {
         setError('This email address is already in use.');
       } else {
-        setError('Failed to create profile. Please try again.');
+        setError('Failed to create account. Please try again.');
+        console.error('Auth error creating profile:', authError);
       }
     } finally {
       setLoading(false);
@@ -155,7 +163,7 @@ export default function RegisterPage() {
                     type="password"
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.g.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Create a password (min. 6 characters)"
                     required
