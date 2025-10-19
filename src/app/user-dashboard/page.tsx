@@ -42,25 +42,35 @@ export default function UserDashboardPage() {
         
         try {
           const collectionsToFetch = [
-              'appointments', 'grievances', 'health-requests', 
-              'education-requests', 'real-estate-requests', 'invitation-requests'
+              { name: 'appointments', type: 'Appointment', detailKey: 'purpose' },
+              { name: 'grievances', type: 'Grievance', detailKey: 'grievanceType', refKey: 'ticketNumber' },
+              { name: 'health-requests', type: 'Health Support', detailKey: 'assistanceType' },
+              { name: 'education-requests', type: 'Education Support', detailKey: 'requestType' },
+              { name: 'real-estate-requests', type: 'Real Estate', detailKey: 'consultationType' },
+              { name: 'invitation-requests', type: 'Invitation', detailKey: 'eventName' },
           ];
 
-          const allPromises = collectionsToFetch.map(collectionName => 
-            getUserServiceRequests(firestore, collectionName, user.uid)
+          const allPromises = collectionsToFetch.map(collectionInfo => 
+            getUserServiceRequests(firestore, collectionInfo.name, user.uid)
           );
           
           const results = await Promise.all(allPromises);
 
           const allRequests: ServiceRequest[] = [];
 
-          // Process and combine all requests into a single list
-          (results[0] as Appointment[]).forEach((req) => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
-          (results[1] as Grievance[]).forEach((req) => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
-          (results[2] as HealthRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Health Support', status: req.status, submittedAt: req.submittedAt, details: req.assistanceType, reference: req.id.slice(0,8) }));
-          (results[3] as EducationRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Education Support', status: req.status, submittedAt: req.submittedAt, details: req.requestType, reference: req.id.slice(0,8) }));
-          (results[4] as RealEstateRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Real Estate', status: req.status, submittedAt: req.submittedAt, details: req.consultationType, reference: req.id.slice(0,8) }));
-          (results[5] as InvitationRequest[]).forEach((req) => allRequests.push({ id: req.id, type: 'Invitation', status: req.status, submittedAt: req.submittedAt, details: req.eventName, reference: req.id.slice(0,8) }));
+          results.forEach((result, index) => {
+            const collectionInfo = collectionsToFetch[index];
+            (result as any[]).forEach(req => {
+              allRequests.push({
+                id: req.id,
+                type: collectionInfo.type,
+                status: req.status,
+                submittedAt: req.submittedAt,
+                details: req[collectionInfo.detailKey as keyof typeof req] || 'N/A',
+                reference: (collectionInfo.refKey ? req[collectionInfo.refKey as keyof typeof req] : req.id.slice(0, 8)) || 'N/A'
+              });
+            });
+          });
 
           // Sort all requests by submission date, most recent first
           allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
@@ -104,7 +114,8 @@ export default function UserDashboardPage() {
   
   const totalRequests = requests.length;
   const pendingRequests = requests.filter(r => ['pending', 'submitted', 'under_review', 'processing', 'in_progress'].includes(r.status.toLowerCase())).length;
-  const completedRequests = totalRequests - pendingRequests;
+  const completedRequests = requests.filter(r => ['completed', 'resolved', 'confirmed', 'approved', 'cancelled', 'rejected', 'closed'].includes(r.status.toLowerCase())).length;
+
 
   return (
     <div className="min-h-screen bg-secondary/50 p-4 sm:p-6 lg:p-8">
