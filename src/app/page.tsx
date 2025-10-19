@@ -289,14 +289,14 @@ export default function Home() {
       <section id="social" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Follow Us</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4 font-headline">Follow Us</h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">Stay connected with us on social media for the latest updates, announcements, and community engagement.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-2 mb-8">
-                <button onClick={() => setActiveTab('All')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'All' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>All</button>
-                <button onClick={() => setActiveTab('Facebook')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Facebook' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Facebook</button>
-                <button onClick={() => setActiveTab('Instagram')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Instagram' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Instagram</button>
-                <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Twitter</button>
+                <button onClick={() => setActiveTab('All')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'All' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>All</button>
+                <button onClick={() => setActiveTab('Facebook')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Facebook' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Facebook</button>
+                <button onClick={() => setActiveTab('Instagram')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Instagram' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Instagram</button>
+                <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>Twitter</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {filteredSocialPosts.map((post: SocialMediaPost) => (
@@ -433,7 +433,7 @@ export default function Home() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Interview and podcast </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 font-headline">Interview and podcast </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Watch the latest video updates, press conferences, and important announcements.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -605,3 +605,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
