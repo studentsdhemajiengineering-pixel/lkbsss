@@ -2,9 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, User } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Menu, User, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { cn } from "@/lib/utils";
@@ -14,11 +21,18 @@ const navLinks = [
   { href: "/news", label: "News" },
   { href: "/gallery", label: "Gallery" },
   { href: "/resources", label: "Resources" },
-  { href: "/services", label: "Services" },
+];
+
+const services = [
+  { href: "/services/appointment-booking", label: "Appointment Booking", icon: CalendarCheck},
+  { href: "/services/grievance-system", label: "Grievance Redressal", icon: FileWarning},
+  { href: "/services/health-support", label: "Health Support", icon: HeartPulse},
+  { href: "/services/education-support", label: "Education Support", icon: BookOpenCheck},
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const [isSheetOpen, setSheetOpen] = useState(false);
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
@@ -28,9 +42,32 @@ export default function Header() {
         pathname.startsWith(href) && href !== "/" || pathname === href ? "text-foreground" : "text-foreground/60"
       )}
       prefetch={false}
+      onClick={() => setSheetOpen(false)}
     >
       {label}
     </Link>
+  );
+
+  const ServiceDropdownMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className={cn("flex items-center gap-1 transition-colors hover:text-foreground/80", 
+            pathname.startsWith("/services") ? "text-foreground" : "text-foreground/60"
+        )}>
+          Services <ChevronDown className="h-4 w-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        {services.map((service) => (
+          <DropdownMenuItem key={service.href} asChild>
+            <Link href={service.href}>
+                <service.icon className="mr-2 h-4 w-4" />
+                <span>{service.label}</span>
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
   
   return (
@@ -40,7 +77,7 @@ export default function Header() {
           <Logo />
         </div>
         <div className="flex items-center md:hidden">
-            <Sheet>
+            <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
@@ -48,12 +85,22 @@ export default function Header() {
                 </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-6 text-lg font-medium mt-8">
+                <div className="flex flex-col gap-6 text-lg font-medium mt-8">
                     <Logo />
-                    {navLinks.map((link) => (
-                        <NavLink key={link.href} {...link} />
-                    ))}
-                </nav>
+                    <nav className="flex flex-col gap-4">
+                      {navLinks.map((link) => (
+                          <NavLink key={link.href} {...link} />
+                      ))}
+                      <div className="text-foreground/60">Services</div>
+                      <div className="flex flex-col gap-4 pl-4">
+                        {services.map(service => (
+                           <Link key={service.href} href={service.href} className="text-base text-foreground/60 hover:text-foreground/80" onClick={() => setSheetOpen(false)}>
+                             {service.label}
+                           </Link>
+                        ))}
+                      </div>
+                    </nav>
+                </div>
             </SheetContent>
             </Sheet>
             <div className="ml-4 md:hidden">
@@ -65,6 +112,7 @@ export default function Header() {
           {navLinks.map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
+          <ServiceDropdownMenu />
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <LanguageSwitcher />
