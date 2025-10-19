@@ -240,7 +240,7 @@ export default function Home() {
           <div className="relative">
             <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full hidden md:block"></div>
             
-            <div className="space-y-16">
+            <div className="space-y-8">
               {awards.map((award, index) => {
                 const IconComponent = award.icon;
                 const isLeft = award.side === 'left';
@@ -350,8 +350,8 @@ export default function Home() {
         </div>
       </section>
 
-       {/* News & Articles Section */}
-       <section id="news" className="w-full py-12 md:py-20 lg:py-24 bg-secondary">
+      {/* News & Articles Section */}
+      <section id="news" className="w-full py-12 md:py-20 lg:py-24 bg-secondary">
         <div className="container px-4 md:px-6">
           <div className="text-center space-y-4 mb-12">
              <div className="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium mb-4">
@@ -411,7 +411,6 @@ export default function Home() {
             </div>
         </div>
       </section>
-
 
       {/* Interview and Podcast Section */}
       <section className="py-16 bg-gray-50">
@@ -476,7 +475,7 @@ export default function Home() {
                       src="/images/book-cover.jpg"
                       alt="Book Cover"
                       width={400}
-                      height={600}
+                      height={500}
                       className="rounded-xl shadow-2xl mx-auto"
                     />
               </div>
@@ -593,5 +592,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
