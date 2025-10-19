@@ -1,0 +1,347 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Digital Connect platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user."
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Indicates if the user has administrator privileges."
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email",
+        "firstName",
+        "lastName",
+        "isAdmin"
+      ]
+    },
+    "SocialMediaPost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SocialMediaPost",
+      "type": "object",
+      "description": "Represents a post fetched from a social media platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the social media post."
+        },
+        "platform": {
+          "type": "string",
+          "description": "The social media platform where the post originated (e.g., Facebook, Twitter)."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the social media post."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL to the social media post.",
+          "format": "uri"
+        },
+        "postedAt": {
+          "type": "string",
+          "description": "The date and time when the post was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "platform",
+        "content",
+        "url",
+        "postedAt"
+      ]
+    },
+    "NewsArticle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NewsArticle",
+      "type": "object",
+      "description": "Represents a news article displayed on the platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the news article."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the news article."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the news article."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to the image associated with the news article.",
+          "format": "uri"
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "The date and time when the article was published.",
+          "format": "date-time"
+        },
+        "isVideo": {
+          "type": "boolean",
+          "description": "Indicates if the news article is a video."
+        },
+        "isPodcast": {
+          "type": "boolean",
+          "description": "Indicates if the news article is a podcast."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "publishedAt"
+      ]
+    },
+    "GalleryImage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GalleryImage",
+      "type": "object",
+      "description": "Represents an image in the gallery.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the gallery image."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to the gallery image.",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the image."
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "The date and time when the image was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "imageUrl",
+        "uploadedAt"
+      ]
+    },
+    "Resource": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Resource",
+      "type": "object",
+      "description": "Represents an official announcement, scheme, or press release.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the resource."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the resource."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the resource."
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "URL to the resource file (e.g., PDF).",
+          "format": "uri"
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "The date and time when the resource was published.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "fileUrl",
+        "publishedAt"
+      ]
+    },
+    "LanguagePage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LanguagePage",
+      "type": "object",
+      "description": "Represents content for a specific language.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the language page."
+        },
+        "language": {
+          "type": "string",
+          "description": "The language of the page (e.g., English, Assamese, Hindi)."
+        },
+        "pageName": {
+          "type": "string",
+          "description": "The name of the page (e.g., Home, About Us)."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the page in the specified language."
+        }
+      },
+      "required": [
+        "id",
+        "language",
+        "pageName",
+        "content"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile data. Accessible to the user themselves.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Indicates admin privileges. The existence of a document for a user in this collection grants admin rights.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who is an admin."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/social_media_posts/{postId}",
+        "definition": {
+          "entityName": "SocialMediaPost",
+          "schema": {
+            "$ref": "#/backend/entities/SocialMediaPost"
+          },
+          "description": "Stores social media posts fetched from various platforms. Accessible for reading by all users.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "The unique identifier of the social media post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/news_articles/{articleId}",
+        "definition": {
+          "entityName": "NewsArticle",
+          "schema": {
+            "$ref": "#/backend/entities/NewsArticle"
+          },
+          "description": "Stores news articles managed by admins. Read access granted to all users; write access restricted to admins (roles_admin).",
+          "params": [
+            {
+              "name": "articleId",
+              "description": "The unique identifier of the news article."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/gallery_images/{imageId}",
+        "definition": {
+          "entityName": "GalleryImage",
+          "schema": {
+            "$ref": "#/backend/entities/GalleryImage"
+          },
+          "description": "Stores gallery images managed by admins. Read access granted to all users; write access restricted to admins (roles_admin).",
+          "params": [
+            {
+              "name": "imageId",
+              "description": "The unique identifier of the gallery image."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/resources/{resourceId}",
+        "definition": {
+          "entityName": "Resource",
+          "schema": {
+            "$ref": "#/backend/entities/Resource"
+          },
+          "description": "Stores official announcements, schemes, and press releases. Read access granted to all users; write access restricted to admins (roles_admin).",
+          "params": [
+            {
+              "name": "resourceId",
+              "description": "The unique identifier of the resource."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/language_pages/{pageId}",
+        "definition": {
+          "entityName": "LanguagePage",
+          "schema": {
+            "$ref": "#/backend/entities/LanguagePage"
+          },
+          "description": "Stores multi-language content for different pages. Read access granted to all users; write access restricted to admins (roles_admin).",
+          "params": [
+            {
+              "name": "pageId",
+              "description": "The unique identifier of the language page."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the Digital Connect platform's features while adhering to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). It leverages denormalization for authorization independence and structural segregation for a homogeneous security posture.\n\n**Authorization Independence:** The design avoids hierarchical authorization dependencies (`get()` calls in security rules) by denormalizing relevant authorization data. For example, if access to `NewsArticle` documents needs to be restricted to admins, we rely on the `roles_admin/{uid}` collection check, rather than fetching the user document to verify `isAdmin`.\n\n**Structural Segregation:** Different types of data with different access requirements are stored in separate collections. Admin-managed content (news articles, gallery images, resources, language pages) are stored in top-level collections, and admin status is determined by membership in the `roles_admin` collection, allowing for simple and secure list operations.\n\n**Access Modeling:**\n*   **Private User Data:** User-specific data is stored under `/users/{userId}`.\n*   **Admin Privileges:** Admin privileges are managed using the `/roles_admin/{userId}` collection. The existence of a document with the user's ID in this collection grants admin rights.\n*   **Public Data:** Social media posts, news articles, gallery images, resources, and language pages are stored in top-level collections with appropriate read access controls.\n\n**QAPs (Rules are not Filters):** The structure enables secure `list` operations. For example, listing news articles only requires checking if the user has the required permissions to read them, without needing to filter based on document content.\n\nThis structure is highly scalable, debuggable and secure."
+  }
+}
