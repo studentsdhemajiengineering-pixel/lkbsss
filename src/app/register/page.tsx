@@ -4,9 +4,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/firebase/provider';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { useUser, useFirebase } from '@/firebase/provider';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, User as UserIcon, Mail, Lock, Phone } from 'lucide-react';
@@ -24,14 +24,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user, isUserLoading } = useUser();
-  const [auth, setAuth] = useState<any>(null);
-  const [db, setDb] = useState<any>(null);
-
-  useEffect(() => {
-    const authInstance = getAuth();
-    setAuth(authInstance);
-    setDb(getFirestore(authInstance.app));
-  }, []);
+  const { auth, firestore } = useFirebase();
 
   useEffect(() => {
     if (!isUserLoading && user) {
@@ -62,7 +55,7 @@ export default function RegisterPage() {
       
       await updateProfile(createdUser, { displayName: fullName });
       
-      const userDocRef = doc(db, 'users', createdUser.uid);
+      const userDocRef = doc(firestore, 'users', createdUser.uid);
       const userProfileData = {
         uid: createdUser.uid,
         displayName: fullName,
@@ -162,7 +155,7 @@ export default function RegisterPage() {
                     type="password"
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.g.target.value)}
                     className="w-full pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Create a password (min. 6 characters)"
                     required
