@@ -77,11 +77,11 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
     const activeCollection = requestTypes.find(rt => rt.id === activeRequestType)?.collection || '';
 
 
-    const handleUpdateStatus = async (id: string, status: string) => {
-        if (!firestore || !activeCollection) return;
+    const handleUpdateStatus = async (id: string, status: string, userId: string) => {
+        if (!firestore || !activeCollection || !userId) return;
         setLoading(true);
         try {
-            await updateServiceRequestStatus(firestore, activeCollection, id, status);
+            await updateServiceRequestStatus(firestore, activeCollection, id, status, userId);
             onDataChange();
         } catch (error) {
             console.error(`Error updating status for ${activeCollection}:`, error);
@@ -89,12 +89,12 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
         setLoading(false);
     };
 
-    const handleDeleteItem = async (id: string) => {
-        if (!firestore || !activeCollection) return;
+    const handleDeleteItem = async (id: string, userId: string) => {
+        if (!firestore || !activeCollection || !userId) return;
         if (!confirm('Are you sure you want to delete this item?')) return;
         setLoading(true);
         try {
-            await deleteServiceRequest(firestore, activeCollection, id);
+            await deleteServiceRequest(firestore, activeCollection, id, userId);
             onDataChange();
         } catch (error) {
              console.error(`Error deleting item from ${activeCollection}:`, error);
@@ -188,7 +188,7 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
                                         <TableCell className="px-6 py-4">
                                             <Select
                                                 value={item.status}
-                                                onValueChange={(value) => handleUpdateStatus(item.id, value)}
+                                                onValueChange={(value) => handleUpdateStatus(item.id, value, item.userId)}
                                             >
                                                 <SelectTrigger className={`w-36 h-auto text-xs font-medium border-0 focus:ring-0 ${getStatusColor(item.status)}`}>
                                                     <SelectValue placeholder="Select Status"/>
@@ -207,7 +207,7 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleDeleteItem(item.id)}
+                                                onClick={() => handleDeleteItem(item.id, item.userId)}
                                                 className="text-destructive hover:text-destructive/80"
                                             >
                                                 <Trash2 className="w-4 h-4" />

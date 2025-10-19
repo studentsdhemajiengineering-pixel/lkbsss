@@ -37,15 +37,20 @@ import type {
 
 
 const addDocument = async (db: any, collectionName: string, data: any, userId?: string) => {
-    const collRef = collection(db, collectionName);
+    if (!userId) {
+        const error = new Error("User must be authenticated to add a document.");
+        console.error(error);
+        throw error;
+    }
+    
+    // Path: /users/{userId}/{collectionName}
+    const collRef = collection(db, 'users', userId, collectionName);
     const payload: any = {
         ...data,
         submittedAt: serverTimestamp(),
-        status: data.status || 'submitted', 
+        status: data.status || 'submitted',
+        userId: userId,
     };
-    if (userId) {
-        payload.userId = userId;
-    }
     
     addDoc(collRef, payload)
         .catch(error => {
@@ -62,12 +67,12 @@ const addDocument = async (db: any, collectionName: string, data: any, userId?: 
         });
 };
 
-export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status'>, userId: string) => addDocument(db, 'appointments', {...data, status: 'pending'}, userId);
-export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'status' | 'ticketNumber'>, userId: string) => addDocument(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}` }, userId);
-export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'status'>, userId: string) => addDocument(db, 'health-requests', data, userId);
-export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'status'>, userId: string) => addDocument(db, 'education-requests', data, userId);
-export const addRealEstateRequest = (db: any, data: Omit<RealEstateRequest, 'id' | 'submittedAt' | 'status'>, userId: string) => addDocument(db, 'real-estate-requests', data, userId);
-export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id' | 'submittedAt' | 'status'>, userId: string) => addDocument(db, 'invitation-requests', data, userId);
+export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'appointments', {...data, status: 'pending'}, userId);
+export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'status' | 'ticketNumber' | 'userId'>, userId: string) => addDocument(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}` }, userId);
+export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'health-requests', data, userId);
+export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'education-requests', data, userId);
+export const addRealEstateRequest = (db: any, data: Omit<RealEstateRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'real-estate-requests', data, userId);
+export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'invitation-requests', data, userId);
 
 
 const getCollectionData = async (db: any, collectionName: string) => {
@@ -87,10 +92,11 @@ export const getSocialMediaPosts = (db: any): Promise<SocialMediaPost[]> => getC
 
 
 const getServiceRequests = async (db: any, collectionName: string, userId?: string) => {
-    const collectionRef = collection(db, collectionName);
-    const q = userId 
-        ? query(collectionRef, where("userId", "==", userId), orderBy("submittedAt", "desc"))
-        : query(collectionRef, orderBy("submittedAt", "desc"));
+    if (!userId) return []; // Cannot fetch requests without a user ID
+
+    // Path: /users/{userId}/{collectionName}
+    const collectionRef = collection(db, 'users', userId, collectionName);
+    const q = query(collectionRef, orderBy("submittedAt", "desc"));
     
     const snapshot = await getDocs(q);
      if (snapshot.empty) {
@@ -99,16 +105,30 @@ const getServiceRequests = async (db: any, collectionName: string, userId?: stri
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() }));
 };
 
-export const getAppointments = (db: any, userId?: string): Promise<Appointment[]> => getServiceRequests(db, 'appointments', userId) as Promise<Appointment[]>;
-export const getGrievances = (db: any, userId?: string): Promise<Grievance[]> => getServiceRequests(db, 'grievances', userId) as Promise<Grievance[]>;
-export const getHealthRequests = (db: any, userId?: string): Promise<HealthRequest[]> => getServiceRequests(db, 'health-requests', userId) as Promise<HealthRequest[]>;
-export const getEducationRequests = (db: any, userId?: string): Promise<EducationRequest[]> => getServiceRequests(db, 'education-requests', userId) as Promise<EducationRequest[]>;
-export const getRealEstateRequests = (db: any, userId?: string): Promise<RealEstateRequest[]> => getServiceRequests(db, 'real-estate-requests', userId) as Promise<RealEstateRequest[]>;
-export const getInvitationRequests = (db: any, userId?: string): Promise<InvitationRequest[]> => getServiceRequests(db, 'invitation-requests', userId) as Promise<InvitationRequest[]>;
+const getAllServiceRequestsForAdmin = async (db: any, collectionName: string) => {
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    const allRequests: any[] = [];
+    for (const userDoc of usersSnapshot.docs) {
+        const userId = userDoc.id;
+        const requestsRef = collection(db, 'users', userId, collectionName);
+        const requestsSnapshot = await getDocs(query(requestsRef, orderBy("submittedAt", "desc")));
+        requestsSnapshot.forEach(doc => {
+            allRequests.push({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() });
+        });
+    }
+    return allRequests;
+};
+
+export const getAppointments = (db: any, userId?: string): Promise<Appointment[]> => userId ? getServiceRequests(db, 'appointments', userId) as Promise<Appointment[]> : getAllServiceRequestsForAdmin(db, 'appointments');
+export const getGrievances = (db: any, userId?: string): Promise<Grievance[]> => userId ? getServiceRequests(db, 'grievances', userId) as Promise<Grievance[]> : getAllServiceRequestsForAdmin(db, 'grievances');
+export const getHealthRequests = (db: any, userId?: string): Promise<HealthRequest[]> => userId ? getServiceRequests(db, 'health-requests', userId) as Promise<HealthRequest[]> : getAllServiceRequestsForAdmin(db, 'health-requests');
+export const getEducationRequests = (db: any, userId?: string): Promise<EducationRequest[]> => userId ? getServiceRequests(db, 'education-requests', userId) as Promise<EducationRequest[]> : getAllServiceRequestsForAdmin(db, 'education-requests');
+export const getRealEstateRequests = (db: any, userId?: string): Promise<RealEstateRequest[]> => userId ? getServiceRequests(db, 'real-estate-requests', userId) as Promise<RealEstateRequest[]> : getAllServiceRequestsForAdmin(db, 'real-estate-requests');
+export const getInvitationRequests = (db: any, userId?: string): Promise<InvitationRequest[]> => userId ? getServiceRequests(db, 'invitation-requests', userId) as Promise<InvitationRequest[]> : getAllServiceRequestsForAdmin(db, 'invitation-requests');
 
 
-export const updateServiceRequestStatus = async (db: any, collectionName: string, id: string, status: string) => {
-    const docRef = doc(db, collectionName, id);
+export const updateServiceRequestStatus = async (db: any, collectionName: string, id: string, status: string, userId: string) => {
+    const docRef = doc(db, 'users', userId, collectionName, id);
     const payload = { status };
     updateDoc(docRef, payload)
         .catch(error => {
@@ -123,8 +143,8 @@ export const updateServiceRequestStatus = async (db: any, collectionName: string
         });
 };
 
-export const deleteServiceRequest = async (db: any, collectionName: string, id: string) => {
-    const docRef = doc(db, collectionName, id);
+export const deleteServiceRequest = async (db: any, collectionName: string, id: string, userId: string) => {
+    const docRef = doc(db, 'users', userId, collectionName, id);
     deleteDoc(docRef)
         .catch(error => {
             errorEmitter.emit(
@@ -192,3 +212,4 @@ export const uploadFile = async (file: File) => {
     const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
 };
+
