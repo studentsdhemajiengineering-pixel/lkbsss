@@ -4,18 +4,21 @@ import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
 
 const galleryImages: Omit<GalleryImage, 'imageId' | 'published_at'>[] = [
-    { id: '1', title: 'Community Gathering', imageUrl: '/images/gallery/1.jpg' },
-    { id: '2', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
-    { id: '3', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
-    { id: '4', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
-    { id: '5', title: 'Health Camp', imageUrl: '/images/gallery/5.jpg' },
-    { id: '6', title: 'Award Function', imageUrl: '/images/gallery/6.jpg' },
-    { id: '7', title: 'Press Conference', imageUrl: '/images/gallery/7.jpg' },
-    { id: '8', title: 'Felicitation Program', imageUrl: '/images/gallery/8.jpg' },
-    { id: '9', title: 'Community Gathering', imageUrl: '/images/gallery/1.jpg' },
-    { id: '10', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
-    { id: '11', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
-    { id: '12', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
+    { id: '1', title: 'Gallery Image 1',  imageUrl:  '/images/gallery/gallery1.jpg' },
+    { id: '2', title: 'Gallery Image 2', imageUrl: '/images/gallery/gallery2.jpg' },
+    { id: '3', title: 'Gallery Image 3', imageUrl: '/images/gallery/gallery3.jpg' },
+    { id: '4', title: 'Gallery Image 4', imageUrl: '/images/gallery/gallery4.jpg' },
+    { id: '5', title: 'Gallery Image 5', imageUrl: '/images/gallery/gallery5.jpg' },
+    { id: '6', title: 'Gallery Image 6', imageUrl: '/images/gallery/gallery6.jpg' },
+    { id: '7', title: 'Gallery Image 7', imageUrl: '/images/gallery/gallery7.jpg' },
+    { id: '8', title: 'Gallery Image 8', imageUrl: '/images/gallery/gallery8.jpg' },
+    { id: '9', title: 'Gallery Image 9', imageUrl: '/images/gallery/gallery9.jpg' },
+    { id: '10', title: 'Gallery Image 10', imageUrl: '/images/gallery/gallery10.jpg' },
+    { id: '11', title: 'Gallery Image 11', imageUrl: '/images/gallery/gallery11.jpg' },
+    { id: '12', title: 'Gallery Image 12', imageUrl: '/images/gallery/gallery12.jpg' },
+    { id: '13', title: 'Gallery Image 13', imageUrl: '/images/gallery/gallery13.jpg' },
+    { id: '14', title: 'Gallery Image 14', imageUrl: '/images/gallery/gallery14.jpg' },
+    { id: '15', title: 'Gallery Image 15', imageUrl: '/images/gallery/gallery15.jpg' },
 ];
 
 

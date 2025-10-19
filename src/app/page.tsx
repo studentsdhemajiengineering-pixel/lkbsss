@@ -284,14 +284,21 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
 ];
 
 const galleryImages: Omit<GalleryImage, 'imageId' | 'published_at'>[] = [
-    { id: '1', title: 'Community Gathering',  imageUrl:  '/images/gallery/1.jpg' },
-    { id: '2', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
-    { id: '3', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
-    { id: '4', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
-    { id: '5', title: 'Health Camp', imageUrl: '/images/gallery/5.jpg' },
-    { id: '6', title: 'Award Function', imageUrl: '/images/gallery/6.jpg' },
-    { id: '7', title: 'Press Conference', imageUrl: '/images/gallery/7.jpg' },
-    { id: '8', title: 'Felicitation Program', imageUrl: '/images/gallery/8.jpg' },
+    { id: '1', title: 'Gallery Image 1',  imageUrl:  '/images/gallery/gallery1.jpg' },
+    { id: '2', title: 'Gallery Image 2', imageUrl: '/images/gallery/gallery2.jpg' },
+    { id: '3', title: 'Gallery Image 3', imageUrl: '/images/gallery/gallery3.jpg' },
+    { id: '4', title: 'Gallery Image 4', imageUrl: '/images/gallery/gallery4.jpg' },
+    { id: '5', title: 'Gallery Image 5', imageUrl: '/images/gallery/gallery5.jpg' },
+    { id: '6', title: 'Gallery Image 6', imageUrl: '/images/gallery/gallery6.jpg' },
+    { id: '7', title: 'Gallery Image 7', imageUrl: '/images/gallery/gallery7.jpg' },
+    { id: '8', title: 'Gallery Image 8', imageUrl: '/images/gallery/gallery8.jpg' },
+    { id: '9', title: 'Gallery Image 9', imageUrl: '/images/gallery/gallery9.jpg' },
+    { id: '10', title: 'Gallery Image 10', imageUrl: '/images/gallery/gallery10.jpg' },
+    { id: '11', title: 'Gallery Image 11', imageUrl: '/images/gallery/gallery11.jpg' },
+    { id: '12', title: 'Gallery Image 12', imageUrl: '/images/gallery/gallery12.jpg' },
+    { id: '13', title: 'Gallery Image 13', imageUrl: '/images/gallery/gallery13.jpg' },
+    { id: '14', title: 'Gallery Image 14', imageUrl: '/images/gallery/gallery14.jpg' },
+    { id: '15', title: 'Gallery Image 15', imageUrl: '/images/gallery/gallery15.jpg' },
 ];
 
 
@@ -722,10 +729,10 @@ export default function Home() {
               A glimpse into our latest events and initiatives.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {galleryImages.slice(0, 8).map((image, index) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {galleryImages.map((image, index) => {
               return (
-                <div key={image.id} className={`relative aspect-square rounded-lg overflow-hidden group ${index >= 4 ? 'hidden md:block' : ''}`}>
+                <div key={image.id} className={`relative aspect-square rounded-lg overflow-hidden group`}>
                     <Image
                       src={image.imageUrl}
                       alt={image.title}
@@ -733,7 +740,7 @@ export default function Home() {
                       className="object-cover transition-transform duration-300 group-hover:scale-110"
                     />
                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <p className="text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">{image.title}</p>
+                    <p className="text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity text-center px-2">{image.title}</p>
                   </div>
                 </div>
               )
