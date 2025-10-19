@@ -1,7 +1,7 @@
 
 export type SocialPost = {
   id: number;
-  platform: 'Twitter' | 'Facebook' | 'Instagram' | 'LinkedIn';
+  platform: 'Twitter' | 'Facebook' | 'Instagram';
   username: string;
   content: string;
   timestamp: string;
@@ -72,7 +72,7 @@ export const interviewsAndPodcasts: InterviewAndPodcast[] = [
     {
         id: '3',
         title: '📌লুইত কুমাৰ বৰ্মনৰ বহু নজনা কথা',
-        thumbnail: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/453892231_1237631371018307_2015268119694680216_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=101&ccb=1-7&_nc_sid=be8305&_nc_ohc=PlCoiMAXhKAQ7kNvwEr2Pf6&_nc_oc=AdlASjNwGdpRnnv5nBnv4masijed7Fzj5zQ4Zajg1pGfuBoff5d3196OJk7Pcp0ccm0&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=7pAoaw8rtBKXeWFVpxsKSQ&oh=00_AfatBCA2IMinX2_U5JLcEhNJgDF1J1HIa4dXiK_G8VIxGw&oe=68BF6FA8',
+        thumbnail: 'https://picsum.photos/seed/podcast3/960/960',
         url: 'https://www.facebook.com/watch/?mibextid=WC7FNe&v=1011876583509983&rdid=39P36saVknGSc5sl',
         duration: '22:15',
         views: '7.1k',
@@ -88,7 +88,7 @@ export const socialPosts: SocialPost[] = [
       username: 'Luit Kumar Barman',
       content: 'Happy to share Trust deed of “ ৰক্ষা” has been registered today. ৰাইজৰ আশীৰ্বাদত আমি আশা কৰো যে আমি ৰাইজক সেৱা কৰিব পাৰিম ',
       timestamp: '1 Day ago',
-      imageUrl: '/images/followus/post1.jpg',
+      imageUrl: 'https://picsum.photos/seed/post1/600/400',
       likes: 245,
       comments: 32,
       shares: 18,
@@ -100,7 +100,7 @@ export const socialPosts: SocialPost[] = [
       username: 'Luit Kumar Barman',
       content: 'Rahul Gandhi is not given the contract of the country alone. He has raised such a sensitive issue. As responsible citizens, we also have duty.',
       timestamp: '4 hours ago',
-      imageUrl: '/images/followus/post2.jpg',
+      imageUrl: 'https://picsum.photos/seed/post2/600/400',
       likes: 189,
       comments: 24,
       shares: 12,
@@ -112,7 +112,7 @@ export const socialPosts: SocialPost[] = [
       username: 'Luit Kumar Barman',
       content: 'Occupancy certificate দিওঁতে GMC বছৰ বছৰ যাব পাৰে কিন্তু RTI ৰ first appeal ৰ তাৰিখ কিন্তু ২ দিনতে hearing ৰ date দিছে। যদিও RTI Act 2005 মতে appellant মাতিব লাগে বুলি নিয়ম নাই কিন্তু natural justice ৰ বাবে সকলোৱে মাতে।',
       timestamp: '6 hours ago',
-      imageUrl: '/images/followus/post3.jpg',
+      imageUrl: 'https://picsum.photos/seed/post3/600/400',
       likes: 156,
       comments: 18,
       shares: 28,
@@ -124,7 +124,7 @@ export const socialPosts: SocialPost[] = [
       username: 'Luit Kumar Barman',
       content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/২০২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ત আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
       timestamp: '8 hours ago',
-      imageUrl: '/images/followus/post4.jpg',
+      imageUrl: 'https://picsum.photos/seed/post4/600/400',
       likes: 312,
       comments: 45,
       shares: 67,
@@ -136,7 +136,7 @@ export const socialPosts: SocialPost[] = [
       username: 'Luit Kumar Barman',
       content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ২০১৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
       timestamp: '1 day ago',
-      imageUrl: '/images/followus/post5.jpg',
+      imageUrl: 'https://picsum.photos/seed/post5/600/400',
       likes: 198,
       comments: 29,
       shares: 15,
@@ -148,7 +148,7 @@ export const socialPosts: SocialPost[] = [
       username: 'Luit Kumar Barman',
       content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰিলোঁ',
       timestamp: '1 day ago',
-      imageUrl: '/images/followus/post6.jpg',
+      imageUrl: 'https://picsum.photos/seed/post6/600/400',
       likes: 2267,
       comments: 38,
       shares: 22,

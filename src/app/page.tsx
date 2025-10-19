@@ -11,7 +11,6 @@ import {
   ArrowRight, 
   Facebook, 
   Instagram, 
-  Linkedin, 
   Rss, 
   Twitter, 
   Youtube,
@@ -51,7 +50,6 @@ const socialIcons: { [key: string]: React.ReactNode } = {
   Twitter: <Twitter className="h-6 w-6 text-sky-500" />,
   Facebook: <Facebook className="h-6 w-6 text-blue-600" />,
   Instagram: <Instagram className="h-6 w-6 text-pink-500" />,
-  LinkedIn: <Linkedin className="h-6 w-6 text-sky-700" />,
 };
 
 const services = [
@@ -471,7 +469,7 @@ export default function Home() {
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl opacity-20 blur-lg"></div>
               <div className="relative bg-white p-4 rounded-2xl shadow-2xl">
                  <Image
-                      src="/images/book-cover.jpg"
+                      src="https://picsum.photos/seed/bookcover/280/380"
                       alt="Book Cover"
                       width={280}
                       height={380}
@@ -591,9 +589,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-
-    
-
-
