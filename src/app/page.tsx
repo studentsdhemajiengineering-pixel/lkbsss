@@ -215,7 +215,7 @@ export default function Home() {
                 className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
               >
                 Learn More About Me
-                <ExternalLink className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function Home() {
           <div className="relative">
             <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full hidden md:block"></div>
             
-            <div className="space-y-8">
+            <div className="space-y-8 md:space-y-4">
               {awards.map((award, index) => {
                 const IconComponent = award.icon;
                 const isLeft = award.side === 'left';
@@ -342,7 +342,7 @@ export default function Home() {
                   className="text-primary hover:text-primary/80 font-medium flex items-center group-hover:translate-x-2 transition-transform duration-300"
                 >
                   Access Service
-                  <ExternalLink className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </div>
             ))}
@@ -474,8 +474,8 @@ export default function Home() {
                  <Image
                       src="/images/book-cover.jpg"
                       alt="Book Cover"
-                      width={400}
-                      height={500}
+                      width={300}
+                      height={400}
                       className="rounded-xl shadow-2xl mx-auto"
                     />
               </div>
