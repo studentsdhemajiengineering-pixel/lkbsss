@@ -37,7 +37,7 @@ import type {
 } from './types';
 
 
-const addServiceRequest = <T extends Omit<ServiceRequest, 'id' | 'submittedAt' | 'userId' | 'status'>>(db: Firestore, collectionName: string, data: T, userId: string): Promise<void> => {
+const addServiceRequest = async <T extends Omit<ServiceRequest, 'id' | 'submittedAt' | 'userId' | 'status'>>(db: Firestore, collectionName: string, data: T, userId: string): Promise<void> => {
     if (!userId) {
         return Promise.reject(new Error("User must be authenticated to add a document."));
     }
@@ -112,18 +112,29 @@ const getServiceRequests = async (db: any, collectionName: string) => {
 };
 
 export const getUserServiceRequests = async (db: Firestore, collectionName: string, userId: string) => {
-    // For a specific user: get their requests from a specific collection
     const userSubcollectionRef = collection(db, 'users', userId, collectionName);
     const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) {
-        return [];
+
+    try {
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+            return [];
+        }
+        return snapshot.docs.map(doc => ({ 
+            id: doc.id, 
+            ...doc.data(), 
+            submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() 
+        }));
+    } catch (error) {
+        const permissionError = new FirestorePermissionError({
+            path: userSubcollectionRef.path,
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        // Re-throw the permission error to be caught by the calling function if needed,
+        // though the primary mechanism is the emitter.
+        throw permissionError;
     }
-    return snapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data(), 
-        submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() 
-    }));
 };
 
 export const getAppointments = (db: any): Promise<Appointment[]> => getServiceRequests(db, 'appointments');
