@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@/firebase/provider';
+import { useUser, useFirebase } from '@/firebase/provider';
 import { useRouter } from 'next/navigation';
 import { getAppointments, getGrievances, getHealthRequests, getEducationRequests, getRealEstateRequests, getInvitationRequests } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { getStatusColor } from '@/lib/status-helpers';
@@ -24,23 +23,24 @@ type ServiceRequest = {
 
 export default function UserDashboardPage() {
   const { user, isUserLoading } = useUser();
+  const { firestore } = useFirebase();
   const router = useRouter();
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState<any>(null);
 
   useEffect(() => {
-    setAuth(getAuth());
+    const authInstance = getAuth();
+    setAuth(authInstance);
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
-    if (user) {
+    if (user && firestore) {
       const fetchRequests = async () => {
         setLoading(true);
-        const firestore = (await import('@/firebase')).getSdks(getAuth().app).firestore;
         
         const allRequests: ServiceRequest[] = [];
 
@@ -66,8 +66,10 @@ export default function UserDashboardPage() {
       };
 
       fetchRequests();
+    } else if (!isUserLoading) {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, firestore, isUserLoading]);
 
   const handleLogout = async () => {
     if(auth){
