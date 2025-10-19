@@ -23,7 +23,6 @@ export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
   const { toast } = useToast();
 
   const handleSubmit = async (event: FormEvent) => {
@@ -36,8 +35,8 @@ export default function AdminLoginPage() {
         title: "Login Successful",
         description: "Redirecting to the dashboard...",
       });
-      router.push('/admin');
-      router.refresh();
+      // Use a full page reload to ensure the new session is recognized by the server.
+      window.location.href = '/admin';
     } catch (error: any) {
       setError(error.message);
       toast({
