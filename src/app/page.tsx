@@ -469,8 +469,8 @@ export default function Home() {
                 {filteredSocialPosts.map((post) => (
                     <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
                         {post.imageUrl &&
-                            <div className="relative">
-                                <Image src={post.imageUrl} alt={post.content} width={600} height={400} className="w-full h-48 object-cover" />
+                            <div className="relative h-48 w-full">
+                                <Image src={post.imageUrl} alt={post.content} layout="fill" objectFit="cover" />
                                 <span className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">{post.platform}</span>
                                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                             </div>
@@ -773,3 +773,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
