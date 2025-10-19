@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -114,8 +114,13 @@ const slides = [
 
 
 export default function Home() {
-    const [activeTab, setActiveTab] = useState('All');
-    const [activeInterviewTab, setActiveInterviewTab] = useState('All');
+    const [activeTab, setActiveTab] = React.useState('All');
+    const [activeInterviewTab, setActiveInterviewTab] = React.useState('All');
+
+    const filteredSocialPosts = socialPosts.filter(post => {
+        if (activeTab === 'All') return true;
+        return post.platform === activeTab;
+    });
 
     const filteredInterviews = interviewsAndPodcasts.filter(item => {
         if (activeInterviewTab === 'All') return true;
@@ -265,87 +270,51 @@ export default function Home() {
       </section>
 
       {/* Social Feed Section */}
-       <section id="social" className="py-16 bg-gray-50">
+      <section id="social" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Follow Us</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Stay connected with us on social media for the latest updates, announcements, and community engagement.
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {['All', 'Facebook', 'Instagram', 'Twitter', 'LinkedIn'].map(platform => (
-              <button
-                key={platform}
-                onClick={() => setActiveTab(platform)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeTab === platform
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {platform}
-              </button>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {socialPosts
-              .filter(post => activeTab === 'All' || post.platform === activeTab)
-              .map((post: any) => {
-                const postImage = PlaceHolderImages.find(p => p.id === 'news-1');
-                return (
-                <Link
-                  key={post.id}
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
-                >
-                  <div className="relative">
-                    <Image
-                      src={postImage?.imageUrl || "https://picsum.photos/seed/social/600/400"}
-                      alt={post.content}
-                      width={600}
-                      height={400}
-                      className="w-full h-48 object-cover"
-                    />
-                    <span className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                      {post.platform}
-                    </span>
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-gray-800 font-medium mb-3 line-clamp-3">
-                      {post.content}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-4">
-                        <span className="flex items-center">
-                          <Heart className="w-4 h-4 mr-1"/>
-                          {post.likes || 0}
-                        </span>
-                        <span className="flex items-center">
-                          <MessageCircle className="w-4 h-4 mr-1"/>
-                          {post.comments || 0}
-                        </span>
-                        <span className="flex items-center">
-                          <Share2 className="w-4 h-4 mr-1" />
-                          {post.shares || 0}
-                        </span>
-                      </div>
-                      <span>{post.timestamp}</span>
-                    </div>
-                  </div>
-                </Link>
-              )})}
-          </div>
-          <div className="text-center">
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              Load More Posts
-            </Button>
-          </div>
+            <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Follow Us</h2>
+                <p className="text-gray-600 max-w-2xl mx-auto">Stay connected with us on social media for the latest updates, announcements, and community engagement.</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+                <button onClick={() => setActiveTab('All')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'All' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>All</button>
+                <button onClick={() => setActiveTab('Facebook')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Facebook' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Facebook</button>
+                <button onClick={() => setActiveTab('Instagram')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Instagram' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Instagram</button>
+                <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Twitter</button>
+                <button onClick={() => setActiveTab('LinkedIn')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'LinkedIn' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>LinkedIn</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {filteredSocialPosts.map((post: SocialPost) => {
+                    const postImage = post.imageId ? PlaceHolderImages.find(p => p.id === post.imageId) : null;
+                    return (
+                        <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
+                            {post.imageUrl &&
+                                <div className="relative">
+                                    <Image src={post.imageUrl} alt={post.content} width={600} height={400} className="w-full h-48 object-cover" />
+                                    <span className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">{post.platform}</span>
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+                                </div>
+                            }
+                            <div className="p-4">
+                                <p className="text-gray-800 font-medium mb-3 h-20 line-clamp-3">{post.content}</p>
+                                <div className="flex items-center justify-between text-sm text-gray-500">
+                                    <div className="flex items-center space-x-4">
+                                        <span className="flex items-center"><Heart className="w-4 h-4 mr-1" />{post.likes}</span>
+                                        <span className="flex items-center"><MessageCircle className="w-4 h-4 mr-1" />{post.comments}</span>
+                                        <span className="flex items-center"><Share2 className="w-4 h-4 mr-1" />{post.shares}</span>
+                                    </div>
+                                    <span>{post.timestamp}</span>
+                                </div>
+                            </div>
+                        </Link>
+                    )
+                })}
+            </div>
+            <div className="text-center">
+                <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium transition-colors">Load More Posts</Button>
+            </div>
         </div>
-      </section>
+    </section>
 
        {/* Services Section */}
        <section className="py-20" style={{backgroundColor: '#e0e7ff'}}>
@@ -382,8 +351,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Latest News Section */}
-      <section id="news" className="w-full py-12 md:py-20 lg:py-24 bg-secondary">
+       {/* News & Articles Section */}
+       <section id="news" className="w-full py-12 md:py-20 lg:py-24 bg-secondary">
         <div className="container px-4 md:px-6">
           <div className="text-center space-y-4 mb-12">
              <div className="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium mb-4">
@@ -397,71 +366,53 @@ export default function Home() {
               Stay informed with the latest news, policy updates, and community announcements.
             </p>
           </div>
-          <Tabs defaultValue="latest" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
-              <TabsTrigger value="latest"><Rss className="mr-2 h-4 w-4" />Latest</TabsTrigger>
-              <TabsTrigger value="video"><Youtube className="mr-2 h-4 w-4" />Video</TabsTrigger>
-              <TabsTrigger value="podcast">
-                <Headphones className="mr-2 h-4 w-4" />
-                Podcasts
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="latest">
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {newsArticles.slice(0, 3).map((article: NewsArticle) => {
-                  const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
-                  return (
-                    <Card key={article.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                       {articleImage && 
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {newsArticles.map((article: NewsArticle) => {
+                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
+                return (
+                    <Link
+                        key={article.id}
+                        href={`/news/${article.id}`}
+                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
+                    >
                         <div className="relative">
-                          <Link href={`/news/${article.id}`} className="block overflow-hidden">
-                              <Image
-                                src={articleImage.imageUrl}
-                                alt={articleImage.description}
-                                data-ai-hint={articleImage.imageHint}
-                                width={600}
-                                height={400}
-                                className="w-full h-56 object-cover hover:scale-105 transition-transform duration-300"
-                              />
-                          </Link>
-                          <div className="absolute top-4 left-4">
-                            <Badge variant="secondary">{article.category}</Badge>
-                          </div>
+                            {articleImage && (
+                                <Image
+                                    src={articleImage.imageUrl}
+                                    alt={article.title}
+                                    width={600}
+                                    height={400}
+                                    className="w-full h-48 object-cover"
+                                />
+                            )}
+                             <span className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">News Articles</span>
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                         </div>
-                      }
-                      <CardHeader>
-                        <CardTitle className="text-xl font-headline leading-tight">
-                          <Link href={`/news/${article.id}`}>{article.title}</Link>
-                        </CardTitle>
-                         <span className="text-sm text-gray-500 pt-2">{new Date(article.date).toLocaleDateString()}</span>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <p className="text-sm text-muted-foreground line-clamp-3">{article.excerpt}</p>
-                      </CardContent>
-                      <CardContent>
-                        <Button asChild variant="link" className="p-0 h-auto font-medium">
-                          <Link href={`/news/${article.id}`}>Read More <ExternalLink className="ml-1 h-4 w-4" /></Link>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )
+                        <div className="p-4">
+                            <h3 className="font-bold text-gray-900 mb-2 h-12 line-clamp-2">{article.title}</h3>
+                            <p className="text-gray-600 text-sm mb-3 h-20 line-clamp-4">{article.excerpt}</p>
+                            <div className="flex items-center justify-between text-sm text-gray-500">
+                                <div className="flex items-center">
+                                    <Calendar className="w-4 h-4 mr-1" />
+                                    {new Date(article.date).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center">
+                                    <Eye className="w-4 h-4 mr-1" />
+                                    {Math.floor(Math.random() * 50)}k
+                                </div>
+                            </div>
+                            <div className="mt-3 text-blue-500 group-hover:text-blue-600 text-sm font-medium flex items-center">
+                                Read More
+                                <ChevronRight className="w-4 h-4 ml-1" />
+                            </div>
+                        </div>
+                    </Link>
+                )
                 })}
-              </div>
-            </TabsContent>
-            <TabsContent value="video">
-               <div className="text-center py-16 text-muted-foreground">Video news content coming soon.</div>
-            </TabsContent>
-            <TabsContent value="podcast">
-                <div className="text-center py-16 text-muted-foreground">Podcasts coming soon.</div>
-            </TabsContent>
-          </Tabs>
-           <div className="text-center mt-12">
-            <Button asChild size="lg" variant="outline">
-              <Link href="/news">View All News</Link>
-            </Button>
-          </div>
+            </div>
         </div>
       </section>
+
 
       {/* Interview and Podcast Section */}
       <section className="py-16 bg-gray-50">
@@ -522,23 +473,13 @@ export default function Home() {
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl opacity-20 blur-lg"></div>
               <div className="relative bg-white p-8 rounded-2xl shadow-2xl">
-                <div className="aspect-[3/4] bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center text-white relative overflow-hidden">
-                   <Image
-                      src="https://picsum.photos/seed/bookcover/600/800"
+                 <Image
+                      src="/images/book-cover.jpg"
                       alt="Book Cover"
-                      fill
-                      className="object-cover opacity-20"
+                      width={600}
+                      height={800}
+                      className="rounded-xl shadow-2xl"
                     />
-                  <div className="relative text-center p-8">
-                    <BookOpen className="w-16 h-16 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold mb-2 font-headline">Damn It</h3>
-                    <h4 className="text-xl font-semibold mb-4">Cinema &amp; Community</h4>
-                    <p className="text-sm opacity-90">By Luit Kumar Barman</p>
-                  </div>
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-xl">
-                  <Star className="w-10 h-10 text-white" />
-                </div>
               </div>
             </div>
 
