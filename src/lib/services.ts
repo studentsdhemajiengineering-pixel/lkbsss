@@ -61,6 +61,7 @@ const addServiceRequest = <T extends Omit<ServiceRequest, 'id' | 'submittedAt' |
                 requestResourceData: payload,
             });
             errorEmitter.emit('permission-error', permissionError);
+            // Reject the promise so the calling function's catch block is triggered
             return Promise.reject(permissionError);
         });
 };
@@ -212,6 +213,3 @@ export const uploadFile = async (file: File) => {
     const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
 };
-
-
-    
