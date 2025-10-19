@@ -1,3 +1,4 @@
+
 export type SocialPost = {
   id: number;
   platform: 'Twitter' | 'Facebook' | 'Instagram' | 'LinkedIn';
@@ -30,6 +31,50 @@ export type Resource = {
   date: string;
   link: string;
 };
+
+export type InterviewAndPodcast = {
+    id: string;
+    title: string;
+    thumbnail: string;
+    url: string;
+    duration: string;
+    views: string;
+    age: string;
+    category: 'Interview' | 'Podcast';
+};
+
+export const interviewsAndPodcasts: InterviewAndPodcast[] = [
+    {
+        id: '1',
+        title: 'আছুৰ প্ৰাক্তন সম্পাদক শংকৰজ্যোতি বৰুৱা সন্দৰ্ভত কি কলে লুইত কুমাৰ বৰ্মনে ?',
+        thumbnail: 'https://img.youtube.com/vi/WMlhLpSGHSg/maxresdefault.jpg',
+        url: 'https://www.youtube.com/watch?v=WMlhLpSGHSg',
+        duration: '15:30',
+        views: '5.2k',
+        age: '2 days ago',
+        category: 'Interview'
+    },
+    {
+        id: '2',
+        title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰশ্নত Boomba Ride ৰ প্ৰযোজক লুইত কুমাৰ বৰ্মন',
+        thumbnail: 'https://img.youtube.com/vi/tTxxu8QJJ_4/maxresdefault.jpg',
+        url: 'https://www.youtube.com/watch?v=tTxxu8QJJ_4',
+        duration: '8:45',
+        views: '3.8k',
+        age: '3 days ago',
+        category: 'Interview'
+    },
+    {
+        id: '3',
+        title: '📌লুইত কুমাৰ বৰ্মনৰ বহু নজনা কথা',
+        thumbnail: 'https://scontent-fra3-1.xx.fbcdn.net/v/t15.5256-10/453892231_1237631371018307_2015268119694680216_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=101&ccb=1-7&_nc_sid=be8305&_nc_ohc=PlCoiMAXhKAQ7kNvwEr2Pf6&_nc_oc=AdlASjNwGdpRnnv5nBnv4masijed7Fzj5zQ4Zajg1pGfuBoff5d3196OJk7Pcp0ccm0&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=7pAoaw8rtBKXeWFVpxsKSQ&oh=00_AfatBCA2IMinX2_U5JLcEhNJgDF1J1HIa4dXiK_G8VIxGw&oe=68BF6FA8',
+        url: 'https://www.facebook.com/watch/?mibextid=WC7FNe&v=1011876583509983&rdid=39P36saVknGSc5sl',
+        duration: '22:15',
+        views: '7.1k',
+        age: '5 days ago',
+        category: 'Podcast'
+    }
+];
 
 export const socialPosts: SocialPost[] = [
   {
