@@ -95,30 +95,25 @@ export default function InvitationRequestPage() {
         return;
     }
     setLoading(true);
-    try {
-        let documentUrl: string | undefined;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
 
-        const payload: any = {
-            ...values,
-            eventDate: values.eventDate.toISOString(),
-            ...(documentUrl && { documentUrl }),
-        };
-        delete payload.document;
-
-        await addInvitationRequest(firestore, payload, user.uid);
-        
-        form.reset();
-        toast({ title: 'Success!', description: 'Invitation request submitted. Track its status in your dashboard.' });
-        router.push('/user-dashboard');
-    } catch (error) {
-        console.error("Error submitting invitation request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit invitation request. Check permissions and try again.' });
-    } finally {
-        setLoading(false);
+    let documentUrl: string | undefined;
+    if (values.document) {
+        documentUrl = await uploadFile(values.document);
     }
+
+    const payload: any = {
+        ...values,
+        eventDate: values.eventDate.toISOString(),
+        ...(documentUrl && { documentUrl }),
+    };
+    delete payload.document;
+
+    await addInvitationRequest(firestore, payload, user.uid);
+    
+    form.reset();
+    toast({ title: 'Success!', description: 'Invitation request submitted. Track its status in your dashboard.' });
+    router.push('/user-dashboard');
+    setLoading(false);
   }
 
   const getMinDate = () => {
@@ -482,3 +477,5 @@ export default function InvitationRequestPage() {
     </div>
   );
 }
+
+    

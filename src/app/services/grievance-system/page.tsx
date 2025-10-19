@@ -71,29 +71,24 @@ export default function PublicGrievancePage() {
         return;
     }
     setLoading(true);
-    try {
-        let documentUrl: string | undefined;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
-        
-        const payload: any = { 
-            ...values,
-            ...(documentUrl && { documentUrl }),
-        };
-        delete payload.document;
 
-        await addGrievance(firestore, payload, user.uid);
-        
-        form.reset();
-        toast({ title: 'Success!', description: 'Grievance submitted successfully! Track its status in your dashboard.' });
-        router.push('/user-dashboard');
-    } catch (error) {
-        console.error("Error submitting grievance: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit grievance. Check permissions and try again.' });
-    } finally {
-      setLoading(false);
+    let documentUrl: string | undefined;
+    if (values.document) {
+        documentUrl = await uploadFile(values.document);
     }
+    
+    const payload: any = { 
+        ...values,
+        ...(documentUrl && { documentUrl }),
+    };
+    delete payload.document;
+
+    await addGrievance(firestore, payload, user.uid);
+    
+    form.reset();
+    toast({ title: 'Success!', description: 'Grievance submitted successfully! Track its status in your dashboard.' });
+    router.push('/user-dashboard');
+    setLoading(false);
   }
 
   if (isUserLoading || !user) {
@@ -344,3 +339,5 @@ export default function PublicGrievancePage() {
     </div>
   );
 }
+
+    

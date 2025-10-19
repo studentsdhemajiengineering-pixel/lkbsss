@@ -85,32 +85,27 @@ export default function AppointmentBookingPage() {
         return;
     }
     setLoading(true);
-    try {
-        let documentUrl: string | undefined;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
 
-        const payload: any = {
-            ...values,
-            dateOfBirth: values.dateOfBirth.toISOString(),
-            appointmentDate: values.appointmentDate.toISOString(),
-            ...(documentUrl && { documentUrl }),
-        };
-        delete payload.document;
-
-
-        await addAppointment(firestore, payload, user.uid);
-        
-        form.reset();
-        toast({ title: 'Success!', description: 'Appointment booked successfully! Track its status in your dashboard.' });
-        router.push('/user-dashboard');
-    } catch (error) {
-        console.error("Error booking appointment: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to book appointment. Check permissions and try again.' });
-    } finally {
-        setLoading(false);
+    let documentUrl: string | undefined;
+    if (values.document) {
+        documentUrl = await uploadFile(values.document);
     }
+
+    const payload: any = {
+        ...values,
+        dateOfBirth: values.dateOfBirth.toISOString(),
+        appointmentDate: values.appointmentDate.toISOString(),
+        ...(documentUrl && { documentUrl }),
+    };
+    delete payload.document;
+
+
+    await addAppointment(firestore, payload, user.uid);
+    
+    form.reset();
+    toast({ title: 'Success!', description: 'Appointment booked successfully! Track its status in your dashboard.' });
+    router.push('/user-dashboard');
+    setLoading(false);
   }
   
   const getMinDate = () => {
@@ -398,3 +393,5 @@ export default function AppointmentBookingPage() {
     </div>
   );
 }
+
+    

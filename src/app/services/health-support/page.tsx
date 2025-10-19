@@ -72,29 +72,24 @@ export default function HealthSupportPage() {
         return;
     }
     setLoading(true);
-    try {
-        let documentUrl: string | undefined;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
 
-        const payload: any = { 
-            ...values,
-            ...(documentUrl && { documentUrl }),
-        };
-        delete payload.document;
-
-        await addHealthRequest(firestore, payload, user.uid);
-        
-        form.reset();
-        toast({ title: 'Success!', description: 'Health support request submitted. Track its status in your dashboard.' });
-        router.push('/user-dashboard');
-    } catch (error) {
-        console.error("Error submitting health request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit health request. Check permissions and try again.' });
-    } finally {
-        setLoading(false);
+    let documentUrl: string | undefined;
+    if (values.document) {
+        documentUrl = await uploadFile(values.document);
     }
+
+    const payload: any = { 
+        ...values,
+        ...(documentUrl && { documentUrl }),
+    };
+    delete payload.document;
+
+    await addHealthRequest(firestore, payload, user.uid);
+    
+    form.reset();
+    toast({ title: 'Success!', description: 'Health support request submitted. Track its status in your dashboard.' });
+    router.push('/user-dashboard');
+    setLoading(false);
   }
 
   if (isUserLoading || !user) {
@@ -362,3 +357,5 @@ export default function HealthSupportPage() {
     </div>
   );
 }
+
+    

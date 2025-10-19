@@ -78,30 +78,25 @@ export default function EducationSupportPage() {
         return;
     }
     setLoading(true);
-    try {
-        let documentUrl: string | undefined;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
-        
-        const payload: any = {
-            ...values,
-            dateOfBirth: values.dateOfBirth.toISOString(),
-            ...(documentUrl && { documentUrl }),
-        };
-        delete payload.document;
 
-        await addEducationRequest(firestore, payload, user.uid);
-        
-        form.reset();
-        toast({ title: 'Success!', description: 'Education support request submitted. Track its status in your dashboard.' });
-        router.push('/user-dashboard');
-    } catch (error) {
-        console.error("Error submitting education request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit education request. Check permissions and try again.' });
-    } finally {
-      setLoading(false);
+    let documentUrl: string | undefined;
+    if (values.document) {
+        documentUrl = await uploadFile(values.document);
     }
+    
+    const payload: any = {
+        ...values,
+        dateOfBirth: values.dateOfBirth.toISOString(),
+        ...(documentUrl && { documentUrl }),
+    };
+    delete payload.document;
+
+    await addEducationRequest(firestore, payload, user.uid);
+    
+    form.reset();
+    toast({ title: 'Success!', description: 'Education support request submitted. Track its status in your dashboard.' });
+    router.push('/user-dashboard');
+    setLoading(false);
   }
 
   if (isUserLoading || !user) {
@@ -410,3 +405,5 @@ export default function EducationSupportPage() {
     </div>
   );
 }
+
+    

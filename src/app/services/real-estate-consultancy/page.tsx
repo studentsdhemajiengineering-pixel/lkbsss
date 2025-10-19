@@ -77,29 +77,24 @@ export default function RealEstateConsultancyPage() {
         return;
     }
     setLoading(true);
-    try {
-        let documentUrl: string | undefined;
-        if (values.document) {
-            documentUrl = await uploadFile(values.document);
-        }
 
-        const payload: any = { 
-            ...values,
-            ...(documentUrl && { documentUrl }),
-        };
-        delete payload.document;
-
-        await addRealEstateRequest(firestore, payload, user.uid);
-        
-        form.reset();
-        toast({ title: 'Success!', description: 'Real estate request submitted. Track its status in your dashboard.' });
-        router.push('/user-dashboard');
-    } catch (error) {
-        console.error("Error submitting real estate request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit request. Check permissions and try again.' });
-    } finally {
-        setLoading(false);
+    let documentUrl: string | undefined;
+    if (values.document) {
+        documentUrl = await uploadFile(values.document);
     }
+
+    const payload: any = { 
+        ...values,
+        ...(documentUrl && { documentUrl }),
+    };
+    delete payload.document;
+
+    await addRealEstateRequest(firestore, payload, user.uid);
+    
+    form.reset();
+    toast({ title: 'Success!', description: 'Real estate request submitted. Track its status in your dashboard.' });
+    router.push('/user-dashboard');
+    setLoading(false);
   }
 
   if (isUserLoading || !user) {
@@ -425,3 +420,5 @@ export default function RealEstateConsultancyPage() {
     </div>
   );
 }
+
+    
