@@ -6,53 +6,40 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Eye, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import type { NewsArticle } from "@/lib/types";
 
-const newsArticles: NewsArticle[] = [
+const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at'>[] & {imageUrl: string}[] = [
     {
         id: '1',
         title: 'New Community Hall Inaugurated, Promises a Hub for Local Events',
         excerpt: 'The newly constructed community hall was inaugurated today, a project aimed at fostering local culture and providing a space for public gatherings and events.',
-        content: '',
-        author: 'Staff Reporter',
         date: '2024-07-20T10:00:00Z',
-        imageId: 'news-1',
+        imageUrl: '/images/newsandarticles/news1.jpg',
         category: 'Latest',
-        published_at: '2024-07-20T10:00:00Z',
     },
     {
         id: '2',
         title: 'Luit Kumar Barman\'s Novel "Damn It" Climbs Bestseller Charts',
         excerpt: 'The latest novel "Damn It" by Luit Kumar Barman has been met with widespread critical acclaim and has quickly become a favorite among readers nationwide.',
-        content: '',
-        author: 'Book Today Magazine',
         date: '2024-07-19T15:30:00Z',
-        imageId: '',
+        imageUrl: '/images/book-cover.jpg',
         category: 'Book',
-        published_at: '2024-07-19T15:30:00Z',
     },
     {
         id: '3',
         title: 'Free Health Camp Receives Overwhelming Response from Community',
         excerpt: 'A free health check-up camp organized last weekend saw hundreds of residents benefiting from medical consultations and free medicine distribution.',
-        content: '',
-        author: 'Community Health Desk',
         date: '2024-07-18T12:00:00Z',
-        imageId: 'news-2',
+        imageUrl: '/images/newsandarticles/news2.jpg',
         category: 'Latest',
-        published_at: '2024-07-18T12:00:00Z',
     },
     {
         id: '4',
         title: 'Scholarship Program Announced for Underprivileged Students',
         excerpt: 'A new scholarship initiative has been launched to support the education of meritorious students from economically weaker sections of society.',
-        content: '',
-        author: 'Education Trust',
         date: '2024-07-17T11:00:00Z',
-        imageId: 'news-3',
+        imageUrl: '/images/newsandarticles/news3.jpg',
         category: 'Latest',
-        published_at: '2024-07-17T11:00:00Z',
     }
 ];
 
@@ -94,10 +81,7 @@ export default function NewsPage() {
                 </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {filteredArticles.map((article: NewsArticle) => {
-                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
-                const imageUrl = article.category === 'Book' ? `/images/book-cover.jpg` : articleImage?.imageUrl;
-
+                {filteredArticles.map((article) => {
                 return (
                     <Link
                         key={article.id}
@@ -105,9 +89,9 @@ export default function NewsPage() {
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                     >
                         <div className="relative">
-                            {imageUrl && (
+                            {article.imageUrl && (
                                 <Image
-                                    src={imageUrl}
+                                    src={article.imageUrl}
                                     alt={article.title}
                                     width={600}
                                     height={400}

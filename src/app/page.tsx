@@ -148,43 +148,34 @@ const socialPosts = [
   },
 ];
 
-const newsArticles: NewsArticle[] = [
+const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at'>[] & {imageUrl: string}[] = [
     {
         id: '1',
         title: 'New Community Hall Inaugurated, Promises a Hub for Local Events',
         excerpt: 'The newly constructed community hall was inaugurated today, a project aimed at fostering local culture and providing a space for public gatherings and events.',
-        content: '',
-        author: 'Staff Reporter',
         date: '2024-07-20T10:00:00Z',
-        imageId: 'news-1',
+        imageUrl: '/images/newsandarticles/news1.jpg',
         category: 'Latest',
-        published_at: '2024-07-20T10:00:00Z',
     },
     {
         id: '2',
         title: 'Luit Kumar Barman\'s Novel "Damn It" Climbs Bestseller Charts',
         excerpt: 'The latest novel "Damn It" by Luit Kumar Barman has been met with widespread critical acclaim and has quickly become a favorite among readers nationwide.',
-        content: '',
-        author: 'Book Today Magazine',
         date: '2024-07-19T15:30:00Z',
-        imageId: '',
+        imageUrl: '/images/book-cover.jpg',
         category: 'Book',
-        published_at: '2024-07-19T15:30:00Z',
     },
     {
         id: '3',
         title: 'Free Health Camp Receives Overwhelming Response from Community',
         excerpt: 'A free health check-up camp organized last weekend saw hundreds of residents benefiting from medical consultations and free medicine distribution.',
-        content: '',
-        author: 'Community Health Desk',
         date: '2024-07-18T12:00:00Z',
-        imageId: 'news-2',
+        imageUrl: '/images/newsandarticles/news2.jpg',
         category: 'Latest',
-        published_at: '2024-07-18T12:00:00Z',
     }
 ];
 
-const interviewsAndPodcasts: InterviewAndPodcast[] = [
+const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   {
     id: '1',
     title: 'In Conversation with Luit Kumar Barman: The Future of Assamese Cinema',
@@ -194,7 +185,6 @@ const interviewsAndPodcasts: InterviewAndPodcast[] = [
     views: '152k',
     age: '3 weeks ago',
     category: 'Interview',
-    published_at: '2024-07-01T10:00:00Z',
   },
   {
     id: '2',
@@ -205,7 +195,6 @@ const interviewsAndPodcasts: InterviewAndPodcast[] = [
     views: '50k',
     age: '1 month ago',
     category: 'Podcast',
-    published_at: '2024-06-20T10:00:00Z',
   },
   {
     id: '3',
@@ -216,7 +205,6 @@ const interviewsAndPodcasts: InterviewAndPodcast[] = [
     views: '2.1M',
     age: '2 months ago',
     category: 'Interview',
-    published_at: '2024-05-15T10:00:00Z',
   },
 ];
 
@@ -351,7 +339,7 @@ export default function Home() {
               <Award className="w-4 h-4 mr-2" />
               Recognition Timeline
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 font-headline">Awards & Recognition</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4 font-headline">Awards &amp; Recognition</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               A journey of excellence marked by prestigious awards and recognition for outstanding contributions.
             </p>
@@ -476,16 +464,14 @@ export default function Home() {
               Latest Updates
             </div>
             <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">
-              News & Articles
+              News &amp; Articles
             </h2>
             <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl/relaxed">
               Stay informed with the latest news, policy updates, and community announcements.
             </p>
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {newsArticles.slice(0, 3).map((article: NewsArticle) => {
-                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
-                const imageUrl = article.category === 'Book' ? `/images/book-cover.jpg` : articleImage?.imageUrl;
+              {newsArticles.slice(0, 3).map((article) => {
                 return (
                     <Link
                         key={article.id}
@@ -493,9 +479,9 @@ export default function Home() {
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                     >
                         <div className="relative">
-                            {imageUrl ? (
+                            {article.imageUrl ? (
                                 <Image
-                                    src={imageUrl}
+                                    src={article.imageUrl}
                                     alt={article.title}
                                     width={600}
                                     height={400}
@@ -710,4 +696,3 @@ export default function Home() {
     </div>
   );
 }
-
