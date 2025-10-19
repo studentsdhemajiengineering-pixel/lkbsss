@@ -22,7 +22,7 @@ import Image from "next/image"
 import { logout } from "@/lib/auth"
 
 const adminNavLinks = [
-  { href: "/admin", label: "Dashboard", icon: Home },
+  { href: "/admin/dashboard", label: "Dashboard", icon: Home },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/news", label: "News", icon: Newspaper },
   { href: "/admin/gallery", label: "Gallery", icon: GalleryHorizontal },
@@ -32,7 +32,7 @@ const adminNavLinks = [
 
 function AdminLogo() {
     return (
-        <Link href="/" className="flex items-center space-x-3" prefetch={false}>
+        <Link href="/admin/dashboard" className="flex items-center space-x-3" prefetch={false}>
             <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
                 <Image src="/images/logo-profile.jpg" alt="Luit Kumar Barman" width={40} height={40} className="object-cover"/>
             </div>
@@ -50,8 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = async () => {
     await logout();
-    router.push('/admin/login');
-    router.refresh();
+    window.location.href = '/admin/login';
   };
 
   if (pathname === '/admin/login') {
@@ -108,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <header className="flex items-center justify-between p-4 border-b">
           <SidebarTrigger />
           <h1 className="text-xl font-semibold font-headline">
-            {adminNavLinks.find(link => pathname === link.href)?.label || "Admin"}
+            {adminNavLinks.find(link => pathname.startsWith(link.href))?.label || "Admin"}
           </h1>
         </header>
         <div className="p-4 md:p-6">

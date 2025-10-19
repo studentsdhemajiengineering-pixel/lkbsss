@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
         description: "Redirecting to the dashboard...",
       });
       // Use a full page reload to ensure the new session is recognized by the server.
-      window.location.href = '/admin';
+      window.location.href = '/admin/dashboard';
     } catch (error: any) {
       setError(error.message);
       toast({
