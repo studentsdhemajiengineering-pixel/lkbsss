@@ -6,30 +6,39 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   const { pathname } = request.nextUrl;
 
+  // Paths related to admin area
   const isAdminRoute = pathname.startsWith('/admin');
-  const isUserLoginPage = pathname === '/login';
   const isAdminLoginPage = pathname === '/admin/login';
-  const isAdminRoot = pathname === '/admin' || pathname === '/admin/';
 
+  // If the user is trying to access an admin route
+  if (isAdminRoute) {
+    // If they are on the login page
+    if (isAdminLoginPage) {
+      // And they are already logged in, redirect them to the dashboard
+      if (session) {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      }
+      // Otherwise, let them see the login page
+      return NextResponse.next();
+    }
 
-  // If trying to access any admin route (except login) without a session, redirect to admin login
-  if (isAdminRoute && !isAdminLoginPage && !session) {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+    // If they are on any other admin route and are NOT logged in, redirect to login
+    if (!session) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
   }
 
-  // If a logged-in admin tries to access the admin login page, redirect to the dashboard
-  if (session && isAdminLoginPage) {
-    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-  }
-  
-  // If a logged-in user (non-admin could be added here) tries to access user login, redirect them
-  if (session && isUserLoginPage) {
-    return NextResponse.redirect(new URL('/user-dashboard', request.url));
-  }
-
+  // For all other routes, continue as normal
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  /*
+   * Match all request paths except for the ones starting with:
+   * - _next/static (static files)
+   * - _next/image (image optimization files)
+   * - images (static assets)
+   * - favicon.ico (favicon file)
+   */
+  matcher: ['/((?!_next/static|_next/image|images|favicon.ico).*)'],
 };
