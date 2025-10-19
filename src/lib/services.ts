@@ -13,6 +13,7 @@ import {
   orderBy,
   Timestamp,
   where,
+  Firestore,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFirestore } from '@/firebase/provider';
@@ -35,19 +36,23 @@ import type {
 } from './types';
 
 
-const addDocument = async (db: any, collectionName: string, data: any, userId?: string) => {
+const addDocument = (db: Firestore, collectionName: string, data: any, userId?: string) => {
     if (!userId) {
-        throw new Error("User must be authenticated to add a document.");
+        // This should not happen if called from a protected route, but it's a safeguard.
+        return Promise.reject(new Error("User must be authenticated to add a document."));
     }
     
+    // Correctly reference the subcollection under the user's document
     const collRef = collection(db, 'users', userId, collectionName);
+    
     const payload: any = {
         ...data,
         submittedAt: serverTimestamp(),
-        status: data.status || 'submitted',
+        status: data.status || (collectionName === 'appointments' ? 'pending' : 'submitted'),
         userId: userId,
     };
     
+    // Return the promise chain
     return addDoc(collRef, payload)
         .catch(error => {
             const permissionError = new FirestorePermissionError({
@@ -56,7 +61,8 @@ const addDocument = async (db: any, collectionName: string, data: any, userId?: 
                 requestResourceData: payload,
             });
             errorEmitter.emit('permission-error', permissionError);
-            // DO NOT re-throw the error here, let the emitter handle it.
+            // Also reject the promise so the UI can show a specific error
+            return Promise.reject(permissionError);
         });
 };
 
