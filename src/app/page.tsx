@@ -256,34 +256,82 @@ export default function Home() {
       </section>
 
       {/* Social Feed Section */}
-      <section id="social" className="w-full py-12 md:py-20 lg:py-24 bg-gray-50">
-        <div className="container px-4 md:px-6">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">
-              Follow Us
-            </h2>
-            <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl/relaxed">
+      <section id="social" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Follow Us</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
               Stay connected with us on social media for the latest updates, announcements, and community engagement.
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {socialPosts.map((post: SocialPost) => (
-              <Card key={post.id} className="flex flex-col">
-                <CardHeader className="flex flex-row items-center gap-4 pb-4">
-                  {socialIcons[post.platform]}
-                  <div>
-                    <CardTitle className="text-base">{post.username}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{post.platform}</p>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-sm">{post.content}</p>
-                </CardContent>
-                <CardFooter>
-                  <p className="text-xs text-muted-foreground">{post.timestamp}</p>
-                </CardFooter>
-              </Card>
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {['All', 'Facebook', 'Instagram', 'Twitter', 'LinkedIn'].map(platform => (
+              <button
+                key={platform}
+                onClick={() => setActiveTab(platform)}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeTab === platform
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {platform}
+              </button>
             ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {socialPosts
+              .filter(post => activeTab === 'All' || post.platform === activeTab)
+              .map((post: any) => (
+                <Link
+                  key={post.id}
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
+                >
+                  <div className="relative">
+                    <Image
+                      src={post.image || "https://picsum.photos/seed/social/600/400"}
+                      alt={post.content}
+                      width={600}
+                      height={400}
+                      className="w-full h-48 object-cover"
+                    />
+                    <span className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      {post.platform}
+                    </span>
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-gray-800 font-medium mb-3 line-clamp-3">
+                      {post.content}
+                    </p>
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center space-x-4">
+                        <span className="flex items-center">
+                          <Heart className="w-4 h-4 mr-1" />
+                          {post.likes || 0}
+                        </span>
+                        <span className="flex items-center">
+                          <Mail className="w-4 h-4 mr-1" />
+                          {post.comments || 0}
+                        </span>
+                        <span className="flex items-center">
+                          <ArrowRight className="w-4 h-4 mr-1" />
+                          {post.shares || 0}
+                        </span>
+                      </div>
+                      <span>{post.timestamp}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+          </div>
+          <div className="text-center">
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              Load More Posts
+            </Button>
           </div>
         </div>
       </section>
