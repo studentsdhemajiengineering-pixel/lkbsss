@@ -14,6 +14,7 @@ import {
   Timestamp,
   where,
   Firestore,
+  setDoc,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFirestore } from '@/firebase/provider';
@@ -36,42 +37,41 @@ import type {
 } from './types';
 
 
-const addDocument = (db: Firestore, collectionName: string, data: any, userId?: string) => {
+const addServiceRequest = <T extends Omit<ServiceRequest, 'id' | 'submittedAt' | 'userId' | 'status'>>(db: Firestore, collectionName: string, data: T, userId: string): Promise<void> => {
     if (!userId) {
-        // This should not happen if called from a protected route, but it's a safeguard.
         return Promise.reject(new Error("User must be authenticated to add a document."));
     }
-    
-    // Correctly reference the subcollection under the user's document
-    const collRef = collection(db, 'users', userId, collectionName);
-    
-    const payload: any = {
+
+    const userSubcollectionRef = collection(db, 'users', userId, collectionName);
+    const newDocRef = doc(userSubcollectionRef); // Creates a reference with a new auto-generated ID
+
+    const payload = {
         ...data,
+        id: newDocRef.id,
         submittedAt: serverTimestamp(),
         status: data.status || (collectionName === 'appointments' ? 'pending' : 'submitted'),
         userId: userId,
     };
-    
-    // Return the promise chain
-    return addDoc(collRef, payload)
+
+    return setDoc(newDocRef, payload)
         .catch(error => {
             const permissionError = new FirestorePermissionError({
-                path: collRef.path,
+                path: newDocRef.path,
                 operation: 'create',
                 requestResourceData: payload,
             });
             errorEmitter.emit('permission-error', permissionError);
-            // Also reject the promise so the UI can show a specific error
             return Promise.reject(permissionError);
         });
 };
 
-export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'appointments', {...data, status: 'pending'}, userId);
-export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'status' | 'ticketNumber' | 'userId'>, userId: string) => addDocument(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}` }, userId);
-export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'health-requests', data, userId);
-export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'education-requests', data, userId);
-export const addRealEstateRequest = (db: any, data: Omit<RealEstateRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'real-estate-requests', data, userId);
-export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addDocument(db, 'invitation-requests', data, userId);
+
+export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addServiceRequest(db, 'appointments', {...data, status: 'pending'}, userId);
+export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'status' | 'ticketNumber' | 'userId'>, userId: string) => addServiceRequest(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}` }, userId);
+export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addServiceRequest(db, 'health-requests', data, userId);
+export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addServiceRequest(db, 'education-requests', data, userId);
+export const addRealEstateRequest = (db: any, data: Omit<RealEstateRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addServiceRequest(db, 'real-estate-requests', data, userId);
+export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id' | 'submittedAt' | 'status' | 'userId'>, userId: string) => addServiceRequest(db, 'invitation-requests', data, userId);
 
 
 const getCollectionData = async (db: any, collectionName: string) => {
@@ -212,3 +212,6 @@ export const uploadFile = async (file: File) => {
     const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
 };
+
+
+    
