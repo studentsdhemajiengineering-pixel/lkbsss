@@ -12,14 +12,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, User, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home } from "lucide-react";
-import { Logo } from "@/components/logo";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { Menu, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/news", label: "News" },
   { href: "/gallery", label: "Gallery" },
   { href: "/resources", label: "Resources" },
 ];
@@ -33,16 +30,37 @@ const services = [
   { href: "/services/real-estate-consultancy", label: "Real Estate Consultancy", icon: Home },
 ];
 
+const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'as', name: 'অসমীয়া', flag: '🇮🇳' },
+    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' }
+];
+
+const Logo = () => (
+    <Link href="/" className="flex items-center space-x-3" prefetch={false}>
+        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <span className="text-blue-800 font-bold text-sm">LKB</span>
+        </div>
+        <div>
+            <h1 className="text-lg font-bold text-white">Luit Kumar Barman</h1>
+            <p className="text-xs text-blue-100">Official Website</p>
+        </div>
+    </Link>
+);
+
+
 export default function Header() {
   const pathname = usePathname();
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+  const [currentLanguage, setLanguage] = useState('en');
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
       href={href}
       className={cn(
-        "transition-colors hover:text-foreground/80",
-        pathname.startsWith(href) && href !== "/" || pathname === href ? "text-foreground" : "text-foreground/60"
+        "transition-colors hover:text-blue-200",
+        pathname === href ? "text-white font-medium" : "text-blue-100"
       )}
       prefetch={false}
       onClick={() => setSheetOpen(false)}
@@ -54,17 +72,17 @@ export default function Header() {
   const ServiceDropdownMenu = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={cn("flex items-center gap-1 transition-colors hover:text-foreground/80", 
-            pathname.startsWith("/services") ? "text-foreground" : "text-foreground/60"
+        <button className={cn("flex items-center gap-1 transition-colors hover:text-blue-200", 
+            pathname.startsWith("/services") ? "text-white font-medium" : "text-blue-100"
         )}>
           Services <ChevronDown className="h-4 w-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-64 bg-white text-gray-800 rounded-lg shadow-xl mt-2">
         {services.map((service) => (
           <DropdownMenuItem key={service.href} asChild>
-            <Link href={service.href}>
-                <service.icon className="mr-2 h-4 w-4" />
+            <Link href={service.href} className="block px-4 py-3 hover:bg-gray-50 border-b">
+                <service.icon className="mr-2 h-4 w-4 text-gray-600" />
                 <span>{service.label}</span>
             </Link>
           </DropdownMenuItem>
@@ -72,58 +90,99 @@ export default function Header() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
+
+  const LanguageSelector = () => (
+      <div className="relative">
+        <button
+            onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+            className="flex items-center space-x-1 hover:text-blue-200 transition-colors text-blue-100"
+        >
+            <Globe className="w-4 h-4" />
+            <span>{languages.find(lang => lang.code === currentLanguage)?.flag}</span>
+        </button>
+        {isLanguageOpen && (
+            <div className="absolute top-full right-0 w-40 bg-white text-gray-800 rounded-lg shadow-xl mt-2">
+            {languages.map((lang) => (
+                <button
+                    key={lang.code}
+                    onClick={() => {
+                        setLanguage(lang.code as any);
+                        setIsLanguageOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                        currentLanguage === lang.code ? 'bg-blue-50 text-blue-800' : ''
+                    }`}
+                >
+                    <span className="mr-2">{lang.flag}</span>
+                    {lang.name}
+                </button>
+            ))}
+            </div>
+        )}
+      </div>
+  );
   
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Logo />
-        </div>
-        <div className="flex items-center md:hidden">
-            <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-            <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-                </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                <div className="flex flex-col gap-6 text-lg font-medium mt-8">
-                    <Logo />
-                    <nav className="flex flex-col gap-4">
-                      {navLinks.map((link) => (
-                          <NavLink key={link.href} {...link} />
-                      ))}
-                      <div className="text-foreground/60">Services</div>
-                      <div className="flex flex-col gap-4 pl-4">
-                        {services.map(service => (
-                           <Link key={service.href} href={service.href} className="text-base text-foreground/60 hover:text-foreground/80" onClick={() => setSheetOpen(false)}>
-                             {service.label}
-                           </Link>
-                        ))}
-                      </div>
-                    </nav>
-                </div>
-            </SheetContent>
-            </Sheet>
-            <div className="ml-4 md:hidden">
-              <Logo />
+    <header className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 text-white shadow-lg sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+                <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="md:hidden mr-2 hover:bg-blue-800">
+                    <Menu className="h-6 w-6 text-white" />
+                    <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-blue-900 text-white">
+                    <div className="flex flex-col gap-6 text-lg font-medium mt-8">
+                        <Logo />
+                        <nav className="flex flex-col gap-4 mt-4">
+                          {navLinks.map((link) => (
+                              <NavLink key={link.href} {...link} />
+                          ))}
+                          <div className="text-blue-200">Services</div>
+                          <div className="flex flex-col gap-3 pl-4">
+                            {services.map(service => (
+                               <Link key={service.href} href={service.href} className="text-sm text-blue-100 hover:text-white" onClick={() => setSheetOpen(false)}>
+                                 {service.label}
+                               </Link>
+                            ))}
+                          </div>
+                        </nav>
+                    </div>
+                </SheetContent>
+                </Sheet>
+                <Logo />
             </div>
-        </div>
 
-        <nav className="ml-6 hidden items-center space-x-6 text-sm font-medium md:flex">
-          {navLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
-          ))}
-          <ServiceDropdownMenu />
-        </nav>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <LanguageSwitcher />
-          <Button asChild className="bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary-light))] text-primary-foreground hover:opacity-90 transition-opacity">
-            <Link href="/login">
-              <User className="mr-2 h-4 w-4" /> Login
-            </Link>
-          </Button>
+            <nav className="hidden items-center space-x-6 text-sm font-medium md:flex">
+              {navLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+              <ServiceDropdownMenu />
+              <LanguageSelector />
+            </nav>
+            <div className="hidden md:flex items-center justify-end space-x-2">
+              <Button asChild variant="default" className="bg-blue-700 hover:bg-blue-600 text-white text-sm">
+                <Link href="/login">
+                  Login
+                </Link>
+              </Button>
+               <Button asChild variant="secondary" className="bg-white text-blue-800 hover:bg-gray-100 text-sm">
+                <Link href="/register">
+                  Register
+                </Link>
+              </Button>
+            </div>
+
+            <div className="md:hidden">
+                 <Button asChild size="sm" variant="default" className="bg-blue-700 hover:bg-blue-600 text-white">
+                    <Link href="/login">
+                        Login
+                    </Link>
+                </Button>
+            </div>
         </div>
       </div>
     </header>
