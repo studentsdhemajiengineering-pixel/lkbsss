@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, User as UserIcon, Mail, Lock, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { errorEmitter, FirestorePermissionError } from '@/firebase';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -60,14 +61,25 @@ export default function RegisterPage() {
       const createdUser = userCredential.user;
       
       await updateProfile(createdUser, { displayName: fullName });
-
-      await setDoc(doc(db, 'users', createdUser.uid), {
+      
+      const userDocRef = doc(db, 'users', createdUser.uid);
+      const userProfileData = {
         uid: createdUser.uid,
         displayName: fullName,
         email: email,
         phoneNumber: `+91${phoneNumber}`,
         createdAt: new Date().toISOString(),
-      });
+      };
+
+      setDoc(userDocRef, userProfileData)
+        .catch(serverError => {
+            const permissionError = new FirestorePermissionError({
+                path: userDocRef.path,
+                operation: 'create',
+                requestResourceData: userProfileData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
 
       toast({ title: 'Registration Successful!', description: 'Redirecting to your dashboard.' });
       router.push('/user-dashboard');
