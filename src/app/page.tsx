@@ -41,7 +41,6 @@ import {
   Eye,
   Camera
 } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/types';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
@@ -107,10 +106,23 @@ const awards = [
 ];
 
 const slides = [
-  PlaceHolderImages.find(p => p.id === 'gallery-1'),
-  PlaceHolderImages.find(p => p.id === 'gallery-2'),
-  PlaceHolderImages.find(p => p.id === 'gallery-3'),
-].filter(Boolean) as (typeof PlaceHolderImages[0])[];
+  {
+    id: '1',
+    description: 'Empowering Communities, Driving Change',
+    imageUrl: '/images/slide1.jpg',
+  },
+  {
+    id: '2',
+    description: 'A Vision for a Better Tomorrow',
+    imageUrl: '/images/slide2.jpg',
+  },
+  {
+    id: '3',
+    description: 'Connecting People, Building Futures',
+    imageUrl: '/images/slide3.jpg',
+  },
+];
+
 
 const socialPosts = [
   {
@@ -696,3 +708,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
