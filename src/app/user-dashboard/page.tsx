@@ -3,12 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { useUser, useFirebase } from '@/firebase/provider';
 import { useRouter } from 'next/navigation';
-import { getAppointments, getGrievances, getHealthRequests, getEducationRequests, getRealEstateRequests, getInvitationRequests } from '@/lib/services';
+import { 
+  getAppointments, 
+  getGrievances, 
+  getHealthRequests, 
+  getEducationRequests, 
+  getRealEstateRequests, 
+  getInvitationRequests 
+} from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { getStatusColor } from '@/lib/status-helpers';
-import { Home, User, BarChart2, Loader2, LogOut } from 'lucide-react';
+import { Home, User, BarChart2, Loader2, LogOut, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
 
@@ -40,8 +47,6 @@ export default function UserDashboardPage() {
         setLoading(true);
         
         try {
-          const allRequests: ServiceRequest[] = [];
-
           const [appointments, grievances, health, education, realEstate, invitations] = await Promise.all([
             getAppointments(firestore, user.uid),
             getGrievances(firestore, user.uid),
@@ -50,6 +55,8 @@ export default function UserDashboardPage() {
             getRealEstateRequests(firestore, user.uid),
             getInvitationRequests(firestore, user.uid),
           ]);
+
+          const allRequests: ServiceRequest[] = [];
 
           appointments.forEach(req => allRequests.push({ id: req.id, type: 'Appointment', status: req.status, submittedAt: req.submittedAt, details: req.purpose, reference: req.id.slice(0,8) }));
           grievances.forEach(req => allRequests.push({ id: req.id, type: 'Grievance', status: req.status, submittedAt: req.submittedAt, details: req.grievanceType, reference: req.ticketNumber }));
@@ -68,7 +75,8 @@ export default function UserDashboardPage() {
       };
 
       fetchRequests();
-    } else if (!isUserLoading) {
+    } else if (!isUserLoading && !user) {
+      // If user is not logged in and we are not in a loading state, stop loading.
       setLoading(false);
     }
   }, [user, firestore, isUserLoading]);
@@ -80,21 +88,17 @@ export default function UserDashboardPage() {
     }
   };
 
-  if (isUserLoading || loading) {
+  if (isUserLoading || (!user && !isUserLoading)) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
-
-  if (!user) {
-    return null; // or a login prompt
-  }
   
   const totalRequests = requests.length;
-  const pendingRequests = requests.filter(r => ['pending', 'submitted', 'under_review', 'processing'].includes(r.status)).length;
-  const completedRequests = requests.filter(r => ['completed', 'resolved', 'approved', 'confirmed'].includes(r.status)).length;
+  const pendingRequests = requests.filter(r => ['pending', 'submitted', 'under_review', 'processing', 'in_progress'].includes(r.status.toLowerCase())).length;
+  const completedRequests = totalRequests - pendingRequests;
 
   return (
     <div className="min-h-screen bg-secondary/50 p-4 sm:p-6 lg:p-8">
@@ -135,7 +139,7 @@ export default function UserDashboardPage() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Completed/Resolved</CardTitle>
-                    <Home className="h-4 w-4 text-muted-foreground" />
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent><div className="text-2xl font-bold">{completedRequests}</div></CardContent>
             </Card>
@@ -146,36 +150,44 @@ export default function UserDashboardPage() {
                 <CardTitle>My Service Requests</CardTitle>
             </CardHeader>
             <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Reference</TableHead>
-                            <TableHead>Service Type</TableHead>
-                            <TableHead>Details</TableHead>
-                            <TableHead>Submitted On</TableHead>
-                            <TableHead>Status</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {requests.length > 0 ? requests.map(req => (
-                            <TableRow key={req.id}>
-                                <TableCell className="font-mono text-xs">{req.reference.toUpperCase()}</TableCell>
-                                <TableCell>{req.type}</TableCell>
-                                <TableCell className="text-muted-foreground">{req.details}</TableCell>
-                                <TableCell>{new Date(req.submittedAt).toLocaleDateString()}</TableCell>
-                                <TableCell>
-                                    <Badge variant="outline" className={getStatusColor(req.status)}>
-                                        {req.status.replace(/_/g, ' ')}
-                                    </Badge>
-                                </TableCell>
-                            </TableRow>
-                        )) : (
-                            <TableRow>
-                                <TableCell colSpan={5} className="text-center h-24">You have not submitted any service requests yet.</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+              {loading ? (
+                <div className="flex justify-center items-center h-48">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                      <TableHeader>
+                          <TableRow>
+                              <TableHead>Reference</TableHead>
+                              <TableHead>Service Type</TableHead>
+                              <TableHead>Details</TableHead>
+                              <TableHead>Submitted On</TableHead>
+                              <TableHead>Status</TableHead>
+                          </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                          {requests.length > 0 ? requests.map(req => (
+                              <TableRow key={req.id}>
+                                  <TableCell className="font-mono text-xs">{req.reference.toUpperCase()}</TableCell>
+                                  <TableCell>{req.type}</TableCell>
+                                  <TableCell className="text-muted-foreground">{req.details}</TableCell>
+                                  <TableCell>{new Date(req.submittedAt).toLocaleDateString()}</TableCell>
+                                  <TableCell>
+                                      <Badge variant="outline" className={`${getStatusColor(req.status)} capitalize`}>
+                                          {req.status.replace(/_/g, ' ')}
+                                      </Badge>
+                                  </TableCell>
+                              </TableRow>
+                          )) : (
+                              <TableRow>
+                                  <TableCell colSpan={5} className="text-center h-24">You have not submitted any service requests yet.</TableCell>
+                              </TableRow>
+                          )}
+                      </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
         </Card>
       </div>
