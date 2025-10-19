@@ -186,7 +186,7 @@ export default function Home() {
                 </div>
                 <h2 className="text-4xl font-bold text-gray-900 mb-6 font-headline">
                   Luit Kumar Barman
-                  <span className="text-xl text-primary font-normal block">Engineer • Film Producer • Social Activist</span>
+                  <span className="text-base text-primary font-normal block">Engineer • Film Producer • Social Activist</span>
                 </h2>
                 <p className="text-lg text-gray-600 leading-relaxed">
                   Luit Kumar Barman is an engineer by education. Presently, he is the Managing Director of Medishine 
@@ -240,7 +240,7 @@ export default function Home() {
           <div className="relative">
             <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full hidden md:block"></div>
             
-            <div className="space-y-4 md:space-y-2">
+            <div className="space-y-2 md:space-y-0">
               {awards.map((award, index) => {
                 const IconComponent = award.icon;
                 const isLeft = award.side === 'left';
@@ -281,7 +281,6 @@ export default function Home() {
                 <button onClick={() => setActiveTab('Facebook')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Facebook' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Facebook</button>
                 <button onClick={() => setActiveTab('Instagram')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Instagram' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Instagram</button>
                 <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Twitter</button>
-                <button onClick={() => setActiveTab('LinkedIn')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'LinkedIn' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>LinkedIn</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {filteredSocialPosts.map((post: SocialPost) => {
@@ -596,4 +595,5 @@ export default function Home() {
     
 
     
+
 
