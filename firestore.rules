@@ -1,35 +1,22 @@
-/**
- * @file Firestore Security Rules for Digital Connect application.
- *
- * Core Philosophy:
- * This ruleset enforces a strict user-ownership model.  Users can only access their own profile data and service requests.
- *
- * Data Structure:
- * - /users/{userId}: Stores user profile information, with the document ID being the user's unique ID.
- * - /users/{userId}/serviceRequests/{serviceRequestId}: Stores service requests associated with a specific user.
- *
- * Key Security Decisions:
- * - Users can only read and write their own data.
- * - Listing all users is disallowed.
- * - Service requests are private and only accessible by the owning user.
- *
- * Denormalization for Authorization:
- * Ownership is enforced through path-based rules, eliminating the need for denormalized data or `get()` calls.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profile data.
+     * @description Protects user profile data.
      * @path /users/{userId}
-     * @allow (create) - A user can create their own profile if the userId matches their auth UID.
-     * @allow (get, update, delete) - A user can only access their own profile data.
-     * @deny (create) - A user cannot create a profile with an ID that doesn't match their auth UID.
-     * @deny (get, update, delete) - A user cannot access another user's profile data.
-     * @principle Enforces document ownership for writes.
+     * @allow (create) User with matching ID can create their own profile.
+     * @allow (get) User with matching ID can get their own profile.
+     * @allow (update) User with matching ID can update their own profile.
+     * @allow (delete) User with matching ID can delete their own profile.
+     * @deny (create) User attempts to create a profile with a different ID.
+     * @deny (get) User attempts to get another user's profile.
+     * @deny (update) User attempts to update another user's profile.
+     * @deny (delete) User attempts to delete another user's profile.
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
+      //Utility function
       function isSignedIn() {
         return request.auth != null;
       }
@@ -38,27 +25,28 @@ service cloud.firestore {
         return request.auth.uid == userId;
       }
 
-      function isExistingOwner(userId) {
-        return isSignedIn() && resource.data != null && isOwner(userId);
-      }
-
       allow get: if isSignedIn() && isOwner(userId);
       allow list: if false;
       allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId);
+      allow delete: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Controls access to service requests for a specific user.
+     * @description Protects service requests made by users.
      * @path /users/{userId}/serviceRequests/{serviceRequestId}
-     * @allow (create) - A user can create a service request under their own user ID.
-     * @allow (get, list, update, delete) - A user can only access their own service requests.
-     * @deny (create) - A user cannot create a service request under another user's ID.
-     * @deny (get, list, update, delete) - A user cannot access another user's service requests.
-     * @principle Restricts access to a user's own service requests.
+     * @allow (create) User with matching ID can create a service request.
+     * @allow (get) User with matching ID can get their own service request.
+     * @allow (update) User with matching ID can update their own service request.
+     * @allow (delete) User with matching ID can delete their own service request.
+     * @deny (create) User attempts to create a service request for a different user.
+     * @deny (get) User attempts to get another user's service request.
+     * @deny (update) User attempts to update another user's service request.
+     * @deny (delete) User attempts to delete another user's service request.
+     * @principle Enforces document ownership and relational integrity for all operations.
      */
     match /users/{userId}/serviceRequests/{serviceRequestId} {
+      //Utility function
       function isSignedIn() {
         return request.auth != null;
       }
@@ -67,15 +55,11 @@ service cloud.firestore {
         return request.auth.uid == userId;
       }
 
-       function isExistingOwner(userId) {
-        return isSignedIn() && resource.data != null && isOwner(userId);
-      }
-
       allow get: if isSignedIn() && isOwner(userId);
       allow list: if false;
       allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId);
+      allow delete: if isSignedIn() && isOwner(userId);
     }
   }
 }
