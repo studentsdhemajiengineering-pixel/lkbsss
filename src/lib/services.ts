@@ -15,6 +15,8 @@ import {
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFirestore } from '@/firebase/provider';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 import type { 
     Appointment,
     Grievance,
@@ -33,16 +35,26 @@ import type {
 
 
 const addDocument = async (db: any, collectionName: string, data: any) => {
-  try {
-    await addDoc(collection(db, collectionName), {
-      ...data,
-      submittedAt: serverTimestamp(),
-      status: 'submitted', // or 'pending'
-    });
-  } catch (e: any) {
-    console.error(`Error adding document to ${collectionName}:`, e);
-    throw new Error(`Failed to submit: ${e.message}`);
-  }
+    const collRef = collection(db, collectionName);
+    const payload = {
+        ...data,
+        submittedAt: serverTimestamp(),
+        status: 'submitted', // or 'pending'
+    };
+    
+    addDoc(collRef, payload)
+        .catch(error => {
+            errorEmitter.emit(
+                'permission-error',
+                new FirestorePermissionError({
+                    path: collRef.path,
+                    operation: 'create',
+                    requestResourceData: payload,
+                })
+            );
+            console.error(`Error adding document to ${collectionName}:`, error);
+            throw new Error(`Failed to submit: ${error.message}`);
+        });
 };
 
 export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'status'>) => addDocument(db, 'appointments', data);
@@ -82,30 +94,81 @@ export const getInvitationRequests = (db: any): Promise<InvitationRequest[]> => 
 
 export const updateServiceRequestStatus = async (db: any, collectionName: string, id: string, status: string) => {
     const docRef = doc(db, collectionName, id);
-    await updateDoc(docRef, { status });
+    const payload = { status };
+    updateDoc(docRef, payload)
+        .catch(error => {
+            errorEmitter.emit(
+                'permission-error',
+                new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'update',
+                    requestResourceData: payload,
+                })
+            );
+        });
 };
 
 export const deleteServiceRequest = async (db: any, collectionName: string, id: string) => {
     const docRef = doc(db, collectionName, id);
-    await deleteDoc(docRef);
+    deleteDoc(docRef)
+        .catch(error => {
+            errorEmitter.emit(
+                'permission-error',
+                new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'delete',
+                })
+            );
+        });
 };
 
 
 export const addContent = async (db: any, collectionName: string, data: Partial<Content>) => {
-    await addDoc(collection(db, collectionName), {
+    const collRef = collection(db, collectionName);
+    const payload = {
         ...data,
         published_at: serverTimestamp()
-    });
+    };
+    addDoc(collRef, payload)
+        .catch(error => {
+            errorEmitter.emit(
+                'permission-error',
+                new FirestorePermissionError({
+                    path: collRef.path,
+                    operation: 'create',
+                    requestResourceData: payload,
+                })
+            );
+        });
 };
 
 export const updateContent = async (db: any, collectionName: string, id: string, data: Partial<Content>) => {
     const docRef = doc(db, collectionName, id);
-    await updateDoc(docRef, data);
+    updateDoc(docRef, data)
+        .catch(error => {
+            errorEmitter.emit(
+                'permission-error',
+                new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'update',
+                    requestResourceData: data,
+                })
+            );
+        });
 };
 
 export const deleteContent = async (db: any, collectionName: string, id: string) => {
     const docRef = doc(db, collectionName, id);
-    await deleteDoc(docRef);
+    deleteDoc(docRef)
+        .catch(error => {
+            errorEmitter.emit(
+                'permission-error',
+                new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'delete',
+                })
+            );
+        });
 };
 
 export const uploadFile = async (file: File) => {
