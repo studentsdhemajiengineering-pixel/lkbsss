@@ -753,32 +753,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Contact CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 font-headline">Ready to Get Started?</h2>
-          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Whether you need assistance with our services or want to get involved in community initiatives, 
-            we're here to help you every step of the way.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/services">
-                Explore Services
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary">
-              <Link href="/contact">
-                Contact Us
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }
-
-    
