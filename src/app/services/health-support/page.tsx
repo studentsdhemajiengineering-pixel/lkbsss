@@ -15,13 +15,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/componentsui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, User, Phone, Mail, Upload, CheckCircle, Activity } from 'lucide-react';
-import { useFirebase } from "@/firebase/provider";
+import { Heart, User, Phone, Mail, Upload, CheckCircle, Activity, Loader2 } from 'lucide-react';
+import { useFirebase, useUser } from "@/firebase/provider";
 import { addHealthRequest, uploadFile } from "@/lib/services";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -36,6 +38,9 @@ const formSchema = z.object({
 
 export default function HealthSupportPage() {
     const { firestore } = useFirebase();
+    const { user, isUserLoading } = useUser();
+    const router = useRouter();
+    const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,8 +55,22 @@ export default function HealthSupportPage() {
     },
   });
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+    if (user) {
+      form.setValue('fullName', user.displayName || '');
+      form.setValue('email', user.email || '');
+      form.setValue('mobile', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+    }
+  }, [user, isUserLoading, router, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a request.' });
+        return;
+    }
     setLoading(true);
     try {
         let documentUrl;
@@ -59,15 +78,24 @@ export default function HealthSupportPage() {
             documentUrl = await uploadFile(values.document);
         }
 
-        await addHealthRequest(firestore, { ...values, documentUrl });
+        await addHealthRequest(firestore, { ...values, documentUrl }, user.uid);
         
         form.reset();
-        alert('Health support request submitted successfully!');
+        toast({ title: 'Success!', description: 'Health support request submitted. Track its status in your dashboard.' });
+        router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting health request: ", error);
-        alert('Failed to submit health request.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit health request.' });
     }
     setLoading(false);
+  }
+
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -315,7 +343,8 @@ export default function HealthSupportPage() {
                     </div>
 
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-3">
-                    {loading ? 'Submitting...' : 'Submit Health Support Request'}
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    Submit Health Support Request
                   </Button>
                 </form>
               </Form>

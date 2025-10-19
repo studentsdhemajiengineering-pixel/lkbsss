@@ -1,6 +1,8 @@
 
+
 export type Appointment = {
   id: string;
+  userId: string;
   fullName: string;
   dateOfBirth: string;
   mobile: string;
@@ -14,6 +16,7 @@ export type Appointment = {
 
 export type Grievance = {
   id: string;
+  userId: string;
   ticketNumber: string;
   fullName: string;
   contactNumber: string;
@@ -28,6 +31,7 @@ export type Grievance = {
 
 export type HealthRequest = {
     id: string;
+    userId: string;
     fullName: string;
     age: number;
     gender: string;
@@ -42,6 +46,7 @@ export type HealthRequest = {
 
 export type EducationRequest = {
     id: string;
+    userId: string;
     studentName: string;
     dateOfBirth: string;
     parentName: string;
@@ -57,6 +62,7 @@ export type EducationRequest = {
 
 export type RealEstateRequest = {
     id: string;
+    userId: string;
     fullName: string;
     contactNumber: string;
     email: string;
@@ -73,6 +79,7 @@ export type RealEstateRequest = {
 
 export type InvitationRequest = {
     id: string;
+    userId: string;
     fullName: string;
     organization: string;
     designation: string;

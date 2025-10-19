@@ -18,10 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, User, Phone, Mail, MapPin, Upload, AlertCircle } from "lucide-react";
-import { useFirebase } from "@/firebase/provider";
+import { FileText, User, Phone, Mail, MapPin, Upload, AlertCircle, Loader2 } from "lucide-react";
+import { useFirebase, useUser } from "@/firebase/provider";
 import { addGrievance, uploadFile } from "@/lib/services";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -35,6 +37,9 @@ const formSchema = z.object({
 
 export default function PublicGrievancePage() {
     const { firestore } = useFirebase();
+    const { user, isUserLoading } = useUser();
+    const router = useRouter();
+    const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,8 +54,22 @@ export default function PublicGrievancePage() {
     },
   });
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+    if (user) {
+      form.setValue('fullName', user.displayName || '');
+      form.setValue('email', user.email || '');
+      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+    }
+  }, [user, isUserLoading, router, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a grievance.' });
+        return;
+    }
     setLoading(true);
     try {
         let documentUrl;
@@ -58,15 +77,24 @@ export default function PublicGrievancePage() {
             documentUrl = await uploadFile(values.document);
         }
 
-        await addGrievance(firestore, { ...values, documentUrl });
+        await addGrievance(firestore, { ...values, documentUrl }, user.uid);
         
         form.reset();
-        alert('Grievance submitted successfully!');
+        toast({ title: 'Success!', description: 'Grievance submitted successfully! Track its status in your dashboard.' });
+        router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting grievance: ", error);
-        alert('Failed to submit grievance.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit grievance.' });
     }
     setLoading(false);
+  }
+
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -297,7 +325,8 @@ export default function PublicGrievancePage() {
                   </div>
 
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white py-3">
-                    {loading ? 'Submitting...' : 'Submit Grievance'}
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    Submit Grievance
                   </Button>
                 </form>
               </Form>

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -12,10 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home, Globe } from "lucide-react";
+import { Menu, ChevronDown, BookOpenCheck, CalendarCheck, FileWarning, HeartPulse, Mail, Home, Globe, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Logo } from "@/components/logo";
+import { useUser } from "@/firebase/provider";
+import { getAuth, signOut } from "firebase/auth";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -41,9 +43,16 @@ const languages = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [currentLanguage, setLanguage] = useState('en');
+  const { user } = useUser();
+
+  const handleLogout = async () => {
+    await signOut(getAuth());
+    router.push('/');
+  };
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
@@ -131,6 +140,9 @@ export default function Header() {
                           {navLinks.map((link) => (
                               <NavLink key={link.href} {...link} />
                           ))}
+                           {user && (
+                            <NavLink href="/user-dashboard" label="Dashboard" />
+                          )}
                           <div className="text-blue-200">Services</div>
                           <div className="flex flex-col gap-3 pl-4">
                             {services.map(service => (
@@ -140,6 +152,12 @@ export default function Header() {
                             ))}
                           </div>
                         </nav>
+                         {user && (
+                            <Button onClick={handleLogout} variant="outline" className="mt-6 bg-transparent text-white border-white">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Logout
+                            </Button>
+                        )}
                     </div>
                 </SheetContent>
                 </Sheet>
@@ -151,27 +169,51 @@ export default function Header() {
                 <NavLink key={link.href} {...link} />
               ))}
               <ServiceDropdownMenu />
+               {user && (
+                <NavLink href="/user-dashboard" label="Dashboard" />
+              )}
               <LanguageSelector />
             </nav>
+
             <div className="hidden md:flex items-center justify-end space-x-2">
-              <Button asChild variant="default" className="bg-blue-700 hover:bg-blue-600 text-white text-sm">
-                <Link href="/login">
-                  Login
-                </Link>
-              </Button>
-               <Button asChild variant="secondary" className="bg-white text-blue-800 hover:bg-gray-100 text-sm">
-                <Link href="/register">
-                  Register
-                </Link>
-              </Button>
+              {user ? (
+                <div className="flex items-center gap-4">
+                    <span className="text-sm text-blue-100 hidden lg:block">Welcome, {user.displayName || 'User'}</span>
+                    <Button onClick={handleLogout} variant="ghost" size="sm" className="text-white hover:bg-blue-700">
+                        <LogOut className="mr-2 h-4 w-4"/>
+                        Logout
+                    </Button>
+                </div>
+              ) : (
+                <>
+                  <Button asChild variant="default" className="bg-blue-700 hover:bg-blue-600 text-white text-sm">
+                    <Link href="/login">
+                      Login
+                    </Link>
+                  </Button>
+                   <Button asChild variant="secondary" className="bg-white text-blue-800 hover:bg-gray-100 text-sm">
+                    <Link href="/register">
+                      Register
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="md:hidden">
-                 <Button asChild size="sm" variant="default" className="bg-blue-700 hover:bg-blue-600 text-white">
-                    <Link href="/login">
-                        Login
-                    </Link>
-                </Button>
+                {user ? (
+                    <Button asChild size="sm" variant="outline" className="bg-transparent border-white text-white">
+                        <Link href="/user-dashboard">
+                            <User className="h-4 w-4"/>
+                        </Link>
+                    </Button>
+                ) : (
+                    <Button asChild size="sm" variant="default" className="bg-blue-700 hover:bg-blue-600 text-white">
+                        <Link href="/login">
+                            Login
+                        </Link>
+                    </Button>
+                )}
             </div>
         </div>
       </div>

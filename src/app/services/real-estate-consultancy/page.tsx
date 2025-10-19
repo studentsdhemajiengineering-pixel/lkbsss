@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,9 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Home, User, Phone, Mail, MapPin, Upload, Building, CheckCircle } from "lucide-react";
-import { useFirebase } from "@/firebase/provider";
+import { Home, User, Phone, Mail, MapPin, Upload, Building, CheckCircle, Loader2 } from "lucide-react";
+import { useFirebase, useUser } from "@/firebase/provider";
 import { addRealEstateRequest, uploadFile } from "@/lib/services";
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -38,7 +40,9 @@ const formSchema = z.object({
 
 export default function RealEstateConsultancyPage() {
   const { firestore } = useFirebase();
-  const [success, setSuccess] = useState(false);
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,8 +60,22 @@ export default function RealEstateConsultancyPage() {
     },
   });
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+    if (user) {
+      form.setValue('fullName', user.displayName || '');
+      form.setValue('email', user.email || '');
+      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+    }
+  }, [user, isUserLoading, router, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a request.' });
+        return;
+    }
     setLoading(true);
     try {
         let documentUrl;
@@ -65,29 +83,22 @@ export default function RealEstateConsultancyPage() {
             documentUrl = await uploadFile(values.document);
         }
 
-        await addRealEstateRequest(firestore, { ...values, documentUrl });
+        await addRealEstateRequest(firestore, { ...values, documentUrl }, user.uid);
         
         form.reset();
-        setSuccess(true);
+        toast({ title: 'Success!', description: 'Real estate request submitted. Track its status in your dashboard.' });
+        router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting real estate request: ", error);
-        alert('Failed to submit request.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit request.' });
     }
     setLoading(false);
   }
 
-  if (success) {
+  if (isUserLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Request Submitted Successfully!</h1>
-          <p className="text-gray-600 mb-6">
-            Your real estate consultancy request has been submitted. Our expert will contact you within 24-48 hours.
-          </p>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
@@ -395,7 +406,8 @@ export default function RealEstateConsultancyPage() {
                   </div>
 
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
-                    {loading ? 'Submitting...' : 'Submit Real Estate Consultancy Request'}
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    Submit Real Estate Consultancy Request
                   </Button>
                 </form>
               </Form>

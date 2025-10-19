@@ -20,12 +20,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon, GraduationCap, User, Phone, Mail, Upload, BookOpen } from "lucide-react";
+import { Calendar as CalendarIcon, GraduationCap, User, Phone, Mail, Upload, BookOpen, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useFirebase } from "@/firebase/provider";
+import { useFirebase, useUser } from "@/firebase/provider";
 import { addEducationRequest, uploadFile } from "@/lib/services";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   studentName: z.string().min(2, { message: "Student name must be at least 2 characters." }),
@@ -41,6 +43,9 @@ const formSchema = z.object({
 
 export default function EducationSupportPage() {
     const { firestore } = useFirebase();
+    const { user, isUserLoading } = useUser();
+    const router = useRouter();
+    const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,8 +61,22 @@ export default function EducationSupportPage() {
     },
   });
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+     if (user) {
+      form.setValue('parentName', user.displayName || '');
+      form.setValue('email', user.email || '');
+      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+    }
+  }, [user, isUserLoading, router, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a request.' });
+        return;
+    }
     setLoading(true);
     try {
         let documentUrl;
@@ -69,15 +88,24 @@ export default function EducationSupportPage() {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
             documentUrl 
-        });
+        }, user.uid);
         
         form.reset();
-        alert('Education support request submitted successfully!');
+        toast({ title: 'Success!', description: 'Education support request submitted. Track its status in your dashboard.' });
+        router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting education request: ", error);
-        alert('Failed to submit education request.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit education request.' });
     }
     setLoading(false);
+  }
+
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -366,7 +394,8 @@ export default function EducationSupportPage() {
                   </div>
 
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3">
-                    {loading ? 'Submitting...' : 'Submit Education Support Request'}
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    Submit Education Support Request
                   </Button>
                 </form>
               </Form>

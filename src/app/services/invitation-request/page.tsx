@@ -25,14 +25,17 @@ import {
     Calendar as CalendarIcon, 
     MapPin, 
     Upload, 
-    Users
+    Users,
+    Loader2
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useFirebase } from "@/firebase/provider";
+import { useFirebase, useUser } from "@/firebase/provider";
 import { addInvitationRequest, uploadFile } from "@/lib/services";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 
 const formSchema = z.object({
@@ -53,6 +56,9 @@ const formSchema = z.object({
 
 export default function InvitationRequestPage() {
     const { firestore } = useFirebase();
+    const { user, isUserLoading } = useUser();
+    const router = useRouter();
+    const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,8 +78,22 @@ export default function InvitationRequestPage() {
     },
   });
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+    if (user) {
+      form.setValue('fullName', user.displayName || '');
+      form.setValue('email', user.email || '');
+      form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+    }
+  }, [user, isUserLoading, router, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a request.' });
+        return;
+    }
     setLoading(true);
     try {
         let documentUrl;
@@ -85,13 +105,14 @@ export default function InvitationRequestPage() {
             ...values,
             eventDate: values.eventDate.toISOString(),
             documentUrl
-        });
+        }, user.uid);
         
         form.reset();
-        alert('Invitation request submitted successfully!');
+        toast({ title: 'Success!', description: 'Invitation request submitted. Track its status in your dashboard.' });
+        router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting invitation request: ", error);
-        alert('Failed to submit invitation request.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit invitation request.' });
     }
     setLoading(false);
   }
@@ -99,6 +120,14 @@ export default function InvitationRequestPage() {
   const getMinDate = () => {
     return new Date();
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-16">
@@ -437,7 +466,8 @@ export default function InvitationRequestPage() {
                     </div>
 
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
-                    {loading ? 'Submitting...' : 'Submit Invitation Request'}
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    Submit Invitation Request
                   </Button>
                 </form>
               </Form>

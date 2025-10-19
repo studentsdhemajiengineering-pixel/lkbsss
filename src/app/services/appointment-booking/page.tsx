@@ -26,14 +26,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar as CalendarIcon, Clock, User, Phone, Mail, FileText, Upload, CheckCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, User, Phone, Mail, FileText, Upload, CheckCircle, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
-import { useFirebase } from "@/firebase/provider";
+import { useFirebase, useUser } from "@/firebase/provider";
 import { addAppointment, uploadFile } from "@/lib/services";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -51,6 +53,9 @@ const formSchema = z.object({
 
 export default function AppointmentBookingPage() {
   const { firestore } = useFirebase();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,8 +68,22 @@ export default function AppointmentBookingPage() {
     },
   });
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+    if (user) {
+      form.setValue('fullName', user.displayName || '');
+      form.setValue('email', user.email || '');
+      form.setValue('mobile', user.phoneNumber ? user.phoneNumber.slice(3) : '');
+    }
+  }, [user, isUserLoading, router, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) return;
+    if (!firestore || !user) {
+        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to book an appointment.' });
+        return;
+    }
     setLoading(true);
     try {
         let documentUrl;
@@ -77,13 +96,14 @@ export default function AppointmentBookingPage() {
             dateOfBirth: values.dateOfBirth.toISOString(),
             appointmentDate: values.appointmentDate.toISOString(),
             documentUrl,
-        });
+        }, user.uid);
         
         form.reset();
-        alert('Appointment booked successfully!');
+        toast({ title: 'Success!', description: 'Appointment booked successfully! Track its status in your dashboard.' });
+        router.push('/user-dashboard');
     } catch (error) {
         console.error("Error booking appointment: ", error);
-        alert('Failed to book appointment.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to book appointment.' });
     }
     setLoading(false);
   }
@@ -93,6 +113,14 @@ export default function AppointmentBookingPage() {
     date.setDate(date.getDate() + 2);
     return date;
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-16">
@@ -353,7 +381,8 @@ export default function AppointmentBookingPage() {
                   </div>
 
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-primary to-purple-600 text-white py-3">
-                    {loading ? 'Booking...' : 'Book Appointment'}
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    Book Appointment
                   </Button>
                 </form>
               </Form>
