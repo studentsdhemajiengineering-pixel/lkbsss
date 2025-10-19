@@ -114,13 +114,11 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold font-headline text-center mb-10">Moments in Time</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {featuredImages.map((image) => {
-                 const imgData = PlaceHolderImages.find(p => p.id === image.imageId);
-                 return imgData ? (
+                 return (
                   <div key={image.id} className="relative aspect-square rounded-xl overflow-hidden group shadow-lg">
                     <Image
-                      src={imgData.imageUrl}
-                      alt={imgData.description}
-                      data-ai-hint={imgData.imageHint}
+                      src={`/images/gallery/${image.imageId}`}
+                      alt={image.title}
                       fill
                       objectFit="cover"
                       className="transition-transform duration-500 group-hover:scale-110"
@@ -129,7 +127,7 @@ export default function AboutPage() {
                       <p className="text-white text-center text-sm font-semibold">{image.title}</p>
                     </div>
                   </div>
-                ) : null;
+                );
               })}
             </div>
             <div className="text-center mt-10">

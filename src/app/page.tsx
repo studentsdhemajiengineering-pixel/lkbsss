@@ -536,18 +536,14 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {galleryImages.slice(0, 8).map((image: GalleryImage, index: number) => {
-              const imgData = PlaceHolderImages.find(p => p.id === image.imageId);
               return (
                 <div key={image.id} className={`relative aspect-square rounded-lg overflow-hidden group ${index >= 4 ? 'hidden md:block' : ''}`}>
-                  {imgData &&
                     <Image
-                      src={imgData.imageUrl}
-                      alt={imgData.description}
-                      data-ai-hint={imgData.imageHint}
+                      src={`/images/gallery/${image.imageId}`}
+                      alt={image.title}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-110"
                     />
-                  }
                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                     <p className="text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity">{image.title}</p>
                   </div>
