@@ -285,7 +285,6 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {filteredSocialPosts.map((post: SocialPost) => {
-                    const postImage = post.imageId ? PlaceHolderImages.find(p => p.id === post.imageId) : null;
                     return (
                         <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
                             {post.imageUrl &&
@@ -476,9 +475,9 @@ export default function Home() {
                  <Image
                       src="/images/book-cover.jpg"
                       alt="Book Cover"
-                      width={600}
-                      height={800}
-                      className="rounded-xl shadow-2xl"
+                      width={400}
+                      height={600}
+                      className="rounded-xl shadow-2xl mx-auto"
                     />
               </div>
             </div>

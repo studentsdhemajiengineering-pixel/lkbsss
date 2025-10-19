@@ -5,6 +5,11 @@ export type SocialPost = {
   username: string;
   content: string;
   timestamp: string;
+  imageUrl?: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  url?: string;
 };
 
 export type NewsArticle = {
@@ -77,35 +82,79 @@ export const interviewsAndPodcasts: InterviewAndPodcast[] = [
 ];
 
 export const socialPosts: SocialPost[] = [
-  {
-    id: 1,
-    platform: 'Twitter',
-    username: '@DigitalConnect',
-    content: 'Our new community portal is now live! Connect, share, and stay informed. #DigitalIndia',
-    timestamp: '2h ago',
-  },
-  {
-    id: 2,
-    platform: 'Facebook',
-    username: 'Digital Connect Official',
-    content: 'We are excited to launch a new series of webinars on digital literacy. First session starts next Monday. Register now!',
-    timestamp: '5h ago',
-  },
-  {
-    id: 3,
-    platform: 'Instagram',
-    username: 'digital_connect',
-    content: 'A sneak peek from our recent hackathon event. Innovation at its best!',
-    timestamp: '1d ago',
-  },
-  {
-    id: 4,
-    platform: 'LinkedIn',
-    username: 'Digital Connect',
-    content: 'We are hiring! Looking for passionate individuals to join our mission of connecting communities digitally. Check our careers page.',
-    timestamp: '3d ago',
-  },
-];
+    {
+      id: 1,
+      platform: 'Facebook',
+      username: 'Luit Kumar Barman',
+      content: 'Happy to share Trust deed of “ ৰক্ষা” has been registered today. ৰাইজৰ আশীৰ্বাদত আমি আশা কৰো যে আমি ৰাইজক সেৱা কৰিব পাৰিম ',
+      timestamp: '1 Day ago',
+      imageUrl: 'https://scontent.fgau1-3.fna.fbcdn.net/v/t39.30808-6/515501124_24046878221643289_5983247591207682282_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Tg2nLILBhOwQ7kNvwH9mIf6&_nc_oc=Adn2jvERWtPFQty4PPOlkK7OLmkn_-LLEL3OsV2MN0atd3j-_6Xzt7I8MgN-te6fR2Uoq_xA6nDc0utfH21XSxq6&_nc_zt=23&_nc_ht=scontent.fgau1-3.fna&_nc_gid=bRvg_ugcHXYbbWh9UjSing&oh=00_AfZhyNlflgfJstQww4Jov8LTRccD84kDWSCu4Ku055PgHg&oe=68BF548A',
+      likes: 245,
+      comments: 32,
+      shares: 18,
+      url: 'https://www.facebook.com/story.php?story_fbid=24046877708310007&id=100002433417790&mibextid=wwXIfr&rdid=cY5Q3TlpDYqLhx7L#',
+    },
+    {
+      id: 2,
+      platform: 'Facebook',
+      username: 'Luit Kumar Barman',
+      content: 'Rahul Gandhi is not given the contract of the country alone. He has raised such a sensitive issue. As responsible citizens, we also have duty.',
+      timestamp: '4 hours ago',
+      imageUrl: 'https://scontent.fgau1-4.fna.fbcdn.net/v/t39.30808-6/515502739_24401563529508088_3031132360328703751_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Ct483EX0LawQ7kNvwHv3UMv&_nc_oc=AdmMtOgkjvg20IM9p7mMj6H3_NuElgTa1ufUw03DwW0fcnOftFjvAKxCLDhtOpBk5c3SSoWGp9wgQCAGJYmsVG-H&_nc_zt=23&_nc_ht=scontent.fgau1-4.fna&_nc_gid=VH0BqBy0bpRuKtGx9Csz6Q&oh=00_Afb7uw5H6kXJvczRW4-U_wGk3UFPYJ3GnZVYk2-7xTdbyg&oe=68BF6C90',
+      likes: 189,
+      comments: 24,
+      shares: 12,
+      url: 'https://www.facebook.com/share/p/16HchpD5Hg/?mibextid=wwXIfr',
+    },
+    {
+      id: 3,
+      platform: 'Facebook',
+      username: 'Luit Kumar Barman',
+      content: 'Occupancy certificate দিওঁতে GMC বছৰ বছৰ যাব পাৰে কিন্তু RTI ৰ first appeal ৰ তাৰিখ কিন্তু ২ দিনতে hearing ৰ date দিছে। যদিও RTI Act 2005 মতে appellant মাতিব লাগে বুলি নিয়ম নাই কিন্তু natural justice ৰ বাবে সকলোৱে মাতে।',
+      timestamp: '6 hours ago',
+      imageUrl: 'https://scontent.fgau1-6.fna.fbcdn.net/v/t39.30808-6/514595096_24010862568578188_7607389513344244545_n.jpg?stp=dst-jpg_s600x600_tt6&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=RSGSpcYrS_0Q7kNvwFpAeMM&_nc_oc=Adl9T2_AiAj0654zlZTsGvnyB66t78u7be1vxfDlRGJIk0gCzqbc4YKTj_z6090BaJ_RDVGU9vTZlqSHxOn1Jaa9&_nc_zt=23&_nc_ht=scontent.fgau1-6.fna&_nc_gid=B35hFYi0pkwNiChhBMjK5g&oh=00_AfYygdWpiCUhPKZIiHm0p9z8L8a-7IfalPndTogquTSqcg&oe=68BF46D7',
+      likes: 156,
+      comments: 18,
+      shares: 28,
+      url: 'https://www.facebook.com/story.php?story_fbid=9778770168880666&id=100002433417790&mibextid=wwXIfr&rdid=kKZNm31VU1GMamyV#',
+    },
+    {
+      id: 4,
+      platform: 'Facebook',
+      username: 'Luit Kumar Barman',
+      content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/২০২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ત আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
+      timestamp: '8 hours ago',
+      imageUrl: 'https://scontent.fgau1-4.fna.fbcdn.net/v/t39.30808-6/515210104_24010455641952214_7258915501411600861_n.jpg?stp=dst-jpg_p526x296_tt6&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=KUTdIwPocOAQ7kNvwF77ldV&_nc_oc=Admn5czVPquRA7l7WJafswiumFhryC5HppM54awcrNimKGHd51CoiyYe76UW3EHXAZJRmLguGefXohw1LepxRP5N&_nc_zt=23&_nc_ht=scontent.fgau1-4.fna&_nc_gid=n5M6om_GixLnPn6V3mNSkQ&oh=00_AfbqPf-xJlhloGD1INZp4OlHtopOVqRVBB8yW5IHHVn6YA&oe=68BF67BE',
+      likes: 312,
+      comments: 45,
+      shares: 67,
+      url: 'https://www.facebook.com/story.php?story_fbid=9714556611968689&id=100002433417790&mibextid=wwXIfr&rdid=N8N9iDPuwK9koMdt#',
+    },
+    {
+      id: 5,
+      platform: 'Facebook',
+      username: 'Luit Kumar Barman',
+      content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ২০১৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
+      timestamp: '1 day ago',
+      imageUrl: 'https://scontent.fgau1-5.fna.fbcdn.net/v/t39.30808-6/514411221_24005078895823222_5354757537042435130_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=2F2Ij0mkURMQ7kNvwG0ly2T&_nc_oc=AdnZBYKTw9GeaUs9E1kUbJFwT5716gOHqrgqsHa9Djs_t63ShKTEc8zUcZLjQ9m34ckHVSJ1HKMIQ2RBI6EipkOV&_nc_zt=23&_nc_ht=scontent.fgau1-5.fna&_nc_gid=zp7KpO6PYfmvyPU76t-vgg&oh=00_AfYI6LDx6hI6BDkPTT6reoP7BJg3Y4o7nnD3qOszls9SUQ&oe=68BF5DB1',
+      likes: 198,
+      comments: 29,
+      shares: 15,
+      url: 'https://www.facebook.com/story.php?story_fbid=9153866098037746&id=100002433417790&mibextid=wwXIfr&rdid=8u6EOG8yUFiywVi4#',
+    },
+    {
+      id: 6,
+      platform: 'Facebook',
+      username: 'Luit Kumar Barman',
+      content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰিলোঁ',
+      timestamp: '1 day ago',
+      imageUrl: 'https://scontent.fgau1-6.fna.fbcdn.net/v/t39.30808-6/514790871_24003903889274056_7951641828885792567_n.jpg?stp=dst-jpg_p526x395_tt6&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=CUIIwxb80MkQ7kNvwEzBlc5&_nc_oc=AdljXVTP7zkhSMpZsDxYzaKS5tKrcHUHPjFNnSRT2Y_YMtUpXRq-O16Lco_J5I_53fQSsZtzpjEUVLjOeWoVM1iS&_nc_zt=23&_nc_ht=scontent.fgau1-6.fna&_nc_gid=C8xAENWjlXbL9KmPbh_KOw&oh=00_AfZGd9HOvfwIHqCxB2RJfjTFFwsUKHRKD0TgkIVvfgzhfA&oe=68BF5130',
+      likes: 2267,
+      comments: 38,
+      shares: 22,
+      url: 'https://www.facebook.com/story.php?story_fbid=8997734850317539&id=100002433417790&mibextid=wwXIfr&rdid=RGkQfMDsVlGPZAKl#',
+    }
+  ];
 
 export const newsArticles: NewsArticle[] = [
   {
