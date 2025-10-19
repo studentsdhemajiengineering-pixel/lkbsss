@@ -19,24 +19,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, User, Phone, Mail, Upload, CheckCircle, Activity } from 'lucide-react';
+import { useFirebase } from "@/firebase/provider";
+import { addHealthRequest, uploadFile } from "@/lib/services";
+import { useState } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
-  age: z.string().min(1, { message: "Age is required." }),
+  age: z.coerce.number().min(1, { message: "Age is required." }),
   gender: z.string().min(1, { message: "Please select a gender." }),
   mobile: z.string().regex(/^\d{10}$/, { message: "Please enter a valid 10-digit phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   assistanceType: z.string().min(1, { message: "Please select an assistance type." }),
   description: z.string().min(20, { message: "Description must be at least 20 characters." }),
-  document: z.any().optional(),
+  document: z.instanceof(File).optional(),
 });
 
 export default function HealthSupportPage() {
+    const { firestore } = useFirebase();
+    const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
-      age: "",
       gender: "",
       mobile: "",
       email: "",
@@ -45,9 +50,24 @@ export default function HealthSupportPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle submission logic
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
+    setLoading(true);
+    try {
+        let documentUrl;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
+        await addHealthRequest(firestore, { ...values, documentUrl });
+        
+        form.reset();
+        alert('Health support request submitted successfully!');
+    } catch (error) {
+        console.error("Error submitting health request: ", error);
+        alert('Failed to submit health request.');
+    }
+    setLoading(false);
   }
 
   return (
@@ -256,13 +276,13 @@ export default function HealthSupportPage() {
                              <FormField
                                 control={form.control}
                                 name="document"
-                                render={({ field }) => (
+                                render={({ field: { onChange, value, ...rest } }) => (
                                 <FormItem>
                                     <FormLabel>Optional Document Upload</FormLabel>
                                     <FormControl>
                                          <div className="relative">
                                             <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                            <Input type="file" {...field} className="pl-10" />
+                                            <Input type="file" onChange={(e) => onChange(e.target.files?.[0])} {...rest} className="pl-10" />
                                         </div>
                                     </FormControl>
                                     <FormDescription>
@@ -294,8 +314,8 @@ export default function HealthSupportPage() {
                         </p>
                     </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-3">
-                    Submit Health Support Request
+                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-3">
+                    {loading ? 'Submitting...' : 'Submit Health Support Request'}
                   </Button>
                 </form>
               </Form>

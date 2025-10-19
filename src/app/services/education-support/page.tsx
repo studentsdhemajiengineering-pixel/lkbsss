@@ -23,6 +23,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, GraduationCap, User, Phone, Mail, Upload, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useFirebase } from "@/firebase/provider";
+import { addEducationRequest, uploadFile } from "@/lib/services";
+import { useState } from "react";
 
 const formSchema = z.object({
   studentName: z.string().min(2, { message: "Student name must be at least 2 characters." }),
@@ -33,10 +36,13 @@ const formSchema = z.object({
   institutionName: z.string().min(3, { message: "Institution name is required." }),
   requestType: z.string().min(1, { message: "Please select a request type." }),
   details: z.string().min(20, { message: "Details must be at least 20 characters." }),
-  document: z.any().optional(),
+  document: z.instanceof(File).optional(),
 });
 
 export default function EducationSupportPage() {
+    const { firestore } = useFirebase();
+    const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,8 +56,28 @@ export default function EducationSupportPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
+    setLoading(true);
+    try {
+        let documentUrl;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
+        await addEducationRequest(firestore, { 
+            ...values,
+            dateOfBirth: values.dateOfBirth.toISOString(),
+            documentUrl 
+        });
+        
+        form.reset();
+        alert('Education support request submitted successfully!');
+    } catch (error) {
+        console.error("Error submitting education request: ", error);
+        alert('Failed to submit education request.');
+    }
+    setLoading(false);
   }
 
   return (
@@ -296,13 +322,13 @@ export default function EducationSupportPage() {
                       <FormField
                         control={form.control}
                         name="document"
-                        render={({ field }) => (
+                        render={({ field: { onChange, value, ...rest } }) => (
                           <FormItem>
                             <FormLabel>Optional Document Upload</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                <Input type="file" {...field} className="pl-10" />
+                                <Input type="file" onChange={(e) => onChange(e.target.files?.[0])} {...rest} className="pl-10" />
                               </div>
                             </FormControl>
                             <FormDescription>
@@ -339,8 +365,8 @@ export default function EducationSupportPage() {
                     </ul>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3">
-                    Submit Education Support Request
+                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3">
+                    {loading ? 'Submitting...' : 'Submit Education Support Request'}
                   </Button>
                 </form>
               </Form>

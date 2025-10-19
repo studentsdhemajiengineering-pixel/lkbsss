@@ -20,6 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Home, User, Phone, Mail, MapPin, Upload, Building, CheckCircle } from "lucide-react";
+import { useFirebase } from "@/firebase/provider";
+import { addRealEstateRequest, uploadFile } from "@/lib/services";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -31,11 +33,13 @@ const formSchema = z.object({
   propertyLocation: z.string().min(3, { message: "Property location is required." }),
   budgetRange: z.string().optional(),
   description: z.string().min(20, { message: "Description must be at least 20 characters." }),
-  document: z.any().optional(),
+  document: z.instanceof(File).optional(),
 });
 
 export default function RealEstateConsultancyPage() {
+  const { firestore } = useFirebase();
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,10 +56,24 @@ export default function RealEstateConsultancyPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    setSuccess(true);
-    // Handle submission logic
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
+    setLoading(true);
+    try {
+        let documentUrl;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
+        await addRealEstateRequest(firestore, { ...values, documentUrl });
+        
+        form.reset();
+        setSuccess(true);
+    } catch (error) {
+        console.error("Error submitting real estate request: ", error);
+        alert('Failed to submit request.');
+    }
+    setLoading(false);
   }
 
   if (success) {
@@ -334,13 +352,13 @@ export default function RealEstateConsultancyPage() {
                        <FormField
                         control={form.control}
                         name="document"
-                        render={({ field }) => (
+                        render={({ field: { onChange, value, ...rest } }) => (
                           <FormItem>
                             <FormLabel>Optional Document Upload</FormLabel>
                             <FormControl>
                                <div className="relative">
                                 <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <Input type="file" onChange={(e) => field.onChange(e.target.files)} className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
+                                <Input type="file" onChange={(e) => onChange(e.target.files?.[0])} className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" {...rest} />
                               </div>
                             </FormControl>
                             <FormDescription className="text-sm text-gray-500 mt-1">
@@ -376,8 +394,8 @@ export default function RealEstateConsultancyPage() {
                     </ul>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
-                    Submit Real Estate Consultancy Request
+                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
+                    {loading ? 'Submitting...' : 'Submit Real Estate Consultancy Request'}
                   </Button>
                 </form>
               </Form>

@@ -1,126 +1,149 @@
 {
   "entities": {
-    "User": {
+    "Appointment": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "User",
+      "title": "Appointment",
       "type": "object",
-      "description": "Represents a user of the Digital Connect platform.",
+      "description": "Represents an appointment booking made by a user.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the user."
-        },
-        "username": {
-          "type": "string",
-          "description": "The username of the user."
-        },
-        "email": {
-          "type": "string",
-          "description": "The email address of the user.",
-          "format": "email"
-        },
-        "firstName": {
-          "type": "string",
-          "description": "The first name of the user."
-        },
-        "lastName": {
-          "type": "string",
-          "description": "The last name of the user."
-        },
-        "isAdmin": {
-          "type": "boolean",
-          "description": "Indicates if the user has administrator privileges."
-        }
+        "id": { "type": "string", "description": "Unique identifier for the appointment." },
+        "fullName": { "type": "string", "description": "The full name of the person booking the appointment." },
+        "dateOfBirth": { "type": "string", "format": "date", "description": "The date of birth of the person." },
+        "mobile": { "type": "string", "description": "The mobile number of the person." },
+        "email": { "type": "string", "format": "email", "description": "The email address of the person." },
+        "appointmentDate": { "type": "string", "format": "date", "description": "The requested date for the appointment." },
+        "purpose": { "type": "string", "description": "The purpose of the appointment." },
+        "documentUrl": { "type": "string", "format": "uri", "description": "URL to an optional uploaded document." },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"], "description": "The status of the appointment." },
+        "submittedAt": { "type": "string", "format": "date-time", "description": "The date and time the appointment was submitted." }
       },
-      "required": [
-        "id",
-        "username",
-        "email",
-        "firstName",
-        "lastName",
-        "isAdmin"
-      ]
+      "required": ["id", "fullName", "dateOfBirth", "mobile", "email", "appointmentDate", "purpose", "status", "submittedAt"]
     },
-    "SocialMediaPost": {
+    "Grievance": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "SocialMediaPost",
+      "title": "Grievance",
       "type": "object",
-      "description": "Represents a post fetched from a social media platform.",
+      "description": "Represents a public grievance or complaint submitted by a user.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the social media post."
-        },
-        "platform": {
-          "type": "string",
-          "description": "The social media platform where the post originated (e.g., Facebook, Twitter)."
-        },
-        "content": {
-          "type": "string",
-          "description": "The content of the social media post."
-        },
-        "url": {
-          "type": "string",
-          "description": "URL to the social media post.",
-          "format": "uri"
-        },
-        "postedAt": {
-          "type": "string",
-          "description": "The date and time when the post was created.",
-          "format": "date-time"
-        }
+        "id": { "type": "string", "description": "Unique identifier for the grievance." },
+        "ticketNumber": { "type": "string", "description": "A unique ticket number for tracking." },
+        "fullName": { "type": "string", "description": "The full name of the complainant." },
+        "contactNumber": { "type": "string", "description": "The contact number of the complainant." },
+        "email": { "type": "string", "format": "email", "description": "The email address of the complainant." },
+        "address": { "type": "string", "description": "The address of the complainant." },
+        "grievanceType": { "type": "string", "description": "The category of the grievance." },
+        "description": { "type": "string", "description": "A detailed description of the grievance." },
+        "documentUrl": { "type": "string", "format": "uri", "description": "URL to an optional uploaded document." },
+        "status": { "type": "string", "enum": ["submitted", "under_review", "resolved", "closed"], "description": "The status of the grievance." },
+        "submittedAt": { "type": "string", "format": "date-time", "description": "The date and time the grievance was submitted." }
       },
-      "required": [
-        "id",
-        "platform",
-        "content",
-        "url",
-        "postedAt"
-      ]
+      "required": ["id", "ticketNumber", "fullName", "contactNumber", "email", "address", "grievanceType", "description", "status", "submittedAt"]
+    },
+    "HealthRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "HealthRequest",
+        "type": "object",
+        "description": "Represents a request for health support.",
+        "properties": {
+            "id": { "type": "string" },
+            "fullName": { "type": "string" },
+            "age": { "type": "number" },
+            "gender": { "type": "string" },
+            "mobile": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "assistanceType": { "type": "string" },
+            "description": { "type": "string" },
+            "documentUrl": { "type": "string", "format": "uri" },
+            "status": { "type": "string", "enum": ["submitted", "processing", "approved", "completed"] },
+            "submittedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "fullName", "age", "gender", "mobile", "email", "assistanceType", "description", "status", "submittedAt"]
+    },
+    "EducationRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "EducationRequest",
+        "type": "object",
+        "description": "Represents a request for education support.",
+        "properties": {
+            "id": { "type": "string" },
+            "studentName": { "type": "string" },
+            "dateOfBirth": { "type": "string", "format": "date" },
+            "parentName": { "type": "string" },
+            "contactNumber": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "institutionName": { "type": "string" },
+            "requestType": { "type": "string" },
+            "details": { "type": "string" },
+            "documentUrl": { "type": "string", "format": "uri" },
+            "status": { "type": "string", "enum": ["submitted", "under_review", "approved", "rejected"] },
+            "submittedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "studentName", "dateOfBirth", "parentName", "contactNumber", "email", "institutionName", "requestType", "details", "status", "submittedAt"]
+    },
+    "RealEstateRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "RealEstateRequest",
+        "type": "object",
+        "description": "Represents a request for real estate consultancy.",
+        "properties": {
+            "id": { "type": "string" },
+            "fullName": { "type": "string" },
+            "contactNumber": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "address": { "type": "string" },
+            "propertyType": { "type": "string" },
+            "consultationType": { "type": "string" },
+            "propertyLocation": { "type": "string" },
+            "budgetRange": { "type": "string" },
+            "description": { "type": "string" },
+            "documentUrl": { "type": "string", "format": "uri" },
+            "status": { "type": "string", "enum": ["submitted", "under_review", "in_progress", "completed"] },
+            "submittedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "fullName", "contactNumber", "email", "address", "propertyType", "consultationType", "propertyLocation", "description", "status", "submittedAt"]
+    },
+    "InvitationRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "InvitationRequest",
+        "type": "object",
+        "description": "Represents a request for an invitation to an event.",
+        "properties": {
+            "id": { "type": "string" },
+            "fullName": { "type": "string" },
+            "organization": { "type": "string" },
+            "designation": { "type": "string" },
+            "contactNumber": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "eventType": { "type": "string" },
+            "eventName": { "type": "string" },
+            "eventDate": { "type": "string", "format": "date" },
+            "eventVenue": { "type": "string" },
+            "numberOfInvitees": { "type": "string" },
+            "purpose": { "type": "string" },
+            "specialRequirements": { "type": "string" },
+            "documentUrl": { "type": "string", "format": "uri" },
+            "status": { "type": "string", "enum": ["submitted", "under_review", "approved", "rejected"] },
+            "submittedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "fullName", "organization", "designation", "contactNumber", "email", "eventType", "eventName", "eventDate", "eventVenue", "numberOfInvitees", "purpose", "status", "submittedAt"]
     },
     "NewsArticle": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "NewsArticle",
       "type": "object",
-      "description": "Represents a news article displayed on the platform.",
+      "description": "Represents a news article.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the news article."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the news article."
-        },
-        "content": {
-          "type": "string",
-          "description": "The content of the news article."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL to the image associated with the news article.",
-          "format": "uri"
-        },
-        "publishedAt": {
-          "type": "string",
-          "description": "The date and time when the article was published.",
-          "format": "date-time"
-        },
-        "isVideo": {
-          "type": "boolean",
-          "description": "Indicates if the news article is a video."
-        },
-        "isPodcast": {
-          "type": "boolean",
-          "description": "Indicates if the news article is a podcast."
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "imageId": { "type": "string" },
+        "category": { "type": "string" },
+        "published_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "title",
-        "content",
-        "publishedAt"
-      ]
+      "required": ["id", "title", "excerpt", "content", "author", "date", "category", "published_at"]
     },
     "GalleryImage": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -128,220 +151,84 @@
       "type": "object",
       "description": "Represents an image in the gallery.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the gallery image."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL to the gallery image.",
-          "format": "uri"
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of the image."
-        },
-        "uploadedAt": {
-          "type": "string",
-          "description": "The date and time when the image was uploaded.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "imageId": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "published_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "imageUrl",
-        "uploadedAt"
-      ]
+      "required": ["id", "title", "imageId", "imageUrl", "published_at"]
     },
     "Resource": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Resource",
       "type": "object",
-      "description": "Represents an official announcement, scheme, or press release.",
+      "description": "Represents an official resource document.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the resource."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the resource."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description of the resource."
-        },
-        "fileUrl": {
-          "type": "string",
-          "description": "URL to the resource file (e.g., PDF).",
-          "format": "uri"
-        },
-        "publishedAt": {
-          "type": "string",
-          "description": "The date and time when the resource was published.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "link": { "type": "string", "format": "uri" },
+        "published_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "title",
-        "description",
-        "fileUrl",
-        "publishedAt"
-      ]
+      "required": ["id", "title", "category", "date", "link", "published_at"]
     },
-    "LanguagePage": {
+     "InterviewAndPodcast": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "LanguagePage",
+      "title": "InterviewAndPodcast",
       "type": "object",
-      "description": "Represents content for a specific language.",
+      "description": "Represents an interview or podcast.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the language page."
-        },
-        "language": {
-          "type": "string",
-          "description": "The language of the page (e.g., English, Assamese, Hindi)."
-        },
-        "pageName": {
-          "type": "string",
-          "description": "The name of the page (e.g., Home, About Us)."
-        },
-        "content": {
-          "type": "string",
-          "description": "The content of the page in the specified language."
-        }
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "thumbnail": { "type": "string", "format": "uri" },
+        "url": { "type": "string", "format": "uri" },
+        "duration": { "type": "string" },
+        "views": { "type": "string" },
+        "age": { "type": "string" },
+        "category": { "type": "string", "enum": ["Interview", "Podcast"] },
+        "published_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "language",
-        "pageName",
-        "content"
-      ]
+      "required": ["id", "title", "thumbnail", "url", "category", "published_at"]
+    },
+    "SocialMediaPost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SocialMediaPost",
+      "type": "object",
+      "description": "Represents a social media post.",
+      "properties": {
+        "id": { "type": "string" },
+        "platform": { "type": "string" },
+        "username": { "type": "string" },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "likes": { "type": "number" },
+        "comments": { "type": "number" },
+        "shares": { "type": "number" },
+        "url": { "type": "string", "format": "uri" },
+        "published_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "platform", "content", "timestamp", "published_at"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password", "anonymous"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profile data. Accessible to the user themselves.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Indicates admin privileges. The existence of a document for a user in this collection grants admin rights.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who is an admin."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/social_media_posts/{postId}",
-        "definition": {
-          "entityName": "SocialMediaPost",
-          "schema": {
-            "$ref": "#/backend/entities/SocialMediaPost"
-          },
-          "description": "Stores social media posts fetched from various platforms. Accessible for reading by all users.",
-          "params": [
-            {
-              "name": "postId",
-              "description": "The unique identifier of the social media post."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/news_articles/{articleId}",
-        "definition": {
-          "entityName": "NewsArticle",
-          "schema": {
-            "$ref": "#/backend/entities/NewsArticle"
-          },
-          "description": "Stores news articles managed by admins. Read access granted to all users; write access restricted to admins (roles_admin).",
-          "params": [
-            {
-              "name": "articleId",
-              "description": "The unique identifier of the news article."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/gallery_images/{imageId}",
-        "definition": {
-          "entityName": "GalleryImage",
-          "schema": {
-            "$ref": "#/backend/entities/GalleryImage"
-          },
-          "description": "Stores gallery images managed by admins. Read access granted to all users; write access restricted to admins (roles_admin).",
-          "params": [
-            {
-              "name": "imageId",
-              "description": "The unique identifier of the gallery image."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/resources/{resourceId}",
-        "definition": {
-          "entityName": "Resource",
-          "schema": {
-            "$ref": "#/backend/entities/Resource"
-          },
-          "description": "Stores official announcements, schemes, and press releases. Read access granted to all users; write access restricted to admins (roles_admin).",
-          "params": [
-            {
-              "name": "resourceId",
-              "description": "The unique identifier of the resource."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/language_pages/{pageId}",
-        "definition": {
-          "entityName": "LanguagePage",
-          "schema": {
-            "$ref": "#/backend/entities/LanguagePage"
-          },
-          "description": "Stores multi-language content for different pages. Read access granted to all users; write access restricted to admins (roles_admin).",
-          "params": [
-            {
-              "name": "pageId",
-              "description": "The unique identifier of the language page."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore structure is designed to support the Digital Connect platform's features while adhering to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). It leverages denormalization for authorization independence and structural segregation for a homogeneous security posture.\n\n**Authorization Independence:** The design avoids hierarchical authorization dependencies (`get()` calls in security rules) by denormalizing relevant authorization data. For example, if access to `NewsArticle` documents needs to be restricted to admins, we rely on the `roles_admin/{uid}` collection check, rather than fetching the user document to verify `isAdmin`.\n\n**Structural Segregation:** Different types of data with different access requirements are stored in separate collections. Admin-managed content (news articles, gallery images, resources, language pages) are stored in top-level collections, and admin status is determined by membership in the `roles_admin` collection, allowing for simple and secure list operations.\n\n**Access Modeling:**\n*   **Private User Data:** User-specific data is stored under `/users/{userId}`.\n*   **Admin Privileges:** Admin privileges are managed using the `/roles_admin/{userId}` collection. The existence of a document with the user's ID in this collection grants admin rights.\n*   **Public Data:** Social media posts, news articles, gallery images, resources, and language pages are stored in top-level collections with appropriate read access controls.\n\n**QAPs (Rules are not Filters):** The structure enables secure `list` operations. For example, listing news articles only requires checking if the user has the required permissions to read them, without needing to filter based on document content.\n\nThis structure is highly scalable, debuggable and secure."
+    "collections": [
+      { "path": "/appointments", "schema": { "$ref": "#/entities/Appointment" }, "description": "Stores appointment requests." },
+      { "path": "/grievances", "schema": { "$ref": "#/entities/Grievance" }, "description": "Stores grievance submissions." },
+      { "path": "/health-requests", "schema": { "$ref": "#/entities/HealthRequest" }, "description": "Stores health support requests." },
+      { "path": "/education-requests", "schema": { "$ref": "#/entities/EducationRequest" }, "description": "Stores education support requests." },
+      { "path": "/real-estate-requests", "schema": { "$ref": "#/entities/RealEstateRequest" }, "description": "Stores real estate consultancy requests." },
+      { "path": "/invitation-requests", "schema": { "$ref": "#/entities/InvitationRequest" }, "description": "Stores invitation requests." },
+      { "path": "/news-articles", "schema": { "$ref": "#/entities/NewsArticle" }, "description": "Stores news articles." },
+      { "path": "/gallery-images", "schema": { "$ref": "#/entities/GalleryImage" }, "description": "Stores gallery images." },
+      { "path": "/resources", "schema": { "$ref": "#/entities/Resource" }, "description": "Stores official resources." },
+      { "path": "/interviews-podcasts", "schema": { "$ref": "#/entities/InterviewAndPodcast" }, "description": "Stores interviews and podcasts." },
+      { "path": "/social-media-posts", "schema": { "$ref": "#/entities/SocialMediaPost" }, "description": "Stores social media posts." }
+    ]
   }
 }

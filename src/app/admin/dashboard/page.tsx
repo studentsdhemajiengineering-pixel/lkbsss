@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BarChart3,
   Settings,
@@ -10,10 +10,54 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import OverviewTab from '@/components/admin/dashboard/overview-tab';
 import ServiceRequestsTab from '@/components/admin/dashboard/service-requests-tab';
 import ContentManagementTab from '@/components/admin/dashboard/content-management-tab';
-import { appointments, grievances, healthRequests, educationRequests, realEstateRequests, invitationRequests, newsArticles, videoNews, podcasts, galleryImages, resources, socialPosts } from '@/lib/data-provider';
+import { useFirebase } from '@/firebase/provider';
+import { 
+    getAppointments, getGrievances, getHealthRequests, getEducationRequests, 
+    getRealEstateRequests, getInvitationRequests, getNewsArticles, 
+    getInterviewsAndPodcasts, getGalleryImages, getResources, getSocialMediaPosts
+} from '@/lib/services';
+import type { Appointment, Grievance, HealthRequest, EducationRequest, RealEstateRequest, InvitationRequest, NewsArticle, InterviewAndPodcast, GalleryImage, Resource, SocialMediaPost } from '@/lib/types';
 
 
 export default function AdminDashboardPage() {
+    const { firestore } = useFirebase();
+
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [grievances, setGrievances] = useState<Grievance[]>([]);
+    const [healthRequests, setHealthRequests] = useState<HealthRequest[]>([]);
+    const [educationRequests, setEducationRequests] = useState<EducationRequest[]>([]);
+    const [realEstateRequests, setRealEstateRequests] = useState<RealEstateRequest[]>([]);
+    const [invitationRequests, setInvitationRequests] = useState<InvitationRequest[]>([]);
+    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+    const [videoNews, setVideoNews] = useState<InterviewAndPodcast[]>([]);
+    const [podcasts, setPodcasts] = useState<InterviewAndPodcast[]>([]);
+    const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+    const [resources, setResources] = useState<Resource[]>([]);
+    const [socialPosts, setSocialPosts] = useState<SocialMediaPost[]>([]);
+
+    const loadData = async () => {
+        if (!firestore) return;
+        getAppointments(firestore).then(setAppointments);
+        getGrievances(firestore).then(setGrievances);
+        getHealthRequests(firestore).then(setHealthRequests);
+        getEducationRequests(firestore).then(setEducationRequests);
+        getRealEstateRequests(firestore).then(setRealEstateRequests);
+        getInvitationRequests(firestore).then(setInvitationRequests);
+        getNewsArticles(firestore).then(setNewsArticles);
+        getInterviewsAndPodcasts(firestore).then(data => {
+            setVideoNews(data.filter(item => item.category === 'Interview'));
+            setPodcasts(data.filter(item => item.category === 'Podcast'));
+        });
+        getGalleryImages(firestore).then(setGalleryImages);
+        getResources(firestore).then(setResources);
+        getSocialMediaPosts(firestore).then(setSocialPosts);
+    }
+    
+    useEffect(() => {
+        loadData();
+    }, [firestore]);
+
+
   const allRequests = [
     ...appointments.map(a => ({ ...a, type: 'Appointment' })),
     ...grievances.map(g => ({ ...g, type: 'Grievance' })),
@@ -87,10 +131,11 @@ export default function AdminDashboardPage() {
               educationRequests={educationRequests}
               realEstateRequests={realEstateRequests}
               invitationRequests={invitationRequests}
+              onDataChange={loadData}
             />
           </TabsContent>
           <TabsContent value="content">
-            <ContentManagementTab content={allContent} />
+            <ContentManagementTab content={allContent} onDataChange={loadData} />
           </TabsContent>
         </Tabs>
       </div>

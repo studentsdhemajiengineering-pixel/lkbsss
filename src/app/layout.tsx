@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { usePathname } from 'next/navigation';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 // export const metadata: Metadata = {
 //   title: 'Digital Connect',
@@ -32,12 +33,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <div className="flex min-h-screen flex-col">
-          {!isAdminRoute && <Header />}
-          <main className="flex-1">{children}</main>
-          {!isAdminRoute && <Footer />}
-        </div>
-        <Toaster />
+        <FirebaseClientProvider>
+            <div className="flex min-h-screen flex-col">
+              {!isAdminRoute && <Header />}
+              <main className="flex-1">{children}</main>
+              {!isAdminRoute && <Footer />}
+            </div>
+            <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );

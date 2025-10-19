@@ -1,13 +1,29 @@
 
+'use client';
 import Image from "next/image";
 import Link from "next/link";
 import { PlayCircle, Camera, Target, Eye, BookOpen, Film } from "lucide-react";
-import { interviewsAndPodcasts, galleryImages } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useFirebase } from "@/firebase/provider";
+import { getGalleryImages, getInterviewsAndPodcasts } from "@/lib/services";
+import { useState, useEffect } from "react";
+import type { GalleryImage, InterviewAndPodcast } from "@/lib/types";
 
 export default function AboutPage() {
+    const { firestore } = useFirebase();
+    const [interviewsAndPodcasts, setInterviewsAndPodcasts] = useState<InterviewAndPodcast[]>([]);
+    const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+
+    useEffect(() => {
+        if(firestore) {
+            getInterviewsAndPodcasts(firestore).then(setInterviewsAndPodcasts);
+            getGalleryImages(firestore).then(setGalleryImages);
+        }
+    }, [firestore]);
+
+
   const featuredVideos = interviewsAndPodcasts.slice(0, 2);
   const featuredImages = galleryImages.slice(0, 4);
 
@@ -117,7 +133,7 @@ export default function AboutPage() {
                  return (
                   <div key={image.id} className="relative aspect-square rounded-xl overflow-hidden group shadow-lg">
                     <Image
-                      src={`/images/gallery/${image.imageId}`}
+                      src={image.imageUrl}
                       alt={image.title}
                       fill
                       objectFit="cover"

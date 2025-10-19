@@ -14,25 +14,30 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { getStatusColor } from "@/lib/status-helpers.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useFirebase } from '@/firebase/provider';
+import { updateServiceRequestStatus, deleteServiceRequest } from '@/lib/services';
+import type { Appointment, Grievance, HealthRequest, EducationRequest, RealEstateRequest, InvitationRequest } from '@/lib/types';
+
 
 type ServiceRequestsTabProps = {
-    appointments: any[];
-    grievances: any[];
-    healthRequests: any[];
-    educationRequests: any[];
-    realEstateRequests: any[];
-    invitationRequests: any[];
+    appointments: Appointment[];
+    grievances: Grievance[];
+    healthRequests: HealthRequest[];
+    educationRequests: EducationRequest[];
+    realEstateRequests: RealEstateRequest[];
+    invitationRequests: InvitationRequest[];
+    onDataChange: () => void;
 };
 
 type RequestType = 'appointments' | 'grievances' | 'health' | 'education' | 'realestate' | 'invitation';
 
-const requestTypes: { id: RequestType, label: string }[] = [
-    { id: 'appointments', label: 'Appointments' },
-    { id: 'grievances', label: 'Grievances' },
-    { id: 'health', label: 'Health Support' },
-    { id: 'education', label: 'Education Support' },
-    { id: 'realestate', label: 'Real Estate' },
-    { id: 'invitation', label: 'Invitations' },
+const requestTypes: { id: RequestType, label: string, collection: string }[] = [
+    { id: 'appointments', label: 'Appointments', collection: 'appointments' },
+    { id: 'grievances', label: 'Grievances', collection: 'grievances' },
+    { id: 'health', label: 'Health Support', collection: 'health-requests' },
+    { id: 'education', label: 'Education Support', collection: 'education-requests' },
+    { id: 'realestate', label: 'Real Estate', collection: 'real-estate-requests' },
+    { id: 'invitation', label: 'Invitations', collection: 'invitation-requests' },
 ];
 
 const statusOptions: Record<RequestType, string[]> = {
@@ -52,7 +57,9 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
     educationRequests,
     realEstateRequests,
     invitationRequests,
+    onDataChange,
 }) => {
+    const { firestore } = useFirebase();
     const [activeRequestType, setActiveRequestType] = useState<RequestType>('appointments');
     const [loading, setLoading] = useState(false);
 
@@ -67,34 +74,41 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
 
     const activeData = dataMap[activeRequestType];
     const activeStatusOptions = statusOptions[activeRequestType];
+    const activeCollection = requestTypes.find(rt => rt.id === activeRequestType)?.collection || '';
 
 
-    const updateStatus = async (type: string, id: string, status: string) => {
+    const handleUpdateStatus = async (id: string, status: string) => {
+        if (!firestore || !activeCollection) return;
         setLoading(true);
-        console.log(`Updating ${type} ID ${id} to ${status}`);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        // Here you would refetch or update state
+        try {
+            await updateServiceRequestStatus(firestore, activeCollection, id, status);
+            onDataChange();
+        } catch (error) {
+            console.error(`Error updating status for ${activeCollection}:`, error);
+        }
         setLoading(false);
     };
 
-    const deleteItem = async (type: string, id: string) => {
+    const handleDeleteItem = async (id: string) => {
+        if (!firestore || !activeCollection) return;
         if (!confirm('Are you sure you want to delete this item?')) return;
         setLoading(true);
-        console.log(`Deleting ${type} ID ${id}`);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        // Here you would refetch or update state
+        try {
+            await deleteServiceRequest(firestore, activeCollection, id);
+            onDataChange();
+        } catch (error) {
+             console.error(`Error deleting item from ${activeCollection}:`, error);
+        }
         setLoading(false);
     };
 
     const getRequestDetails = (item: any, type: RequestType) => {
         const details = {
-            name: item.full_name || item.fullName || item.student_name || item.studentName,
+            name: item.fullName || item.studentName,
             description: '',
-            contact: item.mobile || item.contact_number || item.contactNumber,
+            contact: item.mobile || item.contactNumber,
             email: item.email,
-            date: new Date(item.created_at || item.submittedAt).toLocaleDateString()
+            date: item.submittedAt ? new Date(item.submittedAt.seconds * 1000).toLocaleDateString() : 'N/A'
         };
 
         switch(type) {
@@ -102,19 +116,19 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
                 details.description = item.purpose;
                 break;
             case 'grievances':
-                details.description = `Ticket: ${item.ticket_number || item.ticketNumber}`;
+                details.description = `Ticket: ${item.ticketNumber}`;
                 break;
             case 'health':
-                details.description = item.assistance_type || item.assistanceType;
+                details.description = item.assistanceType;
                 break;
             case 'education':
-                details.description = item.request_type || item.requestType;
+                details.description = item.requestType;
                 break;
             case 'realestate':
-                details.description = item.consultation_type || item.consultationType;
+                details.description = item.consultationType;
                 break;
             case 'invitation':
-                details.description = item.event_name || item.eventName;
+                details.description = item.eventName;
                 break;
         }
         return details;
@@ -174,7 +188,7 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
                                         <TableCell className="px-6 py-4">
                                             <Select
                                                 value={item.status}
-                                                onValueChange={(value) => updateStatus(activeRequestType, item.id, value)}
+                                                onValueChange={(value) => handleUpdateStatus(item.id, value)}
                                             >
                                                 <SelectTrigger className={`w-36 h-auto text-xs font-medium border-0 focus:ring-0 ${getStatusColor(item.status)}`}>
                                                     <SelectValue placeholder="Select Status"/>
@@ -193,7 +207,7 @@ const ServiceRequestsTab: React.FC<ServiceRequestsTabProps> = ({
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => deleteItem(activeRequestType, item.id)}
+                                                onClick={() => handleDeleteItem(item.id)}
                                                 className="text-destructive hover:text-destructive/80"
                                             >
                                                 <Trash2 className="w-4 h-4" />

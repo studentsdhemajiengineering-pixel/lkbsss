@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -41,10 +41,11 @@ import {
   Eye
 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { newsArticles, socialPosts, galleryImages, resources, interviewsAndPodcasts } from '@/lib/placeholder-data';
-import type { SocialPost, NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/placeholder-data';
+import type { SocialMediaPost, NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/types';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
+import { useFirebase } from '@/firebase/provider';
+import { getNewsArticles, getSocialMediaPosts, getGalleryImages, getResources, getInterviewsAndPodcasts } from '@/lib/services';
 
 const socialIcons: { [key: string]: React.ReactNode } = {
   Twitter: <Twitter className="h-6 w-6 text-sky-500" />,
@@ -112,6 +113,22 @@ const slides = [
 
 
 export default function Home() {
+    const { firestore } = useFirebase();
+    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+    const [socialPosts, setSocialPosts] = useState<SocialMediaPost[]>([]);
+    const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+    const [interviewsAndPodcasts, setInterviewsAndPodcasts] = useState<InterviewAndPodcast[]>([]);
+
+    useEffect(() => {
+        if (firestore) {
+            getNewsArticles(firestore).then(setNewsArticles);
+            getSocialMediaPosts(firestore).then(setSocialPosts);
+            getGalleryImages(firestore).then(setGalleryImages);
+            getInterviewsAndPodcasts(firestore).then(setInterviewsAndPodcasts);
+        }
+    }, [firestore]);
+
+
     const [activeTab, setActiveTab] = React.useState('All');
     const [activeInterviewTab, setActiveInterviewTab] = React.useState('All');
 
@@ -124,6 +141,7 @@ export default function Home() {
         if (activeInterviewTab === 'All') return true;
         return item.category === activeInterviewTab;
     });
+
   return (
     <div className="flex flex-col min-h-[100dvh] bg-gray-50">
         
@@ -281,7 +299,8 @@ export default function Home() {
                 <button onClick={() => setActiveTab('Twitter')} className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeTab === 'Twitter' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}>Twitter</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {filteredSocialPosts.map((post: SocialPost) => {
+                {filteredSocialPosts.map((post: SocialMediaPost) => {
+                    const postImage = PlaceHolderImages.find(p => p.id === post.imageUrl);
                     return (
                         <Link key={post.id} href={post.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group">
                             {post.imageUrl &&
@@ -364,7 +383,7 @@ export default function Home() {
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {newsArticles.map((article: NewsArticle) => {
-                const articleImage = article.category === 'Book' ? { imageUrl: `/images/${article.imageId}`, alt: article.title } : PlaceHolderImages.find(p => p.id === article.imageId);
+                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
                 return (
                     <Link
                         key={article.id}
@@ -539,7 +558,7 @@ export default function Home() {
               return (
                 <div key={image.id} className={`relative aspect-square rounded-lg overflow-hidden group ${index >= 4 ? 'hidden md:block' : ''}`}>
                     <Image
-                      src={`/images/gallery/${image.imageId}`}
+                      src={image.imageUrl}
                       alt={image.title}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-110"

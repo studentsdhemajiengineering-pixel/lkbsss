@@ -19,6 +19,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, User, Phone, Mail, MapPin, Upload, AlertCircle } from "lucide-react";
+import { useFirebase } from "@/firebase/provider";
+import { addGrievance, uploadFile } from "@/lib/services";
+import { useState } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -27,10 +30,13 @@ const formSchema = z.object({
   address: z.string().min(10, { message: "Address must be at least 10 characters." }),
   grievanceType: z.string().min(1, { message: "Please select a grievance type." }),
   description: z.string().min(20, { message: "Description must be at least 20 characters." }),
-  document: z.any().optional(),
+  document: z.instanceof(File).optional(),
 });
 
 export default function PublicGrievancePage() {
+    const { firestore } = useFirebase();
+    const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,9 +49,24 @@ export default function PublicGrievancePage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle submission logic
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
+    setLoading(true);
+    try {
+        let documentUrl;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
+        await addGrievance(firestore, { ...values, documentUrl });
+        
+        form.reset();
+        alert('Grievance submitted successfully!');
+    } catch (error) {
+        console.error("Error submitting grievance: ", error);
+        alert('Failed to submit grievance.');
+    }
+    setLoading(false);
   }
 
   return (
@@ -240,7 +261,7 @@ export default function PublicGrievancePage() {
                       <FormField
                         control={form.control}
                         name="document"
-                        render={({ field: { onChange, ...fieldProps } }) => (
+                        render={({ field: { onChange, value, ...rest } }) => (
                           <FormItem>
                             <FormLabel>Optional Document Upload</FormLabel>
                             <FormControl>
@@ -248,9 +269,9 @@ export default function PublicGrievancePage() {
                                 <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                                 <Input 
                                   type="file" 
-                                  onChange={e => onChange(e.target.files)} 
+                                  onChange={(e) => onChange(e.target.files?.[0])}
                                   className="pl-10" 
-                                  {...fieldProps} 
+                                  {...rest} 
                                 />
                               </div>
                             </FormControl>
@@ -275,8 +296,8 @@ export default function PublicGrievancePage() {
                     </ul>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white py-3">
-                    Submit Grievance
+                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white py-3">
+                    {loading ? 'Submitting...' : 'Submit Grievance'}
                   </Button>
                 </form>
               </Form>
@@ -287,5 +308,3 @@ export default function PublicGrievancePage() {
     </div>
   );
 }
-
-    

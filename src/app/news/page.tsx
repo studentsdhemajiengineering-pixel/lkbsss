@@ -1,16 +1,26 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Eye, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { newsArticles } from "@/lib/placeholder-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import type { NewsArticle } from "@/lib/placeholder-data";
+import type { NewsArticle } from "@/lib/types";
+import { useFirebase } from '@/firebase/provider';
+import { getNewsArticles } from '@/lib/services';
 
 export default function NewsPage() {
+    const { firestore } = useFirebase();
+    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+
+    useEffect(() => {
+        if (firestore) {
+            getNewsArticles(firestore).then(setNewsArticles);
+        }
+    }, [firestore]);
+
     const [activeTab, setActiveTab] = useState('All');
 
     const filteredArticles = newsArticles.filter(article => {
@@ -49,7 +59,9 @@ export default function NewsPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {filteredArticles.map((article: NewsArticle) => {
-                const articleImage = article.category === 'Book' ? { imageUrl: `/images/${article.imageId}`, alt: article.title } : PlaceHolderImages.find(p => p.id === article.imageId);
+                const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
+                const imageUrl = article.category === 'Book' ? `/images/book-cover.jpg` : articleImage?.imageUrl;
+
                 return (
                     <Link
                         key={article.id}
@@ -57,9 +69,9 @@ export default function NewsPage() {
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                     >
                         <div className="relative">
-                            {articleImage && (
+                            {imageUrl && (
                                 <Image
-                                    src={articleImage.imageUrl}
+                                    src={imageUrl}
                                     alt={article.title}
                                     width={600}
                                     height={400}

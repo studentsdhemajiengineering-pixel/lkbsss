@@ -1,9 +1,22 @@
+
+'use client';
 import Image from "next/image";
-import { galleryImages } from "@/lib/placeholder-data";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import type { GalleryImage } from "@/lib/placeholder-data";
+import type { GalleryImage } from "@/lib/types";
+import { useFirebase } from "@/firebase/provider";
+import { getGalleryImages } from "@/lib/services";
+import { useState, useEffect } from "react";
 
 export default function GalleryPage() {
+    const { firestore } = useFirebase();
+    const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+
+    useEffect(() => {
+        if (firestore) {
+            getGalleryImages(firestore).then(setGalleryImages);
+        }
+    }, [firestore]);
+
+
   return (
     <div className="container py-12 md:py-16">
       <div className="text-center space-y-4 mb-12">
@@ -19,7 +32,7 @@ export default function GalleryPage() {
           return (
             <div key={image.id} className="relative aspect-square rounded-xl overflow-hidden group shadow-lg">
                 <Image
-                  src={`/images/gallery/${image.imageId}`}
+                  src={image.imageUrl}
                   alt={image.title}
                   fill
                   className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"

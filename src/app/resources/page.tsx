@@ -1,3 +1,6 @@
+
+'use client';
+
 import {
   Table,
   TableBody,
@@ -8,13 +11,25 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { resources } from "@/lib/placeholder-data";
-import type { Resource } from "@/lib/placeholder-data";
+import type { Resource } from "@/lib/types";
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFirebase } from "@/firebase/provider";
+import { getResources } from "@/lib/services";
+import { useState, useEffect } from "react";
 
 export default function ResourcesPage() {
+  const { firestore } = useFirebase();
+  const [resources, setResources] = useState<Resource[]>([]);
+
+  useEffect(() => {
+    if (firestore) {
+      getResources(firestore).then(setResources);
+    }
+  }, [firestore]);
+
+
   const getBadgeVariant = (category: Resource["category"]) => {
     switch (category) {
       case "Announcement":
@@ -56,7 +71,7 @@ export default function ResourcesPage() {
                   <TableCell>
                     <Badge variant={getBadgeVariant(resource.category)}>{resource.category}</Badge>
                   </TableCell>
-                  <TableCell>{resource.date}</TableCell>
+                  <TableCell>{new Date(resource.date).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="ghost" size="icon">
                       <Link href={resource.link} aria-label={`Download ${resource.title}`}>

@@ -22,13 +22,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -38,6 +31,9 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
+import { useFirebase } from "@/firebase/provider";
+import { addAppointment, uploadFile } from "@/lib/services";
+import { useState } from "react";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -50,10 +46,13 @@ const formSchema = z.object({
     required_error: "An appointment date is required.",
   }),
   purpose: z.string().min(10, { message: "Purpose must be at least 10 characters." }),
-  document: z.any().optional(),
+  document: z.instanceof(File).optional(),
 });
 
 export default function AppointmentBookingPage() {
+  const { firestore } = useFirebase();
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,9 +63,29 @@ export default function AppointmentBookingPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle submission logic
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
+    setLoading(true);
+    try {
+        let documentUrl;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
+        await addAppointment(firestore, {
+            ...values,
+            dateOfBirth: values.dateOfBirth.toISOString(),
+            appointmentDate: values.appointmentDate.toISOString(),
+            documentUrl,
+        });
+        
+        form.reset();
+        alert('Appointment booked successfully!');
+    } catch (error) {
+        console.error("Error booking appointment: ", error);
+        alert('Failed to book appointment.');
+    }
+    setLoading(false);
   }
   
   const getMinDate = () => {
@@ -304,13 +323,13 @@ export default function AppointmentBookingPage() {
                         <FormField
                             control={form.control}
                             name="document"
-                            render={({ field }) => (
+                            render={({ field: { onChange, value, ...rest } }) => (
                             <FormItem>
                                 <FormLabel>Optional Document Upload</FormLabel>
                                 <FormControl>
                                      <div className="relative">
                                         <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                        <Input type="file" {...field} className="pl-10" />
+                                        <Input type="file" onChange={(e) => onChange(e.target.files?.[0])} {...rest} className="pl-10" />
                                     </div>
                                 </FormControl>
                                 <p className="text-sm text-muted-foreground mt-1">
@@ -333,8 +352,8 @@ export default function AppointmentBookingPage() {
                     </ul>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-primary to-purple-600 text-white py-3">
-                    Book Appointment
+                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-primary to-purple-600 text-white py-3">
+                    {loading ? 'Booking...' : 'Book Appointment'}
                   </Button>
                 </form>
               </Form>
@@ -345,5 +364,3 @@ export default function AppointmentBookingPage() {
     </div>
   );
 }
-
-    

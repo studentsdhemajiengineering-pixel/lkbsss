@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
     Table,
     TableBody,
@@ -24,19 +24,23 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useFirebase } from '@/firebase/provider';
+import { addContent, updateContent, deleteContent } from '@/lib/services';
+import type { Content } from '@/lib/types';
 
 type ContentType = 'news' | 'videos' | 'podcasts' | 'gallery' | 'resources' | 'social';
 
-const contentTypes: { id: ContentType, label: string }[] = [
-    { id: 'news', label: 'News' },
-    { id: 'videos', label: 'Videos' },
-    { id: 'podcasts', label: 'Podcasts' },
-    { id: 'gallery', label: 'Gallery' },
-    { id: 'resources', label: 'Resources' },
-    { id: 'social', label: 'Social Posts' },
+const contentTypes: { id: ContentType, label: string, collection: string }[] = [
+    { id: 'news', label: 'News', collection: 'news-articles' },
+    { id: 'videos', label: 'Videos', collection: 'interviews-podcasts' },
+    { id: 'podcasts', label: 'Podcasts', collection: 'interviews-podcasts' },
+    { id: 'gallery', label: 'Gallery', collection: 'gallery-images' },
+    { id: 'resources', label: 'Resources', collection: 'resources' },
+    { id: 'social', label: 'Social Posts', collection: 'social-media-posts' },
 ];
 
-const ContentManagementTab = ({ content }: { content: Record<string, any[]> }) => {
+const ContentManagementTab = ({ content, onDataChange }: { content: Record<string, any[]>, onDataChange: () => void }) => {
+    const { firestore } = useFirebase();
     const [selectedContentType, setSelectedContentType] = useState<ContentType>('news');
     const [editingItem, setEditingItem] = useState<any | null>(null);
     const [isAddFormOpen, setAddFormOpen] = useState(false);
@@ -44,33 +48,46 @@ const ContentManagementTab = ({ content }: { content: Record<string, any[]> }) =
     const [loading, setLoading] = useState(false);
 
     const activeContent = content[selectedContentType] || [];
+    const activeCollection = contentTypes.find(ct => ct.id === selectedContentType)?.collection || '';
 
     const handleAddContent = async () => {
+        if (!firestore || !activeCollection) return;
         setLoading(true);
-        console.log("Adding content:", newItem, "to", selectedContentType);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setAddFormOpen(false);
-        setNewItem({});
-        // Here you would refetch or update state
+        try {
+            await addContent(firestore, activeCollection, newItem);
+            onDataChange();
+            setAddFormOpen(false);
+            setNewItem({});
+        } catch (error) {
+            console.error(`Error adding content to ${activeCollection}:`, error);
+        }
         setLoading(false);
     };
 
     const handleEditContent = async () => {
+        if (!firestore || !activeCollection || !editingItem) return;
         setLoading(true);
-        console.log("Editing content:", editingItem, "in", selectedContentType);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setEditingItem(null);
-        // Here you would refetch or update state
+        try {
+            const { id, ...data } = editingItem;
+            await updateContent(firestore, activeCollection, id, data);
+            onDataChange();
+            setEditingItem(null);
+        } catch (error) {
+            console.error(`Error updating content in ${activeCollection}:`, error);
+        }
         setLoading(false);
     };
 
-    const deleteItem = async (type: string, id: string) => {
+    const handleDeleteItem = async (id: string) => {
+        if (!firestore || !activeCollection) return;
         if (!confirm('Are you sure you want to delete this item?')) return;
         setLoading(true);
-        console.log(`Deleting ${type} ID ${id}`);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+            await deleteContent(firestore, activeCollection, id);
+            onDataChange();
+        } catch (error) {
+            console.error(`Error deleting content from ${activeCollection}:`, error);
+        }
         setLoading(false);
     };
 
@@ -93,15 +110,15 @@ const ContentManagementTab = ({ content }: { content: Record<string, any[]> }) =
             </div>
             <div>
                 <Label htmlFor="image-url">Image URL</Label>
-                <Input id="image-url" value={item.image_url || item.thumbnail_url || ''} onChange={(e) => setItem({ ...item, image_url: e.target.value, thumbnail_url: e.target.value })} />
+                <Input id="image-url" value={item.imageUrl || item.thumbnail || ''} onChange={(e) => setItem({ ...item, imageUrl: e.target.value, thumbnail: e.target.value })} />
             </div>
             <div className="md:col-span-2">
                 <Label htmlFor="link-url">Link/URL</Label>
-                <Input id="link-url" value={item.link || item.video_url || item.audio_url || ''} onChange={(e) => setItem({ ...item, link: e.target.value, video_url: e.target.value, audio_url: e.target.value })} />
+                <Input id="link-url" value={item.link || item.url || ''} onChange={(e) => setItem({ ...item, link: e.target.value, url: e.target.value })} />
             </div>
             <div className="md:col-span-2">
                 <Label htmlFor="description">Description *</Label>
-                <Textarea id="description" value={item.description || item.content || ''} onChange={(e) => setItem({ ...item, description: e.target.value, content: e.target.value })} />
+                <Textarea id="description" value={item.description || item.content || item.excerpt || ''} onChange={(e) => setItem({ ...item, description: e.target.value, content: e.target.value, excerpt: e.target.value })} />
             </div>
         </div>
     );
@@ -151,9 +168,9 @@ const ContentManagementTab = ({ content }: { content: Record<string, any[]> }) =
                                     <TableRow key={item.id} className="hover:bg-muted/50">
                                         <TableCell className="px-6 py-4">
                                             <div className="flex items-center space-x-3 max-w-sm">
-                                                {(item.image_url || item.thumbnail_url) && (
+                                                {(item.imageUrl || item.thumbnail) && (
                                                     <Image
-                                                        src={item.image_url || item.thumbnail_url}
+                                                        src={item.imageUrl || item.thumbnail}
                                                         alt={item.title || 'Content image'}
                                                         width={48}
                                                         height={48}
@@ -162,19 +179,19 @@ const ContentManagementTab = ({ content }: { content: Record<string, any[]> }) =
                                                 )}
                                                 <div>
                                                     <h3 className="text-sm font-medium text-foreground line-clamp-1">{item.title}</h3>
-                                                    <p className="text-sm text-muted-foreground line-clamp-2">{item.description || item.content}</p>
+                                                    <p className="text-sm text-muted-foreground line-clamp-2">{item.description || item.content || item.excerpt}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-6 py-4 text-sm text-foreground">{item.category || item.platform || 'General'}</TableCell>
                                         <TableCell className="px-6 py-4 text-sm text-muted-foreground">{getStats(item, selectedContentType)}</TableCell>
-                                        <TableCell className="px-6 py-4 text-sm text-muted-foreground">{new Date(item.published_at || item.created_at).toLocaleDateString()}</TableCell>
+                                        <TableCell className="px-6 py-4 text-sm text-muted-foreground">{item.published_at ? new Date(item.published_at.seconds * 1000).toLocaleDateString() : 'N/A'}</TableCell>
                                         <TableCell className="px-6 py-4">
                                             <div className="flex space-x-2">
                                                 <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)} className="text-primary hover:text-primary/80">
                                                     <Edit className="w-4 h-4" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" onClick={() => deleteItem(selectedContentType, item.id)} className="text-destructive hover:text-destructive/80">
+                                                <Button variant="ghost" size="icon" onClick={() => handleDeleteItem(item.id)} className="text-destructive hover:text-destructive/80">
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
                                             </div>

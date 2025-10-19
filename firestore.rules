@@ -1,221 +1,113 @@
-/**
- * @fileoverview Firestore Security Rules for the Digital Connect platform.
- *
- * Core Philosophy:
- * This ruleset implements a role-based access control system with public read access for certain collections.
- * User data is protected by owner-only access, while administrative privileges are managed through a dedicated collection.
- *
- * Data Structure:
- * - /users/{userId}: Stores individual user profiles, accessible only to the user themselves.
- * - /roles_admin/{userId}: Presence of a document grants admin privileges to the user.
- * - /social_media_posts/{postId}: Publicly readable collection of social media posts.
- * - /news_articles/{articleId}: Publicly readable collection of news articles, writable only by admins.
- * - /gallery_images/{imageId}: Publicly readable collection of gallery images, writable only by admins.
- * - /resources/{resourceId}: Publicly readable collection of resources, writable only by admins.
- * - /language_pages/{pageId}: Publicly readable collection of language pages, writable only by admins.
- *
- * Key Security Decisions:
- * - User listing is disabled for privacy.
- * - Admin privileges are determined by document existence in the /roles_admin collection.
- * - Public read access is granted to specific collections to facilitate data consumption.
- *
- * Denormalization for Authorization:
- * - Admin status is checked via the existence of a document in /roles_admin/{userId}, avoiding the need to read the user document.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Rules for user profiles.
+     * @description Grants access to user-specific data based on ownership.
      * @path /users/{userId}
-     * @allow (create) User with ID 'user123' can create their own profile.
-     *          request.auth.uid == 'user123'
-     *          request.resource.data.id == 'user123'
-     * @allow (get) User with ID 'user123' can read their own profile.
-     *          request.auth.uid == 'user123'
-     * @allow (update) User with ID 'user123' can update their own profile.
-     *          request.auth.uid == 'user123'
-     * @allow (delete) User with ID 'user123' can delete their own profile.
-     *          request.auth.uid == 'user123'
-     * @deny  (create) User with ID 'user123' cannot create a profile with a different ID 'user456'.
-     *          request.auth.uid == 'user123'
-     *          request.resource.data.id == 'user456'
-     * @deny (get) User with ID 'user123' cannot read profile of 'user456'.
-     *          request.auth.uid == 'user456'
-     * @principle Enforces user-ownership for profile data.
+     * @allow (create) - Authenticated user with ID matching the userId in the path can create their profile.
+     * @allow (get, update, delete) - Authenticated user with ID matching the userId in the path can read, update, and delete their profile.
+     * @deny (create) - Authenticated user attempts to create a profile with a userId that doesn't match their own ID.
+     * @deny (list) - Listing users is not allowed.
+     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.
      */
     match /users/{userId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
       allow get: if isOwner(userId);
-      allow list: if false; // User listing is not permitted.
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) && resource.data.id == request.resource.data.id && resource != null;
-      allow delete: if isOwner(userId) && resource != null;
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId);
+      allow delete: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Rules for admin roles.
+     * @description Manages admin privileges based on document existence.
      * @path /roles_admin/{userId}
-     * @allow (create) Admin with ID 'admin123' can be added.
-     *          isAdmin() == true
-     * @allow (get) Anyone can check if a user is admin.
-     *          request.auth.uid != null
-     * @allow (update) Only admins can update admin roles.
-     *          isAdmin() == true
-     * @allow (delete) Only admins can delete admin roles.
-     *          isAdmin() == true
-     * @deny  (create) Non-admin cannot assign admin role.
-     *          isAdmin() == false
-     * @deny (get) An unauthenticated user cannot read the admin list.
-     *          request.auth.uid == null
-     * @principle Uses document existence to grant admin privileges.
+     * @allow (create) - Only an admin can create a role_admin document.  This would require a get() operation to verify their admin status, which is disallowed to maintain authorization independence.
+     * @allow (get) - Any authenticated user can check if a user is an admin.
+     * @allow (delete) - Only an admin can delete a role_admin document.
+     * @deny (create) - A non-admin user attempts to create a role_admin document.
+     * @deny (list) - Listing admin roles is not allowed.
+     * @principle Grants admin privileges based on document existence.
      */
     match /roles_admin/{userId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
-      allow get: if request.auth != null;
-      allow list: if false; // Prevent listing of all admins
+      allow get: if isSignedIn();
+      allow list: if false;
       allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow update: if false;
+      allow delete: if isAdmin();
     }
 
     /**
-     * @description Rules for social media posts.
+     * @description Allows public read access to social media posts.
      * @path /social_media_posts/{postId}
-     * @allow (get) Anyone can read social media posts.
-     *          true
-     * @allow (list) Anyone can list social media posts.
-     *          true
-     * @deny  (create) No one can create social media posts directly.
-     *          false
-     * @deny  (update) No one can update social media posts directly.
-     *          false
-     * @deny  (delete) No one can delete social media posts directly.
-     *          false
-     * @principle Allows public read access to social media posts.
+     * @allow (get, list) - Any user can read social media posts.
+     * @deny (create, update, delete) - Only admins can modify social media posts.
+     * @principle Allows public read access with owner-only writes.
      */
     match /social_media_posts/{postId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
-     * @description Rules for news articles.
+     * @description Allows public read access to news articles.
      * @path /news_articles/{articleId}
-     * @allow (get) Anyone can read news articles.
-     *          true
-     * @allow (list) Anyone can list news articles.
-     *          true
-     * @allow (create) Only admins can create news articles.
-     *          isAdmin() == true
-     * @allow (update) Only admins can update news articles.
-     *          isAdmin() == true
-     * @allow (delete) Only admins can delete news articles.
-     *          isAdmin() == true
-     * @deny  (create) Non-admin cannot create news articles.
-     *          isAdmin() == false
-     * @principle Allows public read access, restricts writes to admins.
+     * @allow (get, list) - Any user can read news articles.
+     * @deny (create, update, delete) - Only admins can modify news articles.
+     * @principle Allows public read access with owner-only writes.
      */
     match /news_articles/{articleId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
-     * @description Rules for gallery images.
+     * @description Allows public read access to gallery images.
      * @path /gallery_images/{imageId}
-     * @allow (get) Anyone can read gallery images.
-     *          true
-     * @allow (list) Anyone can list gallery images.
-     *          true
-     * @allow (create) Only admins can create gallery images.
-     *          isAdmin() == true
-     * @allow (update) Only admins can update gallery images.
-     *          isAdmin() == true
-     * @allow (delete) Only admins can delete gallery images.
-     *          isAdmin() == true
-     * @deny  (create) Non-admin cannot create gallery images.
-     *          isAdmin() == false
-     * @principle Allows public read access, restricts writes to admins.
+     * @allow (get, list) - Any user can read gallery images.
+     * @deny (create, update, delete) - Only admins can modify gallery images.
+     * @principle Allows public read access with owner-only writes.
      */
     match /gallery_images/{imageId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
-     * @description Rules for resources.
+     * @description Allows public read access to resources.
      * @path /resources/{resourceId}
-     * @allow (get) Anyone can read resources.
-     *          true
-     * @allow (list) Anyone can list resources.
-     *          true
-     * @allow (create) Only admins can create resources.
-     *          isAdmin() == true
-     * @allow (update) Only admins can update resources.
-     *          isAdmin() == true
-     * @allow (delete) Only admins can delete resources.
-     *          isAdmin() == true
-     * @deny  (create) Non-admin cannot create resources.
-     *          isAdmin() == false
-     * @principle Allows public read access, restricts writes to admins.
+     * @allow (get, list) - Any user can read resources.
+     * @deny (create, update, delete) - Only admins can modify resources.
+     * @principle Allows public read access with owner-only writes.
      */
     match /resources/{resourceId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
-     * @description Rules for language pages.
+     * @description Allows public read access to language pages.
      * @path /language_pages/{pageId}
-     * @allow (get) Anyone can read language pages.
-     *          true
-     * @allow (list) Anyone can list language pages.
-     *          true
-     * @allow (create) Only admins can create language pages.
-     *          isAdmin() == true
-     * @allow (update) Only admins can update language pages.
-     *          isAdmin() == true
-     * @allow (delete) Only admins can delete language pages.
-     *          isAdmin() == true
-     * @deny  (create) Non-admin cannot create language pages.
-     *          isAdmin() == false
-     * @principle Allows public read access, restricts writes to admins.
+     * @allow (get, list) - Any user can read language pages.
+     * @deny (create, update, delete) - Only admins can modify language pages.
+     * @principle Allows public read access with owner-only writes.
      */
     match /language_pages/{pageId} {
-      function isAdmin() {
-        return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-      }
-
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
+  }
+
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  function isOwner(userId) {
+    return isSignedIn() && request.auth.uid == userId;
+  }
+
+  function isAdmin() {
+    return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
   }
 }

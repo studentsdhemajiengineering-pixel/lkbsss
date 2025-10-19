@@ -30,6 +30,9 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useFirebase } from "@/firebase/provider";
+import { addInvitationRequest, uploadFile } from "@/lib/services";
+import { useState } from "react";
 
 
 const formSchema = z.object({
@@ -45,10 +48,13 @@ const formSchema = z.object({
   numberOfInvitees: z.string().min(1, { message: "Number of invitees is required." }),
   purpose: z.string().min(20, { message: "Purpose must be at least 20 characters." }),
   specialRequirements: z.string().optional(),
-  document: z.any().optional(),
+  document: z.instanceof(File).optional(),
 });
 
 export default function InvitationRequestPage() {
+    const { firestore } = useFirebase();
+    const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,9 +72,28 @@ export default function InvitationRequestPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle submission logic
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
+    setLoading(true);
+    try {
+        let documentUrl;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
+        await addInvitationRequest(firestore, { 
+            ...values,
+            eventDate: values.eventDate.toISOString(),
+            documentUrl
+        });
+        
+        form.reset();
+        alert('Invitation request submitted successfully!');
+    } catch (error) {
+        console.error("Error submitting invitation request: ", error);
+        alert('Failed to submit invitation request.');
+    }
+    setLoading(false);
   }
 
   const getMinDate = () => {
@@ -381,13 +406,13 @@ export default function InvitationRequestPage() {
                             <FormField
                                 control={form.control}
                                 name="document"
-                                render={({ field }) => (
+                                render={({ field: { onChange, value, ...rest } }) => (
                                 <FormItem>
                                     <FormLabel>Supporting Documents</FormLabel>
                                     <FormControl>
                                     <div className="relative">
                                         <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                        <Input type="file" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                                        <Input type="file" onChange={(e) => onChange(e.target.files?.[0])} {...rest} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </div>
                                     </FormControl>
                                     <p className="text-sm text-muted-foreground mt-1">
@@ -411,8 +436,8 @@ export default function InvitationRequestPage() {
                         </ul>
                     </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
-                    Submit Invitation Request
+                  <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
+                    {loading ? 'Submitting...' : 'Submit Invitation Request'}
                   </Button>
                 </form>
               </Form>
