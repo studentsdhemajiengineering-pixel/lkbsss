@@ -45,7 +45,7 @@ import type { NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
 import { useFirebase } from '@/firebase/provider';
-import { getNewsArticles, getGalleryImages, getResources, getInterviewsAndPodcasts } from '@/lib/services';
+import { getGalleryImages, getInterviewsAndPodcasts } from '@/lib/services';
 
 const socialIcons: { [key: string]: React.ReactNode } = {
   Twitter: <Twitter className="h-6 w-6 text-sky-500" />,
@@ -147,16 +147,50 @@ const socialPosts = [
   },
 ];
 
+const newsArticles: NewsArticle[] = [
+    {
+        id: '1',
+        title: 'New Community Hall Inaugurated, Promises a Hub for Local Events',
+        excerpt: 'The newly constructed community hall was inaugurated today, a project aimed at fostering local culture and providing a space for public gatherings and events.',
+        content: '',
+        author: 'Staff Reporter',
+        date: '2024-07-20T10:00:00Z',
+        imageId: 'news-1',
+        category: 'Latest',
+        published_at: '2024-07-20T10:00:00Z',
+    },
+    {
+        id: '2',
+        title: 'Luit Kumar Barman\'s Novel "Damn It" Climbs Bestseller Charts',
+        excerpt: 'The latest novel "Damn It" by Luit Kumar Barman has been met with widespread critical acclaim and has quickly become a favorite among readers nationwide.',
+        content: '',
+        author: 'Book Today Magazine',
+        date: '2024-07-19T15:30:00Z',
+        imageId: '',
+        category: 'Book',
+        published_at: '2024-07-19T15:30:00Z',
+    },
+    {
+        id: '3',
+        title: 'Free Health Camp Receives Overwhelming Response from Community',
+        excerpt: 'A free health check-up camp organized last weekend saw hundreds of residents benefiting from medical consultations and free medicine distribution.',
+        content: '',
+        author: 'Community Health Desk',
+        date: '2024-07-18T12:00:00Z',
+        imageId: 'news-2',
+        category: 'Latest',
+        published_at: '2024-07-18T12:00:00Z',
+    }
+];
+
 
 export default function Home() {
     const { firestore } = useFirebase();
-    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
     const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
     const [interviewsAndPodcasts, setInterviewsAndPodcasts] = useState<InterviewAndPodcast[]>([]);
 
     useEffect(() => {
         if (firestore) {
-            getNewsArticles(firestore).then(setNewsArticles);
             getGalleryImages(firestore).then(setGalleryImages);
             getInterviewsAndPodcasts(firestore).then(setInterviewsAndPodcasts);
         }
@@ -415,6 +449,7 @@ export default function Home() {
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {newsArticles.slice(0, 3).map((article: NewsArticle) => {
                 const articleImage = PlaceHolderImages.find(p => p.id === article.imageId);
+                const imageUrl = article.category === 'Book' ? `/images/book-cover.jpg` : articleImage?.imageUrl;
                 return (
                     <Link
                         key={article.id}
@@ -422,9 +457,9 @@ export default function Home() {
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                     >
                         <div className="relative">
-                            {article.imageId && articleImage ? (
+                            {imageUrl ? (
                                 <Image
-                                    src={articleImage.imageUrl}
+                                    src={imageUrl}
                                     alt={article.title}
                                     width={600}
                                     height={400}

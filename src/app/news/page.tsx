@@ -8,19 +8,55 @@ import { Calendar, Eye, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import type { NewsArticle } from "@/lib/types";
-import { useFirebase } from '@/firebase/provider';
-import { getNewsArticles } from '@/lib/services';
+
+const newsArticles: NewsArticle[] = [
+    {
+        id: '1',
+        title: 'New Community Hall Inaugurated, Promises a Hub for Local Events',
+        excerpt: 'The newly constructed community hall was inaugurated today, a project aimed at fostering local culture and providing a space for public gatherings and events.',
+        content: '',
+        author: 'Staff Reporter',
+        date: '2024-07-20T10:00:00Z',
+        imageId: 'news-1',
+        category: 'Latest',
+        published_at: '2024-07-20T10:00:00Z',
+    },
+    {
+        id: '2',
+        title: 'Luit Kumar Barman\'s Novel "Damn It" Climbs Bestseller Charts',
+        excerpt: 'The latest novel "Damn It" by Luit Kumar Barman has been met with widespread critical acclaim and has quickly become a favorite among readers nationwide.',
+        content: '',
+        author: 'Book Today Magazine',
+        date: '2024-07-19T15:30:00Z',
+        imageId: '',
+        category: 'Book',
+        published_at: '2024-07-19T15:30:00Z',
+    },
+    {
+        id: '3',
+        title: 'Free Health Camp Receives Overwhelming Response from Community',
+        excerpt: 'A free health check-up camp organized last weekend saw hundreds of residents benefiting from medical consultations and free medicine distribution.',
+        content: '',
+        author: 'Community Health Desk',
+        date: '2024-07-18T12:00:00Z',
+        imageId: 'news-2',
+        category: 'Latest',
+        published_at: '2024-07-18T12:00:00Z',
+    },
+    {
+        id: '4',
+        title: 'Scholarship Program Announced for Underprivileged Students',
+        excerpt: 'A new scholarship initiative has been launched to support the education of meritorious students from economically weaker sections of society.',
+        content: '',
+        author: 'Education Trust',
+        date: '2024-07-17T11:00:00Z',
+        imageId: 'news-3',
+        category: 'Latest',
+        published_at: '2024-07-17T11:00:00Z',
+    }
+];
 
 export default function NewsPage() {
-    const { firestore } = useFirebase();
-    const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
-
-    useEffect(() => {
-        if (firestore) {
-            getNewsArticles(firestore).then(setNewsArticles);
-        }
-    }, [firestore]);
-
     const [activeTab, setActiveTab] = useState('All');
 
     const filteredArticles = newsArticles.filter(article => {
