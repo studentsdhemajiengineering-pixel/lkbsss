@@ -14,6 +14,7 @@ const navLinks = [
   { href: "/news", label: "News" },
   { href: "/gallery", label: "Gallery" },
   { href: "/resources", label: "Resources" },
+  { href: "/services", label: "Services" },
 ];
 
 export default function Header() {
@@ -24,7 +25,7 @@ export default function Header() {
       href={href}
       className={cn(
         "transition-colors hover:text-foreground/80",
-        pathname === href ? "text-foreground" : "text-foreground/60"
+        pathname.startsWith(href) && href !== "/" || pathname === href ? "text-foreground" : "text-foreground/60"
       )}
       prefetch={false}
     >
