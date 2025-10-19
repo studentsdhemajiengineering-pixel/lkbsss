@@ -25,8 +25,7 @@ import {
     Calendar as CalendarIcon, 
     MapPin, 
     Upload, 
-    Users,
-    Briefcase
+    Users
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -88,14 +87,14 @@ export default function InvitationRequestPage() {
             <p className="text-gray-600 text-lg">Request invitations for official events and programs</p>
           </div>
 
-          <Card className="mb-8 shadow-lg">
-             <CardHeader>
+          <Card className="mb-8 shadow-lg bg-white rounded-2xl p-8">
+             <CardHeader className="p-0 mb-6">
                 <CardTitle className="flex items-center text-xl font-semibold text-gray-800">
                     <Users className="w-6 h-6 mr-3 text-indigo-600" />
                     Instructions
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -141,7 +140,7 @@ export default function InvitationRequestPage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white rounded-2xl">
             <CardContent className="p-8">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -156,8 +155,8 @@ export default function InvitationRequestPage() {
                                     <FormLabel>Full Name *</FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                            <Input placeholder="Enter your full name" {...field} className="pl-10" />
+                                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                            <Input placeholder="Enter your full name" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -171,7 +170,7 @@ export default function InvitationRequestPage() {
                                     <FormItem>
                                     <FormLabel>Organization *</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Enter your organization name" {...field} />
+                                        <Input placeholder="Enter your organization name" {...field} className="px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -184,7 +183,7 @@ export default function InvitationRequestPage() {
                                     <FormItem>
                                     <FormLabel>Designation *</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Enter your designation" {...field} />
+                                        <Input placeholder="Enter your designation" {...field} className="px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -198,8 +197,8 @@ export default function InvitationRequestPage() {
                                     <FormLabel>Contact Number *</FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                            <Input type="tel" placeholder="Enter contact number" {...field} className="pl-10" />
+                                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                            <Input type="tel" placeholder="Enter contact number" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -215,8 +214,8 @@ export default function InvitationRequestPage() {
                                         <FormLabel>Email ID *</FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                            <Input type="email" placeholder="Enter your email address" {...field} className="pl-10" />
+                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                            <Input type="email" placeholder="Enter your email address" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -238,7 +237,7 @@ export default function InvitationRequestPage() {
                                     <FormLabel>Event Type *</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-auto">
                                             <SelectValue placeholder="Select event type" />
                                         </SelectTrigger>
                                         </FormControl>
@@ -264,7 +263,7 @@ export default function InvitationRequestPage() {
                                     <FormItem>
                                     <FormLabel>Event Name *</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Enter event name" {...field} />
+                                        <Input placeholder="Enter event name" {...field} className="px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -282,12 +281,12 @@ export default function InvitationRequestPage() {
                                             <Button
                                             variant={"outline"}
                                             className={cn(
-                                                "w-full pl-3 text-left font-normal",
+                                                "w-full pl-10 pr-4 py-3 text-left font-normal border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-auto",
                                                 !field.value && "text-muted-foreground"
                                             )}
                                             >
+                                            <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                                             {field.value ? format(field.value, "PPP") : <span>dd-mm-yyyy</span>}
-                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                             </Button>
                                         </FormControl>
                                         </PopoverTrigger>
@@ -312,7 +311,7 @@ export default function InvitationRequestPage() {
                                     <FormItem>
                                     <FormLabel>Number of Invitees *</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="Enter number of invitees" {...field} />
+                                        <Input type="number" placeholder="Enter number of invitees" {...field} className="px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -327,10 +326,10 @@ export default function InvitationRequestPage() {
                                         <FormLabel>Event Venue *</FormLabel>
                                         <FormControl>
                                         <div className="relative">
-                                            <MapPin className="absolute left-3 top-3 text-muted-foreground w-5 h-5" />
+                                            <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                                             <Textarea
                                                 placeholder="Enter complete venue address"
-                                                className="resize-y min-h-[100px] pl-10"
+                                                className="resize-y min-h-[100px] pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                                 {...field}
                                             />
                                         </div>
@@ -354,7 +353,7 @@ export default function InvitationRequestPage() {
                                     <FormControl>
                                     <Textarea
                                         placeholder="Please describe the purpose and objectives of your event"
-                                        className="resize-y min-h-[120px]"
+                                        className="resize-y min-h-[120px] px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                         {...field}
                                     />
                                     </FormControl>
@@ -371,7 +370,7 @@ export default function InvitationRequestPage() {
                                     <FormControl>
                                     <Textarea
                                         placeholder="Any special arrangements or requirements (optional)"
-                                        className="resize-y min-h-[100px]"
+                                        className="resize-y min-h-[100px] px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                         {...field}
                                     />
                                     </FormControl>
@@ -387,8 +386,8 @@ export default function InvitationRequestPage() {
                                     <FormLabel>Supporting Documents</FormLabel>
                                     <FormControl>
                                     <div className="relative">
-                                        <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                                        <Input type="file" {...field} className="pl-10" />
+                                        <Upload className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                        <Input type="file" {...field} className="pl-10 pr-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </div>
                                     </FormControl>
                                     <p className="text-sm text-muted-foreground mt-1">
@@ -412,7 +411,7 @@ export default function InvitationRequestPage() {
                         </ul>
                     </div>
 
-                  <Button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3">
+                  <Button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300">
                     Submit Invitation Request
                   </Button>
                 </form>
@@ -424,4 +423,3 @@ export default function InvitationRequestPage() {
     </div>
   );
 }
-
