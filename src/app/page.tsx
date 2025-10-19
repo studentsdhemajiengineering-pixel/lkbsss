@@ -114,12 +114,12 @@ const slides = [
   {
     id: '2',
     description: 'A Vision for a Better Tomorrow',
-    imageUrl: '/images/slide2.ppg',
+    imageUrl: '/images/slide2.png',
   },
   {
     id: '3',
     description: 'Connecting People, Building Futures',
-    imageUrl: '/images/slide3.ppg',
+    imageUrl: '/images/slide3.png',
   },
 ];
 
@@ -193,7 +193,7 @@ const socialPosts = [
   },
 ];
 
-const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at'>[] & {imageUrl: string}[] = [
+const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at' | 'category' > & {imageUrl: string, category: string, url: string})[] = [
   {
     id: '1',
     title: 'Assam Filmmaker Files Affidavit Supporting Rahul Gandhi Vote Rigging Claims',
@@ -274,7 +274,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   {
     id: '3',
     title: '📌লুইত কুমাৰ বৰ্মনৰ বহু নজনা কথা',
-    thumbnail: '/images/interviews/interview3.ppg',
+    thumbnail: '/images/interviews/interview3.png',
     url: 'https://www.facebook.com/watch/?mibextid=WC7FNe&v=1011876583509983&rdid=39P36saVknGSc5sl',
     duration: '22:15',
     views: '7.1k',
@@ -284,7 +284,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
 ];
 
 const galleryImages: Omit<GalleryImage, 'imageId' | 'published_at'>[] = [
-    { id: '1', title: '',  imageUrl:  '/images/gallery/1.jpg' },
+    { id: '1', title: 'Community Gathering',  imageUrl:  '/images/gallery/1.jpg' },
     { id: '2', title: 'Inauguration Ceremony', imageUrl: '/images/gallery/2.jpg' },
     { id: '3', title: 'Youth Skill Program', imageUrl: '/images/gallery/3.jpg' },
     { id: '4', title: 'Cultural Event', imageUrl: '/images/gallery/4.jpg' },
@@ -550,7 +550,9 @@ export default function Home() {
                 return (
                     <Link
                         key={article.id}
-                        href={`/news/${article.id}`}
+                        href={article.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                     >
                         <div className="relative">
@@ -771,7 +773,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-
-    
