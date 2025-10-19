@@ -37,11 +37,10 @@ import type {
 
 const addDocument = async (db: any, collectionName: string, data: any, userId?: string) => {
     if (!userId) {
-        const error = new Error("User must be authenticated to add a document.");
-        // We are not throwing this because it should be caught by UI logic before this point.
+        // This should be handled by UI logic before calling the service.
         // This is a safeguard.
-        console.error(error); 
-        return;
+        console.error("User must be authenticated to add a document."); 
+        throw new Error("User must be authenticated.");
     }
     
     const collRef = collection(db, 'users', userId, collectionName);
@@ -52,16 +51,17 @@ const addDocument = async (db: any, collectionName: string, data: any, userId?: 
         userId: userId,
     };
     
-    addDoc(collRef, payload)
+    // Return the promise from addDoc
+    return addDoc(collRef, payload)
         .catch(error => {
-            errorEmitter.emit(
-                'permission-error',
-                new FirestorePermissionError({
-                    path: collRef.path,
-                    operation: 'create',
-                    requestResourceData: payload,
-                })
-            );
+            const permissionError = new FirestorePermissionError({
+                path: collRef.path,
+                operation: 'create',
+                requestResourceData: payload,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+            // Re-throw the original error to be caught by the calling function's catch block
+            throw error; 
         });
 };
 
@@ -111,9 +111,10 @@ const getAllServiceRequestsForAdmin = async (db: any, collectionName: string) =>
         const requestsRef = collection(db, 'users', userId, collectionName);
         const requestsSnapshot = await getDocs(query(requestsRef, orderBy("submittedAt", "desc")));
         requestsSnapshot.forEach(doc => {
-            allRequests.push({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString() });
+            allRequests.push({ id: doc.id, ...doc.data(), submittedAt: (doc.data().submittedAt as Timestamp)?.toDate().toISOString(), userId: userId });
         });
     }
+    allRequests.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
     return allRequests;
 };
 

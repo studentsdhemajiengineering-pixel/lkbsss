@@ -78,12 +78,15 @@ export default function RealEstateConsultancyPage() {
     }
     setLoading(true);
     try {
-        const payload: any = { ...values };
-
+        let documentUrl: string | undefined;
         if (values.document) {
-            const documentUrl = await uploadFile(values.document);
-            payload.documentUrl = documentUrl;
+            documentUrl = await uploadFile(values.document);
         }
+
+        const payload: any = { 
+            ...values,
+            ...(documentUrl && { documentUrl }),
+        };
         delete payload.document;
 
         await addRealEstateRequest(firestore, payload, user.uid);
@@ -93,12 +96,13 @@ export default function RealEstateConsultancyPage() {
         router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting real estate request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit request.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit request. Check permissions and try again.' });
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   }
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

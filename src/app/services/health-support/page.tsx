@@ -73,12 +73,15 @@ export default function HealthSupportPage() {
     }
     setLoading(true);
     try {
-        const payload: any = { ...values };
-
+        let documentUrl: string | undefined;
         if (values.document) {
-            const documentUrl = await uploadFile(values.document);
-            payload.documentUrl = documentUrl;
+            documentUrl = await uploadFile(values.document);
         }
+
+        const payload: any = { 
+            ...values,
+            ...(documentUrl && { documentUrl }),
+        };
         delete payload.document;
 
         await addHealthRequest(firestore, payload, user.uid);
@@ -88,12 +91,13 @@ export default function HealthSupportPage() {
         router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting health request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit health request.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit health request. Check permissions and try again.' });
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   }
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

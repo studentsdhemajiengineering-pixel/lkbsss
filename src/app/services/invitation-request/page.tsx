@@ -96,15 +96,16 @@ export default function InvitationRequestPage() {
     }
     setLoading(true);
     try {
+        let documentUrl: string | undefined;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
         const payload: any = {
             ...values,
             eventDate: values.eventDate.toISOString(),
+            ...(documentUrl && { documentUrl }),
         };
-
-        if (values.document) {
-            const documentUrl = await uploadFile(values.document);
-            payload.documentUrl = documentUrl;
-        }
         delete payload.document;
 
         await addInvitationRequest(firestore, payload, user.uid);
@@ -114,16 +115,17 @@ export default function InvitationRequestPage() {
         router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting invitation request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit invitation request.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit invitation request. Check permissions and try again.' });
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   }
 
   const getMinDate = () => {
     return new Date();
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

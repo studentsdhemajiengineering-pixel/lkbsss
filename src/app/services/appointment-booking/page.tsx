@@ -86,16 +86,17 @@ export default function AppointmentBookingPage() {
     }
     setLoading(true);
     try {
+        let documentUrl: string | undefined;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+
         const payload: any = {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
             appointmentDate: values.appointmentDate.toISOString(),
+            ...(documentUrl && { documentUrl }),
         };
-
-        if (values.document) {
-            const documentUrl = await uploadFile(values.document);
-            payload.documentUrl = documentUrl;
-        }
         delete payload.document;
 
 
@@ -106,9 +107,10 @@ export default function AppointmentBookingPage() {
         router.push('/user-dashboard');
     } catch (error) {
         console.error("Error booking appointment: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to book appointment.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to book appointment. Check permissions and try again.' });
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   }
   
   const getMinDate = () => {
@@ -117,7 +119,7 @@ export default function AppointmentBookingPage() {
     return date;
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

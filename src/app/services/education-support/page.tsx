@@ -79,15 +79,16 @@ export default function EducationSupportPage() {
     }
     setLoading(true);
     try {
+        let documentUrl: string | undefined;
+        if (values.document) {
+            documentUrl = await uploadFile(values.document);
+        }
+        
         const payload: any = {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
+            ...(documentUrl && { documentUrl }),
         };
-
-        if (values.document) {
-            const documentUrl = await uploadFile(values.document);
-            payload.documentUrl = documentUrl;
-        }
         delete payload.document;
 
         await addEducationRequest(firestore, payload, user.uid);
@@ -97,12 +98,13 @@ export default function EducationSupportPage() {
         router.push('/user-dashboard');
     } catch (error) {
         console.error("Error submitting education request: ", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit education request.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit education request. Check permissions and try again.' });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
