@@ -254,7 +254,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   {
     id: '1',
     title: 'আছুৰ প্ৰাক্তন সম্পাদক শংকৰজ্যোতি বৰুৱা সন্দৰ্ভত কি কলে লুইত কুমাৰ বৰ্মনে ?',
-    thumbnail: '/images/interviews/interview1.jpg',
+    thumbnail: '/images/interviews/interview1.png',
     url: 'https://www.youtube.com/watch?v=WMlhLpSGHSg',
     duration: '15:30',
     views: '5.2k',
@@ -264,7 +264,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   {
     id: '2',
     title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰশ্নত Boomba Ride ৰ প্ৰযোজক লুইত কুমাৰ বৰ্মন',
-    thumbnail: '/images/interviews/interview2.jpg',
+    thumbnail: '/images/interviews/interview2.png',
     url: 'https://www.youtube.com/watch?v=tTxxu8QJJ_4',
     duration: '8:45',
     views: '3.8k',
@@ -383,7 +383,7 @@ export default function Home() {
                   Pharmaceuticals Pvt Ltd and Director of Genix India Developers Pvt Ltd. He is a renowned film producer 
                   in Assam, whose most recent film, Boomba Ride, was screened at the 75th Cannes Film Festival. He is a 
                   recipient of Rajat Kamal Award of 69th National Film Festival. He is a well-known social activist in Assam.
-                  His appearance in acting in a musical video is appreciated by all sections of people. Above all, he is a novelist also whose last novel “Damn It” is widely appreciated from India.
+                  His appearance in acting in a musical video is appreciated by all sections of people. Above all, he is a novelist also whose last novel “Damn It” is widely appreciated in India.
                 </p>
               </div>
               
@@ -463,7 +463,7 @@ export default function Home() {
       <section id="social" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4 font-headline">Follow Us</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4 font-headline">Follow Me</h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">Stay connected with us on social media for the latest updates, announcements, and community engagement.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -756,3 +756,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
