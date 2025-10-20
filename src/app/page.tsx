@@ -129,7 +129,7 @@ const socialPosts = [
   {
     id: '1',
     platform: 'Facebook',
-    content: 'Happy to share Trust deed of “ ৰক্ষা” has been registered today. ৰাইজৰ আশীৰ্বাদত আমি আশা কৰো যে আমি ৰাইজক সেৱا কৰিব পাৰিম',
+    content: 'Happy to share Trust deed of “ ৰক্ষা” has been registered today. ৰাইজৰ আশীৰ্বাদত আমি আশা কৰো যে আমি ৰাইজক সেৱা কৰিব পাৰিম',
     imageUrl: '/images/followus/post1.jpg',
     likes: 245,
     comments: 32,
@@ -162,7 +162,7 @@ const socialPosts = [
   {
     id: '4',
     platform: 'Facebook',
-    content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/۲۰২৫। এনেکৈ চলি আছে GMC File ৰ date of application 13/3/2024 ত আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
+    content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/۲۰২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ত আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
     imageUrl: '/images/followus/post4.jpg',
     likes: 312,
     comments: 45,
@@ -173,7 +173,7 @@ const socialPosts = [
   {
     id: '5',
     platform: 'Facebook',
-    content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ۲۰۱৯ চনলৈ ৭.৬২ কোটিৰ অনিয়م হৈছিল।',
+    content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ۲۰۱৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
     imageUrl: '/images/followus/post5.jpg',
     likes: 198,
     comments: 29,
@@ -184,7 +184,7 @@ const socialPosts = [
   {
     id: '6',
     platform: 'Facebook',
-    content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰילোঁ',
+    content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰিলোঁ',
     imageUrl: '/images/followus/post6.jpg',
     likes: 2267,
     comments: 38,
@@ -270,7 +270,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   },
   {
     id: '2',
-    title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰש্নত Boomba Ride ৰ প্ৰযোজক লুইت কুমাৰ বৰ্মন',
+    title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰশ্নত Boomba Ride ৰ প্ৰযোজক লুইত কুমাৰ বৰ্মন',
     thumbnail: '/images/interviews/interview2.png',
     url: 'https://www.youtube.com/watch?v=tTxxu8QJJ_4',
     duration: '8:45',
@@ -346,7 +346,7 @@ export default function Home() {
                     src={slide.imageUrl}
                     alt={slide.description}
                     fill
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                     priority={index === 0}
                   />
                   <div className="absolute inset-0 bg-black/50" />
@@ -768,5 +768,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
