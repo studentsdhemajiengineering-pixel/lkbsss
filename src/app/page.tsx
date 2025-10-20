@@ -161,7 +161,7 @@ const socialPosts = [
   {
     id: '4',
     platform: 'Facebook',
-    content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/۲۰২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ত আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
+    content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/۲۰২৫। এনেکৈ চলি আছে GMC File ৰ date of application 13/3/2024 ত আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
     imageUrl: '/images/followus/post4.jpg',
     likes: 312,
     comments: 45,
@@ -172,7 +172,7 @@ const socialPosts = [
   {
     id: '5',
     platform: 'Facebook',
-    content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ۲۰۱৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
+    content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ۲۰۱৯ চনলৈ ৭.৬২ কোটিৰ অনিয়م হৈছিল।',
     imageUrl: '/images/followus/post5.jpg',
     likes: 198,
     comments: 29,
@@ -263,7 +263,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   },
   {
     id: '2',
-    title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰש্নত Boomba Ride ৰ প্ৰযোজক লুইত কুমাৰ বৰ্মন',
+    title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰש্নত Boomba Ride ৰ প্ৰযোজক লুইت কুমাৰ বৰ্মন',
     thumbnail: '/images/interviews/interview2.png',
     url: 'https://www.youtube.com/watch?v=tTxxu8QJJ_4',
     duration: '8:45',
@@ -703,7 +703,7 @@ export default function Home() {
                     <p className="text-indigo-100">Buy On Amazon</p>
                   </div>
                   <Button asChild className="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-3 rounded-full font-semibold transition-colors">
-                    <Link href="#">
+                    <Link href="https://www.amazon.in/dp/B0CGY2PQ2S?&tag=notionpcom-21">
                         Buy Now
                     </Link>
                   </Button>
