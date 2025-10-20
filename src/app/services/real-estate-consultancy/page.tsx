@@ -395,23 +395,23 @@ export default function RealEstateConsultancyPage() {
                   <div className="bg-teal-50 rounded-lg p-4">
                     <h3 className="font-medium text-teal-800 mb-2">Our Real Estate Services:</h3>
                     <ul className="text-sm text-teal-700 space-y-1 list-disc list-inside">
-                        <li>• Property buying and selling guidance</li>
-                        <li>• Legal documentation and verification assistance</li>
-                        <li>• Property valuation and market analysis</li>
-                        <li>• Investment advisory and portfolio planning</li>
-                        <li>• Rental property management consultation</li>
-                        <li>• Land acquisition and development guidance</li>
+                        <li>Property buying and selling guidance</li>
+                        <li>Legal documentation and verification assistance</li>
+                        <li>Property valuation and market analysis</li>
+                        <li>Investment advisory and portfolio planning</li>
+                        <li>Rental property management consultation</li>
+                        <li>Land acquisition and development guidance</li>
                     </ul>
                   </div>
 
                   <div className="bg-blue-50 rounded-lg p-4">
                     <h3 className="font-medium text-blue-800 mb-2">Important Information:</h3>
                     <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                        <li>• Our certified real estate expert will contact you within 24-48 hours</li>
-                        <li>• Initial consultation is free of charge</li>
-                        <li>• All property transactions are handled with complete transparency</li>
-                        <li>• We provide end-to-end support for all real estate needs</li>
-                        <li>• Confidentiality of all client information is guaranteed</li>
+                        <li>Our certified real estate expert will contact you within 24-48 hours</li>
+                        <li>Initial consultation is free of charge</li>
+                        <li>All property transactions are handled with complete transparency</li>
+                        <li>We provide end-to-end support for all real estate needs</li>
+                        <li>Confidentiality of all client information is guaranteed</li>
                     </ul>
                   </div>
 

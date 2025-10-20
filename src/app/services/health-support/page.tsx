@@ -201,7 +201,7 @@ export default function HealthSupportPage() {
                                 <FormItem>
                                 <FormLabel>Age *</FormLabel>
                                 <FormControl>
-                                    <Input type="number" placeholder="Enter your age" {...field} />
+                                    <Input type="number" placeholder="Enter your age" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>

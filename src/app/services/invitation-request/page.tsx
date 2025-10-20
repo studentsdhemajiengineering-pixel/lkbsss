@@ -372,7 +372,7 @@ export default function InvitationRequestPage() {
                                     <FormItem>
                                     <FormLabel>Number of Invitees *</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="Enter number of invitees" {...field} className="px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                                        <Input type="number" placeholder="Enter number of invitees" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} className="px-4 py-3 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
