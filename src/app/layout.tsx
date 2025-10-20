@@ -25,8 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Digital Connect</title>
-        <meta name="description" content="Your central hub for information and connection." />
+        <title>Luit Kumar Barman</title>
+        <meta name="description" content="Change begins with a click — we’re just one away." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
