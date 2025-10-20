@@ -8,7 +8,7 @@ import { Calendar, Eye, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { NewsArticle } from "@/lib/types";
 
-const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at'>[] & {imageUrl: string}[] = [
+const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at'> & {imageUrl: string, views: string})[] = [
     {
         id: '1',
         title: 'New Community Hall Inaugurated, Promises a Hub for Local Events',
@@ -16,6 +16,7 @@ const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publis
         date: '2024-07-20T10:00:00Z',
         imageUrl: '/images/newsandarticles/news1.jpg',
         category: 'Latest',
+        views: '12k',
     },
     {
         id: '2',
@@ -24,6 +25,7 @@ const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publis
         date: '2024-07-19T15:30:00Z',
         imageUrl: '/images/book-cover.png',
         category: 'Book',
+        views: '34k',
     },
     {
         id: '3',
@@ -32,6 +34,7 @@ const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publis
         date: '2024-07-18T12:00:00Z',
         imageUrl: '/images/newsandarticles/news2.jpg',
         category: 'Latest',
+        views: '28k',
     },
     {
         id: '4',
@@ -40,6 +43,7 @@ const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publis
         date: '2024-07-17T11:00:00Z',
         imageUrl: '/images/newsandarticles/news3.jpg',
         category: 'Latest',
+        views: '41k',
     }
 ];
 
@@ -111,7 +115,7 @@ export default function NewsPage() {
                                 </div>
                                 <div className="flex items-center">
                                     <Eye className="w-4 h-4 mr-1" />
-                                    {Math.floor(Math.random() * 50)}k
+                                    {article.views}
                                 </div>
                             </div>
                             <div className="mt-3 text-blue-500 group-hover:text-blue-600 text-sm font-medium flex items-center">

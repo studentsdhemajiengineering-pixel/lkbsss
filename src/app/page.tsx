@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import type { NewsArticle, GalleryImage, Resource, InterviewAndPodcast } from '@/lib/types';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay"
 import { Badge } from '@/components/ui/badge';
 import { useFirebase } from '@/firebase/provider';
 import { getGalleryImages, getInterviewsAndPodcasts } from '@/lib/services';
@@ -183,7 +184,7 @@ const socialPosts = [
   {
     id: '6',
     platform: 'Facebook',
-    content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰিলোঁ',
+    content: 'নিজৰ কলমৰ বাবে আজি ২০২৪ বৰ্ষৰ e শিৰোমনি বটা প্ৰদান কৰে e সংবাদে। ধন্যবাদ থাকিল আৰু এই সন্মান যিহেতু চচিয়েল মেডিয়াৰ বাবে আহিছে, গতিকে এই সন্মান মই social media ৰ সকলো বন্ধু, followers ক dedicate কৰילোঁ',
     imageUrl: '/images/followus/post6.jpg',
     likes: 2267,
     comments: 38,
@@ -193,7 +194,7 @@ const socialPosts = [
   },
 ];
 
-const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at' | 'category' > & {imageUrl: string, category: string, url: string})[] = [
+const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'published_at' | 'category' > & {imageUrl: string, category: string, url: string, views: string})[] = [
   {
     id: '1',
     title: 'Assam Filmmaker Files Affidavit Supporting Rahul Gandhi Vote Rigging Claims',
@@ -202,6 +203,7 @@ const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publi
     imageUrl: '/images/newsandarticles/news1.png',
     category: 'Latest',
     url: 'https://www.assamtimes.org/node/23501',
+    views: '23k'
   },
   {
     id: '2',
@@ -211,6 +213,7 @@ const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publi
     imageUrl: '/images/newsandarticles/news2.jpg',
     category: 'Latest',
     url: 'https://m.economictimes.com/news/elections/lok-sabha/india/police-complaint-filed-against-pm-modi-over-mahatma-gandhi-remarks/articleshow/110569755.cms',
+    views: '45k'
   },
   {
     id: '3',
@@ -220,6 +223,7 @@ const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publi
     imageUrl: '/images/newsandarticles/news3.jpg',
     category: 'Latest',
     url: 'https://www.pratidintime.com/guwahati-news-breaking-latest/activist-luit-kumar-barman-files-fir-against-nalbari-dc-varnali-deka',
+    views: '12k'
   },
   {
     id: '4',
@@ -229,6 +233,7 @@ const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publi
     imageUrl: '/images/newsandarticles/news4.jpg',
     category: 'Latest',
     url: 'https://www.sentinelassam.com/north-east-india-news/assam-news/nalbari-district-information-and-public-relations-officer-chumpi-chutia-refutes-allegation-made-by-luit-kumar-barman',
+    views: '31k'
   },
   {
     id: '5',
@@ -238,6 +243,7 @@ const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publi
     imageUrl: '/images/newsandarticles/news5.jpg',
     category: 'Latest',
     url: 'https://ukhrultimes.com/assam-complainant-to-re-approach-court-on-nrc-updation-scam/',
+    views: '18k'
   },
   {
     id: '6',
@@ -247,13 +253,14 @@ const newsArticles: (Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publi
     imageUrl: '/images/newsandarticles/news6.jpg',
     category: 'Latest',
     url: 'https://tehelka.com/assam-nrc-plaint-registered-against-hajela-wipro-and-iss/',
+    views: '28k'
   },
 ];
 
 const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   {
     id: '1',
-    title: 'আছুৰ প্ৰাক্তন সম্পাদক শংকৰজ্যোতি বৰুৱা সন্দৰ্ভত কি কলে লুইত কুমাৰ বৰ্মনে ?',
+    title: 'आছুৰ প্ৰাক্তন সম্পাদক শংকৰজ্যোতি বৰুৱা সন্দৰ্ভত কি কলে লুইত কুমাৰ বৰ্মনে ?',
     thumbnail: '/images/interviews/interview1.png',
     url: 'https://www.youtube.com/watch?v=WMlhLpSGHSg',
     duration: '15:30',
@@ -305,6 +312,7 @@ const galleryImages: Omit<GalleryImage, 'imageId' | 'published_at'>[] = [
 export default function Home() {
     const [activeTab, setActiveTab] = React.useState('All');
     const [activeInterviewTab, setActiveInterviewTab] = React.useState('All');
+    const autoplay = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
 
     const filteredSocialPosts = socialPosts.filter(post => {
         if (activeTab === 'All') return true;
@@ -321,10 +329,14 @@ export default function Home() {
         
        {/* Banner Slider Section */}
       <section className="relative h-[600px] overflow-hidden bg-gray-100">
-        <Carousel className="w-full h-full"
+        <Carousel 
+            className="w-full h-full"
             opts={{
                 loop: true,
             }}
+            plugins={[autoplay.current]}
+            onMouseEnter={autoplay.current.stop}
+            onMouseLeave={autoplay.current.reset}
         >
           <CarouselContent>
             {slides.map((slide, index) => (
@@ -334,7 +346,7 @@ export default function Home() {
                     src={slide.imageUrl}
                     alt={slide.description}
                     fill
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     priority={index === 0}
                   />
                   <div className="absolute inset-0 bg-black/50" />
@@ -589,7 +601,7 @@ export default function Home() {
                                 </div>
                                 <div className="flex items-center">
                                     <Eye className="w-4 h-4 mr-1" />
-                                    {Math.floor(Math.random() * 50)}k
+                                    {article.views}
                                 </div>
                             </div>
                             <div className="mt-3 text-blue-500 group-hover:text-blue-600 text-sm font-medium flex items-center">
