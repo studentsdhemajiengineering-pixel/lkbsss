@@ -55,19 +55,17 @@ export default function PublicGrievancePage() {
   });
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push('/login');
-    }
-    if (user) {
+    if (!isUserLoading && user) {
       form.setValue('fullName', user.displayName || '');
       form.setValue('email', user.email || '');
       form.setValue('contactNumber', user.phoneNumber ? user.phoneNumber.replace('+91', '') : '');
     }
-  }, [user, isUserLoading, router, form]);
+  }, [user, isUserLoading, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!firestore || !user) {
-        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a grievance.' });
+        toast({ variant: 'destructive', title: 'Authentication Required', description: 'Please log in to submit a grievance.' });
+        router.push('/login');
         return;
     }
     setLoading(true);
@@ -99,7 +97,7 @@ export default function PublicGrievancePage() {
     }
   }
 
-  if (isUserLoading || !user) {
+  if (isUserLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -347,3 +345,5 @@ export default function PublicGrievancePage() {
     </div>
   );
 }
+
+    
