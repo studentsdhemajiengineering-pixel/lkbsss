@@ -1,7 +1,7 @@
 
 'use client';
 
-import type { Metadata } from 'next';
+import { useEffect } from 'react';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
@@ -21,6 +21,16 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith('/admin');
+
+  useEffect(() => {
+    const handleContextmenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+    document.addEventListener('contextmenu', handleContextmenu);
+    return () => {
+      document.removeEventListener('contextmenu', handleContextmenu);
+    };
+  }, []);
 
   return (
     <html lang="en" suppressHydrationWarning>
