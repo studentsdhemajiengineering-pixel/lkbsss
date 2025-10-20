@@ -22,7 +22,7 @@ const newsArticles: Omit<NewsArticle, 'content' | 'author' | 'imageId' | 'publis
         title: 'Luit Kumar Barman\'s Novel "Damn It" Climbs Bestseller Charts',
         excerpt: 'The latest novel "Damn It" by Luit Kumar Barman has been met with widespread critical acclaim and has quickly become a favorite among readers nationwide.',
         date: '2024-07-19T15:30:00Z',
-        imageUrl: '/images/book-cover.jpg',
+        imageUrl: '/images/book-cover.png',
         category: 'Book',
     },
     {

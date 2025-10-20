@@ -128,7 +128,7 @@ const socialPosts = [
   {
     id: '1',
     platform: 'Facebook',
-    content: 'Happy to share Trust deed of “ ৰক্ষা” has been registered today. ৰাইজৰ আশীৰ্বাদত আমি আশা কৰো যে আমি ৰাইজক সেৱা কৰিব পাৰিম',
+    content: 'Happy to share Trust deed of “ ৰক্ষা” has been registered today. ৰাইজৰ আশীৰ্বাদত আমি আশা কৰো যে আমি ৰাইজক সেৱا কৰিব পাৰিম',
     imageUrl: '/images/followus/post1.jpg',
     likes: 245,
     comments: 32,
@@ -161,7 +161,7 @@ const socialPosts = [
   {
     id: '4',
     platform: 'Facebook',
-    content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/২০২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ত আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
+    content: 'GMC ত অফিচাৰৰ চহী হয় ২৫/০৩/২০২৫ ত আৰু issue হয় ২৩/৪/۲۰২৫। এনেকৈ চলি আছে GMC File ৰ date of application 13/3/2024 ত আৰু ১ বছৰ পিছত হে গম পালে যে FAR বেছি আছে। তাকো কিমান বেছি আছে সেইটোও লিখিব নোৱাৰিলে।',
     imageUrl: '/images/followus/post4.jpg',
     likes: 312,
     comments: 45,
@@ -172,7 +172,7 @@ const socialPosts = [
   {
     id: '5',
     platform: 'Facebook',
-    content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ২০১৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
+    content: 'ED Guwahati য়ে কালি কামাখ্যা দেৱোত্তৰ বৰ্ডৰ বিষয়ববীয়া কিছুমানৰ ঘৰত অভিযান চলায়। ২০০৩ ৰ পৰা ۲۰۱৯ চনলৈ ৭.৬২ কোটিৰ অনিয়ম হৈছিল।',
     imageUrl: '/images/followus/post5.jpg',
     likes: 198,
     comments: 29,
@@ -263,7 +263,7 @@ const interviewsAndPodcasts: Omit<InterviewAndPodcast, 'published_at'>[] = [
   },
   {
     id: '2',
-    title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰশ্নত Boomba Ride ৰ প্ৰযোজক লুইত কুমাৰ বৰ্মন',
+    title: 'অসমীয়াৰ চিনেমাৰ ভাল দিন আহিছে নেকি? আজিৰ প্ৰש্নত Boomba Ride ৰ প্ৰযোজক লুইত কুমাৰ বৰ্মন',
     thumbnail: '/images/interviews/interview2.png',
     url: 'https://www.youtube.com/watch?v=tTxxu8QJJ_4',
     duration: '8:45',
@@ -500,7 +500,7 @@ export default function Home() {
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium transition-colors">Load More Posts</Button>
             </div>
         </div>
-    </section>
+      </section>
 
        {/* Services Section */}
        <section className="py-20" style={{backgroundColor: '#e0e7ff'}}>
@@ -664,7 +664,7 @@ export default function Home() {
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl opacity-20 blur-lg"></div>
               <div className="relative bg-white p-4 rounded-2xl shadow-2xl">
                  <Image
-                      src="/images/book-cover.jpg"
+                      src="/images/book-cover.png"
                       alt="Book Cover"
                       width={280}
                       height={380}
