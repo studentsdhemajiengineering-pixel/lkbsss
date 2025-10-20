@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
-import { getStatusColor } from "@/lib/status-helpers.tsx";
+import { getStatusColor } from "@/lib/status-helpers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useFirebase } from '@/firebase/provider';
 import { updateServiceRequestStatus, deleteServiceRequest } from '@/lib/services';

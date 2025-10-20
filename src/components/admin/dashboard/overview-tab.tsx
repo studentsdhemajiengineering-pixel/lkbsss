@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, FileText, Heart, GraduationCap, CheckCircle, Clock, AlertCircle } from "lucide-react";
-import { getStatusColor, getStatusIcon } from "@/lib/status-helpers.tsx";
+import { getStatusColor, getStatusIcon } from "@/lib/status-helpers";
 
 type Request = {
     id: string;
