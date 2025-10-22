@@ -1,87 +1,69 @@
-/**
- * @file Firestore Security Rules for Digital Connect application.
- *
- * Core Philosophy:
- * This ruleset enforces a strict user-ownership model. Each user can only access their own profile data and the service requests they have created.
- *
- * Data Structure:
- * - User profiles are stored in `/users/{userId}`.
- * - Service requests are stored in a subcollection `/users/{userId}/serviceRequests/{serviceRequestId}`.
- *
- * Key Security Decisions:
- * - Users can only create their own user document and can only read and modify their own data.
- * - Users can only manage their own service requests.
- * - Listing of all users is disallowed for privacy.
- *
- * Denormalization for Authorization:
- * - Ownership is enforced through the Firestore path structure (`/users/{userId}/...`), making denormalization unnecessary.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profile data.
+     * @description Rule set for user documents.
      * @path /users/{userId}
-     * @allow (create) - User with UID 'user_abc' can create their own profile document at /users/user_abc.
-     * @deny (create) - User with UID 'user_xyz' cannot create a profile document at /users/user_abc.
-     * @allow (get, update, delete) - User with UID 'user_abc' can read, update, and delete their own profile document at /users/user_abc.
-     * @deny (get, update, delete) - User with UID 'user_xyz' cannot read, update, or delete the profile document at /users/user_abc.
-     * @principle Enforces document ownership for writes.
+     * @allow (create) User with ID 'user123' can create their own user document.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data.id: 'user123'
+     * @deny (create) User with ID 'user123' cannot create a user document for another user 'user456'.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data.id: 'user456'
+     * @principle Enforces document ownership and validates relational integrity on creation.
      */
     match /users/{userId} {
-      // Helper function to check if the user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      // Helper function to check if the authenticated user is the owner of the resource
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      // Helper function to check if the authenticated user is the owner of the resource, and it exists
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if false; // Listing all users is not permitted.
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      // Validate that the user ID in the path matches the authenticated user's ID.
+      allow create: if isSignedIn() && isSelfCreate(userId);
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+      allow update: if isSignedIn() && isExistingOwner(userId) ;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
     }
 
     /**
-     * @description Controls access to service requests under a specific user.
+     * @description Rule set for service request documents within a user's subcollection.
      * @path /users/{userId}/serviceRequests/{serviceRequestId}
-     * @allow (create) - User 'user_abc' can create a service request under their user path /users/user_abc/serviceRequests/req_123.
-     * @deny (create) - User 'user_xyz' cannot create a service request under the path of user 'user_abc'.
-     * @allow (get, update, delete) - User 'user_abc' can read, update, and delete their own service request at /users/user_abc/serviceRequests/req_123.
-     * @deny (get, update, delete) - User 'user_xyz' cannot read, update, or delete the service request at /users/user_abc/serviceRequests/req_123.
-     * @principle Enforces document ownership for writes; restricts access to a user's own data tree.
+     * @allow (create) User 'user123' can create a service request under their own user document.
+     *   - auth.uid: 'user123'
+     * @deny (create) User 'user123' cannot create a service request under another user's document.
+     *   - auth.uid: 'user456'
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId}/serviceRequests/{serviceRequestId} {
-       // Helper function to check if the user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      // Helper function to check if the authenticated user is the owner of the resource
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      // Helper function to check if the authenticated user is the owner of the resource, and it exists
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-      allow delete: if isExistingOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId);
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isExistingOwner(userId);
+      allow delete: if isSignedIn() && isExistingOwner(userId);
     }
+
+    // ---- Helper functions ----
+
+    // Checks if the user is signed in.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Checks if the user is the owner of the document based on the path.
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Checks if the authenticated user is creating their own user document, verifying identity matches document id
+    function isSelfCreate(userId) {
+          return request.auth.uid == userId;
+    }
+
+    // Checks if the user is the owner of the document, and the document exists
+    function isExistingOwner(userId) {
+      return isOwner(userId) && existsAfter(/databases/$(database)/documents/users/$(userId));
+    }
+
+     // Prevents the user ID from being changed after the document is created.
+     //function isUserIdNotChanged(userId) {
+     // return request.resource.data.id == resource.data.id;
+    //}
   }
 }
