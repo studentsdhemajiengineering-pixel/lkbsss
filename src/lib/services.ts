@@ -112,6 +112,9 @@ const getServiceRequests = async (db: any, collectionName: string) => {
 };
 
 export const getUserServiceRequests = async (db: Firestore, collectionName: string, userId: string) => {
+    if (!userId) {
+      throw new Error("User ID is required to fetch service requests.");
+    }
     const userSubcollectionRef = collection(db, 'users', userId, collectionName);
     const q = query(userSubcollectionRef, orderBy("submittedAt", "desc"));
 
