@@ -1,80 +1,67 @@
 /**
- * @file Firestore Security Rules — Digital Connect (Final Corrected Version)
+ * @file Firestore Security Rules — Digital Connect (Final Fixed Version)
  *
- * 🔐 Core Principles:
- * - Every authenticated user can access only their own data.
- * - Works automatically for *any* subcollection (e.g. serviceRequests, health-requests, appointments, etc.).
- * - Prevents unauthorized access, listing, or cross-user data exposure.
- * - Compatible with Firebase Auth (Email, Phone, Google, etc.).
- *
- * 🏠 Data Structure:
- * - User profiles are stored in `/users/{userId}`.
- * - Service requests for each user are stored in `/users/{userId}/serviceRequests/{serviceRequestId}`.
- *
- * 🔒 Key Security Decisions:
- * - Strict user-ownership model: Users can only access their own profiles and service requests.
- * - No public user directory: Listing all users is explicitly disabled.
- * - Path-based authorization: Ownership is enforced by the Firestore path structure itself.
- *
- * 🔑 Denormalization for Authorization:
- * - Not required: Ownership is implicit in the path structure. The `userId` parameter in the path `/users/{userId}` *is* the denormalized owner ID.
+ * @corePhilosophy This ruleset enforces a strict user-ownership model for all data. Each authenticated user can only access data directly associated with their user ID.
+ * @dataStructure User profiles are stored under `/users/{userId}` and service requests are stored in a subcollection `/users/{userId}/serviceRequests/{serviceRequestId}`.
+ * @keySecurityDecisions Listing all users is explicitly denied to prevent information leakage. The rules are structured to avoid complex `get()` calls by leveraging the path for authorization.
+ * @denormalizationAuthorization The data structure is designed to make authorization checks simple and performant, avoiding the need for denormalization.
+ * @structuralSegregation There is no need to segregate public and private data, because all data is private to a user.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * Check if the user is authenticated
+     * @description Checks if the user is authenticated.
+     * @details Returns true if `request.auth` is not null, indicating the user is signed in.
      */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /**
-     * Check if the authenticated user owns the document path
-     * @param {string} userId - The user ID from the document path.
-     * @return {bool} - True if the user is signed in and the UID matches the userId.
+     * @description Checks if the authenticated user owns the resource based on the provided userId.
+     * @details Compares the `request.auth.uid` to the `userId` path parameter.
      */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
     /**
-     * @description Rules for the /users/{userId} collection.
+     * @description Checks if the authenticated user owns the existing resource based on the provided userId.
+     * @details Compares the `request.auth.uid` to the `userId` path parameter and checks if the resource exists.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Rule set for user documents.
      * @path /users/{userId}
-     * @allow (create) - Authenticated user 'user_abc' can create their own profile if request.auth.uid == 'user_abc'.
-     * @allow (get) - Authenticated user 'user_abc' can read their profile at /users/user_abc.
-     * @allow (update) - Authenticated user 'user_abc' can update their profile at /users/user_abc.
-     * @allow (delete) - Authenticated user 'user_abc' can delete their profile at /users/user_abc.
-     * @deny (create) - Authenticated user 'user_xyz' cannot create a profile at /users/user_abc.
-     * @deny (get) - Authenticated user 'user_xyz' cannot read the profile at /users/user_abc.
-     * @principle Enforces document ownership; only the user can read/write their own profile.
+     * @allow (create) - Authenticated user with matching userId can create their profile.
+     * @allow (get, update, delete) - Authenticated user with matching userId can read, update, or delete their profile.
+     * @deny (create) - Authenticated user trying to create a profile with a different userId.
+     * @deny (list) - Prevents listing all users.
+     * @principle Enforces document ownership; users can only access their own profile data.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false; // No public directory. Listing all users is not allowed.
+      allow get, update, delete: if isExistingOwner(userId);
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+      allow list: if false;
+    }
 
-      /**
-       * @description Rules for the /users/{userId}/serviceRequests/{serviceRequestId} collection.
-       * @path /users/{userId}/serviceRequests/{serviceRequestId}
-       * @allow (create) - Authenticated user 'user_abc' can create a service request under /users/user_abc/serviceRequests/req123.
-       * @allow (get) - Authenticated user 'user_abc' can read their service request at /users/user_abc/serviceRequests/req123.
-       * @allow (update) - Authenticated user 'user_abc' can update their service request at /users/user_abc/serviceRequests/req123.
-       * @allow (delete) - Authenticated user 'user_abc' can delete their service request at /users/user_abc/serviceRequests/req123.
-       * @deny (create) - Authenticated user 'user_xyz' cannot create a service request under /users/user_abc/serviceRequests/req123.
-       * @deny (get) - Authenticated user 'user_xyz' cannot read service request at /users/user_abc/serviceRequests/req123.
-       * @principle Enforces document ownership; only the user can read/write their own service requests.
-       */
-      match /serviceRequests/{serviceRequestId} {
-        allow get: if isOwner(userId);
-        allow list: if isOwner(userId);
-        allow create: if isOwner(userId);
-        allow update: if isOwner(userId) && resource != null;
-        allow delete: if isOwner(userId) && resource != null;
-      }
+    /**
+     * @description Rule set for service requests under a user.
+     * @path /users/{userId}/serviceRequests/{serviceRequestId}
+     * @allow (create, get, update, delete) - Authenticated user with matching userId can create, read, update, or delete their service requests.
+     * @deny (create) - Authenticated user trying to create a service request under a different userId.
+     * @deny (list) - Authenticated user with matching userId can list their service requests.
+     * @principle Enforces document ownership; users can only access their own service requests.
+     */
+    match /users/{userId}/serviceRequests/{serviceRequestId} {
+      allow get, update, delete: if isExistingOwner(userId);
+      allow create: if isOwner(userId);
+      allow list: if isOwner(userId);
     }
   }
 }
