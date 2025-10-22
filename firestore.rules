@@ -2,95 +2,94 @@
  * @fileoverview Firestore Security Rules for Digital Connect application.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model, ensuring that users can only
- * access their own data. This is achieved through hierarchical data organization
- * and path-based authorization.
+ * This ruleset enforces a strict user-ownership model. Each user can only
+ * read and write their own data, stored under their unique user ID.
  *
  * Data Structure:
- * - /users/{userId}: Stores user profile information. Only the user can read/write
- *   their own profile.
+ * - /users/{userId}: Stores user profile information.
  * - /users/{userId}/serviceRequests/{serviceRequestId}: Stores service requests
- *   created by a user. Only the user can manage their own requests.
+ *   created by the user.
  *
  * Key Security Decisions:
- * - User listing is disallowed to protect user privacy.
- * - The rules rely on the authenticated user's UID (`request.auth.uid`) for all
- *   authorization decisions.
- * - Data consistency between the path and the document data is enforced on create
- *   and update operations.
+ * - Users can only access their own user document and service requests.
+ * - Listing all users is disallowed.
+ * - Data validation is relaxed during prototyping to allow for rapid iteration on the data model.
  *
  * Denormalization for Authorization:
- * - Ownership is implicitly enforced through the path structure (e.g., a service
- *   request's userId is not explicitly stored in the document, but is derived from
- *   the path /users/{userId}/serviceRequests/{serviceRequestId}).
+ * The data structure is designed to make authorization decisions based on the
+ * Firestore path. Specifically, service requests are stored as a subcollection of
+ * the user document, so that only the owner can access them.
  *
  * Structural Segregation:
- * - The data model uses subcollections under the user's document to store private data.
+ * All data is private and user-specific, stored under the /users/{userId} path.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Checks if the request is authenticated.
-     * @return {boolean} True if the request is authenticated, false otherwise.
+     * @description Controls access to user profile data. Only the user themselves can read or write their profile.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' can create their profile.
+     *   - request.auth.uid: 'user123'
+     *   - request.resource.data.id: 'user123'
+     * @allow (get) User with ID 'user123' can read their profile.
+     *   - request.auth.uid: 'user123'
+     * @allow (update) User with ID 'user123' can update their profile.
+     *   - request.auth.uid: 'user123'
+     * @allow (delete) User with ID 'user123' can delete their profile.
+     *   - request.auth.uid: 'user123'
+     * @deny (create) User with ID 'user456' cannot create a profile for 'user123'.
+     *   - request.auth.uid: 'user456'
+     *   - request.resource.data.id: 'user123'
+     * @deny (get) User with ID 'user456' cannot read the profile of 'user123'.
+     *   - request.auth.uid: 'user456'
+     * @principle Enforces document ownership for all read and write operations.  Validates id on create.
      */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * @description Checks if the authenticated user's UID matches the provided userId.
-     * @param {string} userId The user ID to compare against the authenticated user's UID.
-     * @return {boolean} True if the user is signed in and the UID matches, false otherwise.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /**
-     * @description Checks if the user is an existing owner and resource exists.
-     * @param {string} userId The user ID to compare against the authenticated user's UID.
-     * @return {boolean} True if the user is signed in and the UID matches, false otherwise.
-     */
-    function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-    }
-
     match /users/{userId} {
-      /**
-       * @description Manages user profile data.
-       * @path /users/{userId}
-       * @allow (create) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can create their profile if request.auth.uid == userId.
-       * @allow (get) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can read their profile.
-       * @allow (update) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can update their profile.
-       * @allow (delete) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can delete their profile.
-       * @deny (create) User 'otherUserId' cannot create a profile with userId 'P4urHKI134Rsor6RDIKgv7qCoAG2'.
-       * @principle Enforces document ownership for writes. Validates relational integrity.
-       */
       allow get: if isOwner(userId);
-      allow list: if false; // User listing is not allowed.
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow list: if false; // Listing all users is not permitted.
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.id == userId;
       allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
-
-      match /serviceRequests/{serviceRequestId} {
-        /**
-         * @description Manages service requests made by a user.
-         * @path /users/{userId}/serviceRequests/{serviceRequestId}
-         * @allow (create) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can create a service request under their profile.
-         * @allow (get) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can read their service request.
-         * @allow (update) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can update their service request.
-         * @allow (delete) User 'P4urHKI134Rsor6RDIKgv7qCoAG2' can delete their service request.
-         * @deny (create) User 'otherUserId' cannot create a service request under user 'P4urHKI134Rsor6RDIKgv7qCoAG2'.
-         * @principle Enforces document ownership for writes.
-         */
-        allow get: if isOwner(userId);
-        allow list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId);
-      }
     }
+
+    /**
+     * @description Controls access to service requests for a specific user.  Only the user can read, write, or delete their own service requests.
+     * @path /users/{userId}/serviceRequests/{serviceRequestId}
+     * @allow (create) User 'user123' can create a service request.
+     *   - request.auth.uid: 'user123'
+     * @allow (get) User 'user123' can read their service request 'req456'.
+     *   - request.auth.uid: 'user123'
+     * @allow (update) User 'user123' can update their service request 'req456'.
+     *   - request.auth.uid: 'user123'
+     * @allow (delete) User 'user123' can delete their service request 'req456'.
+     *   - request.auth.uid: 'user123'
+     * @deny (create) User 'user456' cannot create a service request for user 'user123'.
+     *   - request.auth.uid: 'user456'
+     * @deny (get) User 'user456' cannot read a service request of user 'user123'.
+     *   - request.auth.uid: 'user456'
+     * @principle Enforces document ownership for all read and write operations within the user's service requests subcollection.
+     */
+    match /users/{userId}/serviceRequests/{serviceRequestId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  function isOwner(userId) {
+    return isSignedIn() && request.auth.uid == userId;
+  }
+
+  function isExistingOwner(userId) {
+    return isOwner(userId) && resource != null;
   }
 }
