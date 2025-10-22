@@ -66,12 +66,12 @@ const addServiceRequest = async <T extends Omit<ServiceRequest, 'id' | 'submitte
 };
 
 
-export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'userId'>, userId: string) => addServiceRequest(db, 'appointments', {...data, status: 'pending'}, userId);
-export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'ticketNumber' | 'userId'>, userId: string) => addServiceRequest(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}`, status: 'submitted' }, userId);
-export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'userId'>, userId: string) => addServiceRequest(db, 'health-requests', {...data, status: 'submitted'}, userId);
-export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'userId'>, userId: string) => addServiceRequest(db, 'education-requests', {...data, status: 'submitted'}, userId);
-export const addRealEstateRequest = (db: any, data: Omit<RealEstateRequest, 'id' | 'submittedAt' | 'userId'>, userId: string) => addServiceRequest(db, 'real-estate-requests', {...data, status: 'submitted'}, userId);
-export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id' | 'submittedAt' | 'userId'>, userId: string) => addServiceRequest(db, 'invitation-requests', {...data, status: 'submitted'}, userId);
+export const addAppointment = (db: any, data: Omit<Appointment, 'id' | 'submittedAt' | 'userId' | 'status'>, userId: string) => addServiceRequest(db, 'appointments', {...data, status: 'pending'}, userId);
+export const addGrievance = (db: any, data: Omit<Grievance, 'id' | 'submittedAt' | 'ticketNumber' | 'userId' | 'status'>, userId: string) => addServiceRequest(db, 'grievances', { ...data, ticketNumber: `GRV-${Date.now()}`, status: 'submitted' }, userId);
+export const addHealthRequest = (db: any, data: Omit<HealthRequest, 'id' | 'submittedAt' | 'userId' | 'status'>, userId: string) => addServiceRequest(db, 'health-requests', {...data, status: 'submitted'}, userId);
+export const addEducationRequest = (db: any, data: Omit<EducationRequest, 'id' | 'submittedAt' | 'userId' | 'status'>, userId: string) => addServiceRequest(db, 'education-requests', {...data, status: 'submitted'}, userId);
+export const addRealEstateRequest = (db: any, data: Omit<RealEstateRequest, 'id' | 'submittedAt' | 'userId' | 'status'>, userId: string) => addServiceRequest(db, 'real-estate-requests', {...data, status: 'submitted'}, userId);
+export const addInvitationRequest = (db: any, data: Omit<InvitationRequest, 'id' | 'submittedAt' | 'userId' | 'status'>, userId: string) => addServiceRequest(db, 'invitation-requests', {...data, status: 'submitted'}, userId);
 
 
 const getCollectionData = async (db: any, collectionName: string) => {
