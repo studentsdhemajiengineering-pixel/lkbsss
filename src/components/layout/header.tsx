@@ -185,7 +185,7 @@ export default function Header() {
                     </Button>
                 </div>
               ) : (
-                <div className="hidden">
+                <div className="flex items-center space-x-2">
                   <Button asChild variant="default" className="bg-blue-700 hover:bg-blue-600 text-white text-sm">
                     <Link href="/login">
                       Login
@@ -208,7 +208,7 @@ export default function Header() {
                         </Link>
                     </Button>
                 ) : (
-                    <div className="hidden">
+                    <div>
                       <Button asChild size="sm" variant="default" className="bg-blue-700 hover:bg-blue-600 text-white">
                           <Link href="/login">
                               Login
