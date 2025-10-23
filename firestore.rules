@@ -1,110 +1,103 @@
 /**
- * @fileoverview Firestore Security Rules for Digital Connect application.
- *
- * Core Philosophy:
- * This ruleset enforces a strict user-ownership model, ensuring that users can only
- * access data under their own UID.  It prioritizes security and data isolation.
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a strict user-ownership model for the Digital Connect application.
  *
  * Data Structure:
  * - /users/{userId}: Stores user profile data, with the document ID matching the user's UID.
- * - /users/{userId}/serviceRequests/{serviceRequestId}: Stores service requests created by users,
- *   nested under the user's document to enforce ownership.
+ * - /users/{userId}/serviceRequests/{serviceRequestId}: Stores service requests made by a specific user.
  *
  * Key Security Decisions:
- * - User listing is implicitly disallowed via the rules structure. Only individual user documents can be accessed via their UID.
- * - Ambiguous scenarios default to the most secure interpretation: strict owner-only access.
- * - Rules are designed to be future-proof, minimizing the need for modifications as the application evolves.
- *
- * Denormalization for Authorization:
- * Ownership is implicit in the path for service requests under /users/{userId},
- * eliminating the need for denormalized ownership fields or complex `get()` calls.
- *
- * Structural Segregation:
- * The structure inherently segregates user data, with service requests stored under
- * the respective user's document, reinforcing the ownership model.
+ * - Users can only manage their own profile data and service requests.
+ * - Listing all users is explicitly disallowed.
+ * - Subcollections inherit the ownership constraint from their parent user document.
+ * - Data consistency between document IDs and path parameters is enforced on create and update.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secure user profiles. Only the user can read/write their own profile.
+     * @description Controls access to user profile documents. Users can only manage their own profiles.
      * @path /users/{userId}
-     * @allow (create) User with ID 'user123' can create their own profile.
-     * @allow (get) User with ID 'user123' can read their own profile.
-     * @allow (update) User with ID 'user123' can update their own profile.
-     * @allow (delete) User with ID 'user123' can delete their own profile.
-     * @deny (create) User with ID 'user456' cannot create a profile for 'user123'.
-     * @deny (get) User with ID 'user456' cannot read the profile of 'user123'.
-     * @deny (update) User with ID 'user456' cannot update the profile of 'user123'.
-     * @deny (delete) User with ID 'user456' cannot delete the profile of 'user123'.
-     * @principle Enforces document ownership for all operations on user profiles.
+     * @allow (create) - Authenticated user creates their own profile with a matching userId.
+     *   - request.auth.uid: "user123"
+     *   - request.resource.data: { id: "user123", firstName: "John", ... }
+     * @allow (get, update, delete) - Authenticated user accesses their own profile.
+     *   - request.auth.uid: "user123"
+     *   - resource.data: { id: "user123", firstName: "John", ... }
+     * @deny (create) - Authenticated user attempts to create a profile with a mismatched userId.
+     *   - request.auth.uid: "user123"
+     *   - request.resource.data: { id: "user456", firstName: "Jane", ... }
+     * @deny (list) - Listing all users is disallowed.
+     * @principle Enforces document ownership for writes and restricts listing of user profiles. Validates that the `id` field matches the `userId` path parameter.
      */
     match /users/{userId} {
-      function isOwner(userId) {
-        return request.auth.uid == userId;
+      function isSignedIn() {
+        return request.auth != null;
       }
-      function isExistingOwner(userId) {
-          return isOwner(userId) && resource.data != null;
-      }
-      allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if request.auth.uid == userId;
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
 
-    /**
-     * @description Secure service requests under user profiles. Only the user can read/write their own requests.
-     * @path /users/{userId}/serviceRequests/{serviceRequestId}
-     * @allow (create) User with ID 'user123' can create a service request under their profile.
-     * @allow (get) User with ID 'user123' can read a service request under their profile.
-     * @allow (update) User with ID 'user123' can update a service request under their profile.
-     * @allow (delete) User with ID 'user123' can delete a service request under their profile.
-     * @deny (create) User with ID 'user456' cannot create a service request under 'user123''s profile.
-     * @deny (get) User with ID 'user456' cannot read a service request under 'user123''s profile.
-     * @deny (update) User with ID 'user456' cannot update a service request under 'user123''s profile.
-     * @deny (delete) User with ID 'user456' cannot delete a service request under 'user123''s profile.
-     * @principle Enforces document ownership for all operations on service requests.
-     */
-    match /users/{userId}/serviceRequests/{serviceRequestId} {
       function isOwner(userId) {
-        return request.auth.uid == userId;
+        return isSignedIn() && request.auth.uid == userId;
       }
-     function isExistingOwner(userId) {
-          return isOwner(userId) && resource.data != null;
-      }
-      allow get: if isOwner(userId);
+
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow get, update, delete: if isOwner(userId) && resource.data.id == userId;
       allow list: if false;
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Controls access to service request documents within a user's subcollection. Only the owner can manage their service requests.
+       * @path /users/{userId}/serviceRequests/{serviceRequestId}
+       * @allow (create) - Authenticated user creates a service request under their userId.
+       *   - request.auth.uid: "user123"
+       *   - request.resource.data: { userId: "user123", requestDate: "...", ... }
+       * @allow (get, list, update, delete) - Authenticated user accesses their own service requests.
+       *   - request.auth.uid: "user123"
+       *   - resource.data: { userId: "user123", requestDate: "...", ... }
+       * @deny (create) - Authenticated user attempts to create a service request for another user.
+       *   - request.auth.uid: "user123"
+       *   - request.resource.data: { userId: "user456", requestDate: "...", ... }
+       * @principle Enforces document ownership and ensures that the 'userId' field, if present, matches the path parameter.
+       */
+      match /serviceRequests/{serviceRequestId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow update, delete: if isOwner(userId) && resource != null && (!('userId' in resource.data) || resource.data.userId == userId);
+      }
+
+      /**
+       * @description Controls access to any subcollection (1st level) within a user's document. Access is restricted to the owner.
+       * @path /users/{userId}/{subcollection}/{docId}
+       * @allow (get, list) - Authenticated user reads data in their subcollection.
+       *   - request.auth.uid: "user123"
+       * @allow (create) - Authenticated user creates a document in their subcollection, ensuring userId matches.
+       *   - request.auth.uid: "user123"
+       *   - request.resource.data: { userId: "user123", ... }
+       * @allow (update, delete) - Authenticated user updates or deletes a document in their subcollection.
+       *   - request.auth.uid: "user123"
+       *   - resource.data: { userId: "user123", ... }
+       * @deny (create) - Authenticated user tries to create a document with a mismatched userId.
+       *   - request.auth.uid: "user123"
+       *   - request.resource.data: { userId: "user456", ... }
+       * @principle Enforces ownership and restricts data access within subcollections to the owner.
+       */
+      match /{subcollection}/{docId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow update, delete: if isOwner(userId) && resource != null && (!('userId' in resource.data) || resource.data.userId == userId);
+      }
+
+      /**
+       * @description Controls access to any nested subcollection within a user's document. Access is restricted to the owner.
+       * @path /users/{userId}/{subcollection}/{docId}/{nestedCollection}/{nestedDocId}
+       * @allow (get, list, create, update, delete) - Authenticated user manages data in their nested subcollection.
+       *   - request.auth.uid: "user123"
+       * @principle Enforces ownership for nested subcollections.
+       */
+      match /{subcollection}/{docId}/{nestedCollection}/{nestedDocId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update, delete: if isOwner(userId) && resource != null;
+      }
     }
-        /**
-         * @description Secure all subcollections under /users/{userId}.
-         * @path /users/{userId}/{documents=**}
-         * @allow (create) User with ID 'user123' can create documents in any subcollection under their profile.
-         * @allow (get) User with ID 'user123' can read documents in any subcollection under their profile.
-         * @allow (update) User with ID 'user123' can update documents in any subcollection under their profile.
-         * @allow (delete) User with ID 'user123' can delete documents in any subcollection under their profile.
-         * @deny (create) User with ID 'user456' cannot create documents in subcollections under 'user123''s profile.
-         * @deny (get) User with ID 'user456' cannot read documents in subcollections under 'user123''s profile.
-         * @deny (update) User with ID 'user456' cannot update documents in subcollections under 'user123''s profile.
-         * @deny (delete) User with ID 'user456' cannot delete documents in subcollections under 'user123''s profile.
-         * @principle Enforces strict ownership for all subcollections under user profiles.
-         */
-         match /users/{userId}/{documents=**} {
-          function isOwner(userId) {
-            return request.auth.uid == userId;
-          }
-          function isExistingOwner(userId) {
-              return isOwner(userId) && resource.data != null;
-          }
-          allow get: if isOwner(userId);
-          allow list: if false;
-          allow create: if request.auth.uid == userId;
-          allow update: if isExistingOwner(userId);
-          allow delete: if isExistingOwner(userId);
-        }
   }
 }
