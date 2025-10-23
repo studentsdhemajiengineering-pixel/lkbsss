@@ -1,78 +1,88 @@
 /**
- * @fileoverview Firestore Security Rules for Digital Connect application.
+ * @file Firestore Security Rules for Digital Connect application.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model, ensuring that users can only access their own data.
+ * This ruleset enforces a strict user-ownership model. Each user has full access to their own profile and associated service requests.
  *
  * Data Structure:
- * - User profiles are stored under `/users/{userId}`.
- * - Service requests are stored in a subcollection `/users/{userId}/serviceRequests/{serviceRequestId}`.
+ * - User profiles are stored in `/users/{userId}`, where `{userId}` is the Firebase Authentication UID.
+ * - Service requests are stored in `/users/{userId}/serviceRequests/{serviceRequestId}`, creating a user-owned subcollection.
  *
  * Key Security Decisions:
  * - Users can only read and write their own profile data.
- * - Users can only read and write their own service requests.
- * - No public data access is allowed.
+ * - Users can only read, create, update, and delete service requests associated with their profile.
+ * - Listing all users is disallowed to prevent data leakage.
  *
  * Denormalization for Authorization:
- * The Firestore structure itself denormalizes the authorization data by nesting service requests under the user's document.
- * This avoids the need for additional reads to determine ownership.
- *
- * Structural Segregation:
- * All user-specific data is stored under the `/users/{userId}` path, ensuring clear separation and easy enforcement of ownership-based rules.
+ * - The data structure itself enforces ownership, so explicit denormalization is not needed.  The `userId` is embedded in the path.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profile data.
-     * @path /users/{userId}
-     * @allow (create) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can create their own profile.
-     * @allow (get) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can read their own profile.
-     * @allow (update) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can update their own profile.
-     * @allow (delete) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can delete their own profile.
-     * @deny (create) User 'anotherUserId' cannot create a profile with userId 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3'.
-     * @deny (get) User 'anotherUserId' cannot read user 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' profile.
-     * @principle Enforces document ownership for all operations.
+     * @description Defines a function to check if the current user is signed in.
      */
-    match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Controls access to service requests made by a user.
-     * @path /users/{userId}/serviceRequests/{serviceRequestId}
-     * @allow (create) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can create a service request under their profile.
-     * @allow (get) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can read their own service request.
-     * @allow (update) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can update their own service request.
-     * @allow (delete) User 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' can delete their own service request.
-     * @deny (create) User 'anotherUserId' cannot create a service request under user 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' profile.
-     * @deny (get) User 'anotherUserId' cannot read user 'mEHiKNI7SVOfHaaFltYdCrCPAgJ3' service requests.
-     * @principle Enforces document ownership for all operations on service requests.
-     */
-    match /users/{userId}/serviceRequests/{serviceRequestId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isExistingOwner(userId) && resource.data.userId == userId;
-      allow delete: if isExistingOwner(userId);
-    }
-
-    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
 
+    /**
+     * @description Defines a function to check if the request is made by the owner of the document.
+     * @param {string} userId - The user ID to compare against the request's authentication UID.
+     */
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return request.auth.uid == userId;
     }
 
+    /**
+     * @description Defines a function to check if the request is made by the existing owner of the document.
+     * @param {string} userId - The user ID to compare against the resource data.
+     */
     function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
+      return request.auth.uid == resource.data.id;
+    }
+
+    /**
+     * @description Security rules for user profiles.
+     * @path /users/{userId}
+     * @allow (create) - A user with UID 'user123' can create their own profile at /users/user123 if request.auth.uid == 'user123'.
+     * @allow (get) - A user with UID 'user123' can get their own profile at /users/user123 if request.auth.uid == 'user123'.
+     * @allow (update) - A user with UID 'user123' can update their own profile at /users/user123 if request.auth.uid == 'user123'.
+     * @allow (delete) - A user with UID 'user123' can delete their own profile at /users/user123 if request.auth.uid == 'user123'.
+     * @deny (create) - A user with UID 'user456' cannot create a profile at /users/user123.
+     * @deny (get) - A user with UID 'user456' cannot get the profile at /users/user123.
+     * @deny (update) - A user with UID 'user456' cannot update the profile at /users/user123.
+     * @deny (delete) - A user with UID 'user456' cannot delete the profile at /users/user123.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId);
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+
+    /**
+     * @description Security rules for service requests under a user's profile.
+     * @path /users/{userId}/serviceRequests/{serviceRequestId}
+     * @allow (create) - A user with UID 'user123' can create a service request under /users/user123/serviceRequests/req1 if request.auth.uid == 'user123'.
+     * @allow (get) - A user with UID 'user123' can get their service request at /users/user123/serviceRequests/req1 if request.auth.uid == 'user123'.
+     * @allow (update) - A user with UID 'user123' can update their service request at /users/user123/serviceRequests/req1 if request.auth.uid == 'user123'.
+     * @allow (delete) - A user with UID 'user123' can delete their service request at /users/user123/serviceRequests/req1 if request.auth.uid == 'user123'.
+     * @deny (create) - A user with UID 'user456' cannot create a service request under /users/user123/serviceRequests/req1.
+     * @deny (get) - A user with UID 'user456' cannot get the service request at /users/user123/serviceRequests/req1.
+     * @deny (update) - A user with UID 'user456' cannot update the service request at /users/user123/serviceRequests/req1.
+     * @deny (delete) - A user with UID 'user456' cannot delete the service request at /users/user123/serviceRequests/req1.
+     * @principle Enforces document ownership for all operations within the user's service requests.
+     */
+    match /users/{userId}/serviceRequests/{serviceRequestId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId);
+      allow delete: if isSignedIn() && isOwner(userId);
     }
   }
 }
