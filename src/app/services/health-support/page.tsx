@@ -79,10 +79,9 @@ export default function HealthSupportPage() {
 
         const payload: any = { 
             ...values,
+            documentUrl,
         };
-        if (documentUrl) {
-            payload.documentUrl = documentUrl;
-        }
+
         delete payload.document;
 
         await addHealthRequest(firestore, payload, user.uid);
@@ -363,5 +362,3 @@ export default function HealthSupportPage() {
     </div>
   );
 }
-
-    

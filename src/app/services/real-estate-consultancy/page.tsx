@@ -84,10 +84,9 @@ export default function RealEstateConsultancyPage() {
 
         const payload: any = { 
             ...values,
+            documentUrl,
         };
-        if (documentUrl) {
-            payload.documentUrl = documentUrl;
-        }
+
         delete payload.document;
 
         await addRealEstateRequest(firestore, payload, user.uid);
@@ -426,5 +425,3 @@ export default function RealEstateConsultancyPage() {
     </div>
   );
 }
-
-    

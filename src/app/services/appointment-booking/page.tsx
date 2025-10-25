@@ -94,12 +94,10 @@ export default function AppointmentBookingPage() {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
             appointmentDate: values.appointmentDate.toISOString(),
+            documentUrl,
         };
-        if (documentUrl) {
-            payload.documentUrl = documentUrl;
-        }
+        
         delete payload.document;
-
 
         await addAppointment(firestore, payload, user.uid);
         
@@ -399,5 +397,3 @@ export default function AppointmentBookingPage() {
     </div>
   );
 }
-
-    

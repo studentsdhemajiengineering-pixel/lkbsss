@@ -78,10 +78,9 @@ export default function PublicGrievancePage() {
         
         const payload: any = { 
             ...values,
+            documentUrl,
         };
-        if (documentUrl) {
-            payload.documentUrl = documentUrl;
-        }
+        
         delete payload.document;
 
         await addGrievance(firestore, payload, user.uid);
@@ -345,5 +344,3 @@ export default function PublicGrievancePage() {
     </div>
   );
 }
-
-    

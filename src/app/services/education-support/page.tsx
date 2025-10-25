@@ -86,10 +86,9 @@ export default function EducationSupportPage() {
         const payload: any = {
             ...values,
             dateOfBirth: values.dateOfBirth.toISOString(),
+            documentUrl,
         };
-        if (documentUrl) {
-            payload.documentUrl = documentUrl;
-        }
+        
         delete payload.document;
 
         await addEducationRequest(firestore, payload, user.uid);
@@ -411,5 +410,3 @@ export default function EducationSupportPage() {
     </div>
   );
 }
-
-    

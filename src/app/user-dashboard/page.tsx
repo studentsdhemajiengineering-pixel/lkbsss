@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { getStatusColor } from '@/lib/status-helpers';
-import { Home, User, BarChart2, Loader2, LogOut, CheckCircle } from 'lucide-react';
+import { Home, User, BarChart2, Loader2, LogOut, CheckCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
+import Link from 'next/link';
 import type { Appointment, Grievance, HealthRequest, EducationRequest, RealEstateRequest, InvitationRequest } from '@/lib/types';
 
 type ServiceRequest = {
@@ -20,6 +22,7 @@ type ServiceRequest = {
   submittedAt: string;
   details: string;
   reference: string;
+  documentUrl?: string;
 };
 
 export default function UserDashboardPage() {
@@ -67,7 +70,8 @@ export default function UserDashboardPage() {
                 status: req.status,
                 submittedAt: req.submittedAt,
                 details: req[collectionInfo.detailKey as keyof typeof req] || 'N/A',
-                reference: (collectionInfo.refKey ? req[collectionInfo.refKey as keyof typeof req] : req.id.slice(0, 8)) || 'N/A'
+                reference: (collectionInfo.refKey ? req[collectionInfo.refKey as keyof typeof req] : req.id.slice(0, 8)) || 'N/A',
+                documentUrl: req.documentUrl
               });
             });
           });
@@ -176,6 +180,7 @@ export default function UserDashboardPage() {
                             <TableHead>Details</TableHead>
                             <TableHead>Submitted On</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Attachment</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -190,10 +195,21 @@ export default function UserDashboardPage() {
                                         {req.status.replace(/_/g, ' ')}
                                     </Badge>
                                 </TableCell>
+                                <TableCell>
+                                    {req.documentUrl ? (
+                                        <Button asChild variant="link" className="p-0 h-auto">
+                                            <Link href={req.documentUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                                                View Attachment <ExternalLink className="ml-2 h-3 w-3" />
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <span className="text-muted-foreground text-xs">None</span>
+                                    )}
+                                </TableCell>
                             </TableRow>
                         )) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center h-24">You have not submitted any service requests yet.</TableCell>
+                                <TableCell colSpan={6} className="text-center h-24">You have not submitted any service requests yet.</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

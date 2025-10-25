@@ -103,10 +103,9 @@ export default function InvitationRequestPage() {
         const payload: any = {
             ...values,
             eventDate: values.eventDate.toISOString(),
+            documentUrl,
         };
-        if (documentUrl) {
-            payload.documentUrl = documentUrl;
-        }
+        
         delete payload.document;
 
         await addInvitationRequest(firestore, payload, user.uid);
@@ -483,5 +482,3 @@ export default function InvitationRequestPage() {
     </div>
   );
 }
-
-    
